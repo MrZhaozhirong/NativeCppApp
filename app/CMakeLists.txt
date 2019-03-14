@@ -6,19 +6,32 @@ cmake_minimum_required(VERSION 3.4.1)
 # 设置生成的so动态库最后输出的路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
 
+# 为log_common.h 指定平台
+IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
+    ADD_DEFINITIONS(-DWindows)
+ELSE (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
+    ADD_DEFINITIONS(-DLinux)
+ENDIF ()
 
+find_library( # Sets the name of the path variable.
+              log-lib
+              # Specifies the name of the NDK library that you want CMake to locate.
+              log )
+
+
+
+
+
+
+
+
+# AS CMake sample
 add_library( # Sets the name of the library.
              native-lib
              # Sets the library as a shared library.
              SHARED
              # Provides a relative path to your source file(s).
              src/main/cpp/native-lib.cpp )
-
-find_library( # Sets the name of the path variable.
-              log-lib
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
 
 target_link_libraries( # Specifies the target library.
                        native-lib
