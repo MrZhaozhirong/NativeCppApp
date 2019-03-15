@@ -19,21 +19,23 @@ public class NativeGLActivity extends AppCompatActivity {
         setContentView(R.layout.activity_native_gl);
         SurfaceView surfaceview = findViewById(R.id.easy_surface_view);
         surfaceview.getHolder().setFormat(PixelFormat.RGBA_8888);
+        final NativeEGL nativeEGL = new NativeEGL();
+
         surfaceview.getHolder().addCallback(new SurfaceHolder.Callback() {
 
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-
+                nativeEGL.onSurfaceCreate(holder.getSurface());
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+                nativeEGL.onSurfaceChange(width, height);
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-
+                nativeEGL.onSurfaceDestroy();
             }
         });
     }

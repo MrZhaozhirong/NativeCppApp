@@ -15,6 +15,12 @@
 // 参考android-26/android/opengl/EGLxt.java中的定义
 #define EGL_OPENGL_ES3_BIT_KHR 0x0040
 #define EGL_RECORDABLE_ANDROID 0x3142
+// 参考android-26/android/opengl/EGLxt.java中的定义
+// egl.h没有 eglPresentationTimeANDROID 的接口，
+// 所以只能自己定义函数指针，并通过eglGetProcAddress动态获取其函数地址了
+// 使用前记得判断是否为空
+typedef EGLBoolean (* EGL_PRESENTATION_TIME_ANDROID_PROC)(EGLDisplay display, EGLSurface surface, khronos_stime_nanoseconds_t time);
+
 
 class EglCore {
 
@@ -57,7 +63,8 @@ public:
 
 
     static void logCurrentEglState();
-
+    // 动态 设置pts方法
+    EGL_PRESENTATION_TIME_ANDROID_PROC eglPresentationTimeANDROID = NULL;
 private:
     EGLConfig getConfig(int flags, int version);
     void checkEglError(const char *msg);

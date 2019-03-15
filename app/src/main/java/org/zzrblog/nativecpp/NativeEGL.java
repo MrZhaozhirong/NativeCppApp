@@ -15,7 +15,7 @@ public class NativeEGL {
 
     public native void onSurfaceChange(int width, int height);
 
-    public native void onSurfaceDestory();
+    public native void onSurfaceDestroy();
 
 
 
