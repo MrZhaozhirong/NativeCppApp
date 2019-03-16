@@ -16,8 +16,9 @@ Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceCreate(JNIEnv *env, jobject instan
     ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
     glThread = new GLThread();
     testRender = new NativeGLRender();
-    glThread->onSurfaceCreate(nativeWindow);
     glThread->setGLRender(testRender);
+    glThread->onSurfaceCreate(nativeWindow);
+
 }
 
 

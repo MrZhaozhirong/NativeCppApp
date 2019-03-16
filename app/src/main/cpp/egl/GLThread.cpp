@@ -58,7 +58,7 @@ void *glThreadImpl(void *context)
         //onDraw
         if(glThread->isStart)
         {
-            LOGI("GLThread onDraw.");
+            //LOGI("GLThread onDraw.");
             glThread->mRender->renderOnDraw();
         }
     }

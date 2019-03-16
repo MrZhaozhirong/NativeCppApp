@@ -4,7 +4,7 @@
 # Sets the minimum version of CMake required to build the native library.
 cmake_minimum_required(VERSION 3.4.1)
 # 设置生成的so动态库最后输出的路径
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
 
 # 为log_common.h 指定平台
 IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
@@ -14,27 +14,39 @@ ELSE (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
 ENDIF ()
 
 find_library( # Sets the name of the path variable.
-              log-lib
-              # Specifies the name of the NDK library that you want CMake to locate.
-              log )
-
-
-
-
-
-
-
-
+        log-lib
+        # Specifies the name of the NDK library that you want CMake to locate.
+        log)
 # AS CMake sample
 add_library( # Sets the name of the library.
-             native-lib
-             # Sets the library as a shared library.
-             SHARED
-             # Provides a relative path to your source file(s).
-             src/main/cpp/native-lib.cpp )
+        native-lib
+        # Sets the library as a shared library.
+        SHARED
+        # Provides a relative path to your source file(s).
+        src/main/cpp/native-lib.cpp)
 
 target_link_libraries( # Specifies the target library.
-                       native-lib
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+        native-lib
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib})
+
+
+add_library(
+        native-egl
+        SHARED
+        src/main/cpp/common/zzr_common.c
+        src/main/cpp/egl/EglCore.cpp
+        src/main/cpp/egl/EglSurfaceBase.cpp
+        src/main/cpp/egl/WindowSurface.cpp
+        src/main/cpp/egl/GLThread.cpp
+        src/main/cpp/nativegl/NativeGLRender.cpp
+        src/main/cpp/nativegl/native_egl_jni.cpp
+        )
+target_link_libraries(
+        native-egl
+        EGL
+        GLESv2
+        android
+        ${log-lib})
+

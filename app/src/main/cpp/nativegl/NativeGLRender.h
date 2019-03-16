@@ -8,11 +8,14 @@
 
 #include "../egl/GLRender.hpp"
 #include "../common/constructormagic.h"
+#include "../egl/EglCore.h"
+#include "../egl/WindowSurface.h"
 
 class NativeGLRender : public GLRender{
 
 public:
     NativeGLRender();
+    ~NativeGLRender();
 
     void surfaceCreated(ANativeWindow *window) override;
     void surfaceChanged(int width, int height) override;
@@ -20,6 +23,9 @@ public:
     void surfaceDestroyed(void) override;
 
 private:
+    int r_count;
+    EglCore* mEglCore;
+    WindowSurface *mWindowSurface;
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 };
 

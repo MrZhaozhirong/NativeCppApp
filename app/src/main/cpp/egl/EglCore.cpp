@@ -21,6 +21,9 @@ void EglCore::logCurrentEglState()
 
 
 EglCore::EglCore() {
+    mEglDisplay = EGL_NO_DISPLAY;
+    mEglContext = EGL_NO_CONTEXT;
+    mEglConfig = NULL;
     initEgl(NULL, 0);
 }
 
@@ -33,6 +36,9 @@ EglCore::~EglCore() {
 }
 
 EglCore::EglCore(EGLContext sharedContext, int flags) {
+    mEglDisplay = EGL_NO_DISPLAY;
+    mEglContext = EGL_NO_CONTEXT;
+    mEglConfig = NULL;
     initEgl(sharedContext, flags);
 }
 
