@@ -121,7 +121,7 @@ namespace CELL
             float fy = centerY - eyeY;
             float fz = centerZ - eyeZ;
             // Normalize f
-            float rlf = 1.0f / Matrix.length(fx, fy, fz);
+            float rlf = 1.0f / length(fx, fy, fz);
             fx *= rlf;
             fy *= rlf;
             fz *= rlf;
@@ -130,7 +130,7 @@ namespace CELL
             float sy = fz * upX - fx * upZ;
             float sz = fx * upY - fy * upX;
             // and normalize s
-            float rls = 1.0f / Matrix.length(sx, sy, sz);
+            float rls = 1.0f / length(sx, sy, sz);
             sx *= rls;
             sy *= rls;
             sz *= rls;
@@ -159,8 +159,13 @@ namespace CELL
             translateM(rm, rmOffset, -eyeX, -eyeY, -eyeZ);
         }
 
-        // Translates matrix m by x, y, and z in place.
         static inline
+        float length(float x, float y, float z) {
+            return (float) sqrt(x * x + y * y + z * z);
+        }
+
+        // Translates matrix m by x, y, and z in place.
+        static
         void translateM(float* m, int mOffset, float x, float y, float z)
         {
             for (int i=0 ; i<4 ; i++) {
