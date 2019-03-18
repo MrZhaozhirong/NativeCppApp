@@ -34,11 +34,17 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     mWindowSurface = new WindowSurface(mEglCore, window, true);
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
+
+    cube = new CubeIndex();
+    cubeShaderProgram = new CubeShaderProgram();
 }
 void NativeGLRender::surfaceChanged(int width, int height)
 {
     mWindowSurface->makeCurrent();
     LOGD("render surface change ... update MVP!");
+    glViewport(0,0, width, height);
+    glEnable(GL_DEPTH_TEST);
+
     mWindowSurface->swapBuffers();
 }
 void NativeGLRender::renderOnDraw()

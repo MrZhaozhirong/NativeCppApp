@@ -10,6 +10,7 @@
 #include "../common/constructormagic.h"
 #include "../egl/EglCore.h"
 #include "../egl/WindowSurface.h"
+#include "../objects/CubeIndex.h"
 
 class NativeGLRender : public GLRender{
 
@@ -24,8 +25,13 @@ public:
 
 private:
     int r_count;
-    EglCore* mEglCore;
-    WindowSurface *mWindowSurface;
+
+    EglCore * mEglCore;
+    WindowSurface * mWindowSurface;
+
+    CubeIndex * cube;
+    CubeShaderProgram * cubeShaderProgram;
+
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 };
 
