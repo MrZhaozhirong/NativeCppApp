@@ -10,9 +10,9 @@
 
 class CubeIndex {
 public:
-    static const int POSITION_COMPONENT_COUNT ;
-    static const int COLOR_COMPONENT_COUNT ;
-    static const int STRIDE ;
+    static const int POSITION_COMPONENT_COUNT = 3;
+    static const int COLOR_COMPONENT_COUNT = 3;
+    static const int STRIDE = 3+3;
 public:
     CubeIndex();
     ~CubeIndex();
@@ -20,8 +20,8 @@ public:
     void draw();
     void bindData(CubeShaderProgram * shaderProgram);
 private:
-    char * CUBE_VERTEX_DATA;
-    char * CUBE_INDEX;
+    short * CUBE_VERTEX_DATA;
+    short * CUBE_INDEX;
 };
 
 

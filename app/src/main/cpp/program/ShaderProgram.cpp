@@ -21,6 +21,7 @@ ShaderProgram::~ShaderProgram() {
 }
 
 void ShaderProgram::userProgram() {
+    //glUseProgram(programId);
     if(programId!=0){
         glUseProgram(programId);
     } else {

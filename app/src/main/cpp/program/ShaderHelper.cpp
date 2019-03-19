@@ -22,7 +22,7 @@ bool checkGlError(const char* funcName) {
 GLuint compileShader(GLenum type, const char * shaderCode) {
     GLuint shaderObjectId = glCreateShader(type);
     if (shaderObjectId == 0){
-        LOGW(" Warning! Could not create new shader, glGetError:"+glGetError());
+        LOGW(" Warning! Could not create new shader, glGetError:%d", glGetError());
         return 0;
     }
     glShaderSource(shaderObjectId,  1, &shaderCode, NULL);
@@ -60,7 +60,7 @@ GLuint ShaderHelper::compileFragmentShader(const char *shaderCode) {
 
 GLuint ShaderHelper::buildProgram(const char *vertexShaderSource, const char *fragmentShaderSource) {
 
-    GLuint programObjectId = 0;
+    GLuint programObjectId ;
     GLuint vertexShader = compileVertexShader(vertexShaderSource);
     GLuint fragmentShader = compileFragmentShader(fragmentShaderSource);
 
@@ -82,7 +82,7 @@ GLuint ShaderHelper::linkProgram(GLuint vertexShaderId, GLuint fragmentShaderId)
     glAttachShader(programObjectId, vertexShaderId);
     glAttachShader(programObjectId, fragmentShaderId);
 
-    GLint linked = GL_FALSE;
+    GLint linked ;
     glLinkProgram(programObjectId);
     glGetProgramiv(programObjectId, GL_LINK_STATUS, &linked);
     if (!linked) {

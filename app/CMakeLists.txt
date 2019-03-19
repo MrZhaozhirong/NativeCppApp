@@ -3,8 +3,12 @@
 
 # Sets the minimum version of CMake required to build the native library.
 cmake_minimum_required(VERSION 3.4.1)
-# 设置生成的so动态库最后输出的路径
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
+# 将当前 "./src/main/cpp" 目录下的所有源文件保存到 "NATIVE_SRC" 中，然后在 add_library 方法调用。
+aux_source_directory(./src/main/cpp/common   COMMON_SRC )
+aux_source_directory(./src/main/cpp/egl      EGL_SRC )
+aux_source_directory(./src/main/cpp/objects  OBJECTS_SRC )
+aux_source_directory(./src/main/cpp/program  PROGRAM_SRC )
+aux_source_directory(./src/main/cpp/nativegl NATIVE_GL_SRC )
 
 # 为log_common.h 指定平台
 IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
@@ -32,16 +36,17 @@ target_link_libraries( # Specifies the target library.
         ${log-lib})
 
 
+
+
+
 add_library(
         native-egl
         SHARED
-        src/main/cpp/common/zzr_common.c
-        src/main/cpp/egl/EglCore.cpp
-        src/main/cpp/egl/EglSurfaceBase.cpp
-        src/main/cpp/egl/WindowSurface.cpp
-        src/main/cpp/egl/GLThread.cpp
-        src/main/cpp/nativegl/NativeGLRender.cpp
-        src/main/cpp/nativegl/native_egl_jni.cpp
+        ${COMMON_SRC}
+        ${EGL_SRC}
+        ${OBJECTS_SRC}
+        ${PROGRAM_SRC}
+        ${NATIVE_GL_SRC}
         )
 target_link_libraries(
         native-egl

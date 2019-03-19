@@ -11,8 +11,8 @@
 
 class CubeShaderProgram : public ShaderProgram{
 public:
-    static const char * vertexShaderResourceStr;
-    static const char * fragmentShaderResourceStr;
+    //static char * vertexShaderResourceStr ;
+    //static char * fragmentShaderResourceStr ;
 
     CubeShaderProgram();
     ~CubeShaderProgram();
