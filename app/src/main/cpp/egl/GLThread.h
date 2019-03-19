@@ -19,7 +19,7 @@ public:
     bool isChange;
     bool isStart;
 
-    ANativeWindow* window = NULL;
+    ANativeWindow* window;
     int width;
     int height;
     GLRender * mRender;

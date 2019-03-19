@@ -11,7 +11,7 @@ android {
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-frtti -fexceptions"
+                cppFlags "-frtti -fexceptions -Wc++11-extensions"
                 abiFilters 'armeabi-v7a'
             }
         }

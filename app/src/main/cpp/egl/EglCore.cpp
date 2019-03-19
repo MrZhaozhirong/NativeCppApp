@@ -24,13 +24,15 @@ EglCore::EglCore() {
     mEglDisplay = EGL_NO_DISPLAY;
     mEglContext = EGL_NO_CONTEXT;
     mEglConfig = NULL;
+    eglPresentationTimeANDROID = NULL;
+    mEglVersion = -1;
     initEgl(NULL, 0);
 }
 
 EglCore::~EglCore() {
     if (mEglDisplay != EGL_NO_DISPLAY) {
         // 类析构函数 检测回收资源
-        LOGW(TAG, "WARNING: EglCore was not explicitly released -- state may be leaked");
+        LOGW("WARNING: EglCore was not explicitly released -- state may be leaked");
         release();
     }
 }
@@ -216,7 +218,7 @@ void EglCore::makeCurrent(EGLSurface eglSurface) {
 //Makes our EGL context current, using the supplied "draw" and "read" surfaces.
 void EglCore::makeCurrent(EGLSurface drawSurface, EGLSurface readSurface) {
     if (mEglDisplay == EGL_NO_DISPLAY) {
-        LOGD(TAG, "NOTE: makeCurrent w/o display");
+        LOGD("NOTE: makeCurrent w/o display");
     }
     if (!eglMakeCurrent(mEglDisplay, drawSurface, readSurface, mEglContext)) {
         //TODO throw new RuntimeException("eglMakeCurrent(draw,read) failed");

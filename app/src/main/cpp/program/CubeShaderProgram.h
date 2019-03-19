@@ -9,7 +9,7 @@
 #include "ShaderProgram.h"
 #include "../common/constructormagic.h"
 
-class CubeShaderProgram : ShaderProgram{
+class CubeShaderProgram : public ShaderProgram{
 public:
     static const char * vertexShaderResourceStr;
     static const char * fragmentShaderResourceStr;

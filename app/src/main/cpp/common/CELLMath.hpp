@@ -17,6 +17,7 @@ namespace CELL
     #define I(_i, _j) ((_j)+ 4*(_i))
     class Matrix
     {
+    public:
         /**
          * Multiplies two 4x4 matrices together and stores the result in a third 4x4 matrix.
          * In matrix notation: result = lhs x rhs.
@@ -99,10 +100,10 @@ namespace CELL
             float angleInRadians = (float) (yFovInDegrees * PI / 360.0);
             float a = (float) (1.0/ tan(angleInRadians));
             //矩阵都是先列后行
-            m[0] = a / aspect;  m[4] = 0f;  m[8] = 0f;              m[12] = 0f;
-            m[1] = 0f;          m[5] = a;   m[9] = 0f;              m[13] = 0f;
-            m[2] = 0f;          m[6] = 0f;  m[10] = -((f+n)/(f-n)); m[14] = -((2f*f*n)/(f-n));
-            m[3] = 0f;          m[7] = 0f;  m[11] = -1f;            m[15] = 0f;
+            m[0] = a / aspect;  m[4] = 0;   m[8] = 0;               m[12] = 0;
+            m[1] = 0;           m[5] = a;   m[9] = 0;               m[13] = 0;
+            m[2] = 0;           m[6] = 0;   m[10] = -((f+n)/(f-n)); m[14] = -((2*f*n)/(f-n));
+            m[3] = 0;           m[7] = 0;   m[11] = -1;             m[15] = 0;
         }
 
 

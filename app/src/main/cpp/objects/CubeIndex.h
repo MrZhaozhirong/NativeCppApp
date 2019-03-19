@@ -18,10 +18,10 @@ public:
     ~CubeIndex();
 
     void draw();
-    void bindData(CubeShaderProgram shaderProgram);
+    void bindData(CubeShaderProgram * shaderProgram);
 private:
-    char CUBE_VERTEX_DATA[];
-    char CUBE_INDEX[];
+    char * CUBE_VERTEX_DATA;
+    char * CUBE_INDEX;
 };
 
 

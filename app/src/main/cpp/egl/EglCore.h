@@ -28,7 +28,7 @@ public:
     EGLDisplay mEglDisplay;
     EGLContext mEglContext;
 
-    int mEglVersion = -1;
+    int mEglVersion;
     EGLConfig mEglConfig;
 
 public:
@@ -64,7 +64,7 @@ public:
 
     static void logCurrentEglState();
     // 动态 设置pts方法
-    EGL_PRESENTATION_TIME_ANDROID_PROC eglPresentationTimeANDROID = NULL;
+    EGL_PRESENTATION_TIME_ANDROID_PROC eglPresentationTimeANDROID;
 private:
     EGLConfig getConfig(int flags, int version);
     void checkEglError(const char *msg);

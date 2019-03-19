@@ -18,10 +18,9 @@ public:
                    const char * fragmentShaderResourceStr );
     virtual ~ShaderProgram();
 
+public:
     int getShaderProgramId();
-
     void userProgram();
-
     void deleteProgram();
 };
 

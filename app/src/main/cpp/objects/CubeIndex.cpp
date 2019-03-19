@@ -48,13 +48,13 @@ CubeIndex::~CubeIndex() {
     delete [] CUBE_INDEX;
 }
 
-void CubeIndex::bindData(CubeShaderProgram shaderProgram) {
-    glVertexAttribPointer(static_cast<GLuint>(shaderProgram.aPositionLocation),
+void CubeIndex::bindData(CubeShaderProgram* shaderProgram) {
+    glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aPositionLocation),
                           POSITION_COMPONENT_COUNT, GL_BYTE,
                           GL_FALSE, STRIDE,
                           CUBE_VERTEX_DATA);
 
-    glVertexAttribPointer(static_cast<GLuint>(shaderProgram.aColorLocation),
+    glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aColorLocation),
                           COLOR_COMPONENT_COUNT, GL_BYTE,
                           GL_FALSE, STRIDE,
                           &CUBE_VERTEX_DATA[POSITION_COMPONENT_COUNT]);

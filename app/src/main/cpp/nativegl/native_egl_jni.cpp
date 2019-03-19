@@ -8,7 +8,6 @@
 GLThread *glThread = NULL;
 NativeGLRender* testRender = NULL;
 
-
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceCreate(JNIEnv *env, jobject instance, jobject surface)
@@ -18,9 +17,7 @@ Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceCreate(JNIEnv *env, jobject instan
     testRender = new NativeGLRender();
     glThread->setGLRender(testRender);
     glThread->onSurfaceCreate(nativeWindow);
-
 }
-
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -30,7 +27,6 @@ Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceChange(JNIEnv *env, jobject instan
 
     glThread->onSurfaceChange(width, height);
 }
-
 
 extern "C"
 JNIEXPORT void JNICALL

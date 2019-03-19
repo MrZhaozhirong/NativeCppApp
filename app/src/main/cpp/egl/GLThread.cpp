@@ -12,6 +12,7 @@ GLThread::GLThread() {
     isCreate = false;
     isChange = false;
     isStart = false;
+    window = NULL;
 }
 
 GLThread::~GLThread() { }

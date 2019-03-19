@@ -18,20 +18,23 @@ public:
     NativeGLRender();
     ~NativeGLRender();
 
-    void surfaceCreated(ANativeWindow *window) override;
-    void surfaceChanged(int width, int height) override;
-    void renderOnDraw() override;
-    void surfaceDestroyed(void) override;
+    void surfaceCreated(ANativeWindow *window) ;
+    void surfaceChanged(int width, int height) ;
+    void renderOnDraw() ;
+    void surfaceDestroyed(void) ;
 
 private:
-    int r_count;
+    float * viewProjectionMatrix;
+    float * projectionMatrix;
+    float * viewMatrix;
+
 
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
 
     CubeIndex * cube;
     CubeShaderProgram * cubeShaderProgram;
-
+private:
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 };
 
