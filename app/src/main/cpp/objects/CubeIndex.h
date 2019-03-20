@@ -19,9 +19,15 @@ public:
 
     void draw();
     void bindData(CubeShaderProgram * shaderProgram);
+
+public:
+    float * modelMatrix;
+
 private:
-    short * CUBE_VERTEX_DATA;
-    short * CUBE_INDEX;
+    int8_t * CUBE_VERTEX_DATA;
+    int8_t * CUBE_INDEX;
+
+
 };
 
 

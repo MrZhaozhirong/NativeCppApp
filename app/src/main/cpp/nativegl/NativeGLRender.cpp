@@ -14,28 +14,19 @@ NativeGLRender::NativeGLRender() {
     mWindowSurface = NULL;
 
     viewMatrix = new float[16];
-    CELL::Matrix::setIdentityM(viewMatrix, 0);
+    CELLMath::Matrix::setIdentityM(viewMatrix, 0);
     projectionMatrix = new float[16];
-    CELL::Matrix::setIdentityM(projectionMatrix, 0);
-
+    CELLMath::Matrix::setIdentityM(projectionMatrix, 0);
+    // 投影矩阵P x 视图矩阵V = VP
     viewProjectionMatrix = new float[16];
     memset(viewProjectionMatrix, 0, sizeof(float) * 16);
+    // (投影矩阵P x 视图矩阵V) x 具体模型的模型矩阵M = MVP
+    modelViewProjectionMatrix = new float[16];
+    memset(modelViewProjectionMatrix, 0, sizeof(float) * 16);
 }
 
 NativeGLRender::~NativeGLRender() {
-    if (mWindowSurface) {
-        mWindowSurface->release();
-        delete mWindowSurface;
-        mWindowSurface = NULL;
-    }
-    if (mEglCore) {
-        mEglCore->release();
-        delete mEglCore;
-        mEglCore = NULL;
-    }
-    delete [] viewMatrix;
-    delete [] projectionMatrix;
-    delete [] viewProjectionMatrix;
+
 }
 
 void NativeGLRender::surfaceCreated(ANativeWindow *window)
@@ -46,7 +37,7 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     mWindowSurface = new WindowSurface(mEglCore, window, true);
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
-
+    mWindowSurface->makeCurrent();
     cube = new CubeIndex();
     cubeShaderProgram = new CubeShaderProgram();
 }
@@ -57,12 +48,12 @@ void NativeGLRender::surfaceChanged(int width, int height)
     glViewport(0,0, width, height);
     glEnable(GL_DEPTH_TEST);
 
-    CELL::Matrix::perspectiveM(projectionMatrix, 45.0f, (float)width/(float)height, 1.0f, 100.0f);
-    CELL::Matrix::setLookAtM(viewMatrix, 0,
+    CELLMath::Matrix::perspectiveM(projectionMatrix, 45.0f, (float)width/(float)height, 1.0f, 100.0f);
+    CELLMath::Matrix::setLookAtM(viewMatrix, 0,
                              4.0f, 4.0f, 4.0f,
                              0.0f, 0.0f, 0.0f,
                              0.0f, 1.0f, 0.0f);
-    CELL::Matrix::multiplyMM(viewProjectionMatrix,  projectionMatrix, viewMatrix);
+    CELLMath::Matrix::multiplyMM(viewProjectionMatrix,  projectionMatrix, viewMatrix);
 
     mWindowSurface->swapBuffers();
 }
@@ -80,7 +71,10 @@ void NativeGLRender::renderOnDraw()
     //    r_count = 0;
     //}
     //glClearColor((r_count / 100.0), 0.6, (1.0 - r_count / 100.0), 1.0);
+
     cubeShaderProgram->ShaderProgram::userProgram();
+    CELLMath::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
+    cubeShaderProgram->setUniforms(modelViewProjectionMatrix);
     cube->bindData(cubeShaderProgram);
     cube->draw();
     mWindowSurface->swapBuffers();
@@ -88,6 +82,58 @@ void NativeGLRender::renderOnDraw()
 void NativeGLRender::surfaceDestroyed(void)
 {
     // 清空自定义模型，纹理，各种BufferObject
+    if (mWindowSurface) {
+        mWindowSurface->release();
+        delete mWindowSurface;
+        mWindowSurface = NULL;
+    }
+    if (mEglCore) {
+        mEglCore->release();
+        delete mEglCore;
+        mEglCore = NULL;
+    }
+    if(viewMatrix!=NULL) {
+        delete [] viewMatrix;
+        viewMatrix = NULL;
+    }
+    if(projectionMatrix!=NULL) {
+        delete [] projectionMatrix;
+        projectionMatrix = NULL;
+    }
+    if(viewProjectionMatrix!=NULL) {
+        delete [] viewProjectionMatrix;
+        viewProjectionMatrix = NULL;
+    }
+    if(modelViewProjectionMatrix!=NULL) {
+        delete [] modelViewProjectionMatrix;
+        modelViewProjectionMatrix = NULL;
+    }
 }
+
+
+void NativeGLRender::handleMultiTouch(float distance) {
+    float OBJECT_SCALE_FLOAT = 1.1f;
+    if(distance > 0) {
+        CELLMath::Matrix::scaleM(cube->modelMatrix,0, OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT);
+    } else {
+        CELLMath::Matrix::scaleM(cube->modelMatrix,0, 1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT);
+    }
+}
+
+void NativeGLRender::handleTouchDown(float x, float y) {
+    // TODO
+}
+
+void NativeGLRender::handleTouchDrag(float x, float y) {
+    // TODO
+}
+
+void NativeGLRender::handleTouchUp(float x, float y) {
+    // TODO
+}
+
+
+
+
 
 

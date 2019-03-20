@@ -23,7 +23,12 @@ public:
     void renderOnDraw() ;
     void surfaceDestroyed(void) ;
 
+    void handleMultiTouch(float distance);
+    void handleTouchDown(float x, float y);
+    void handleTouchDrag(float x, float y);
+    void handleTouchUp(float x, float y);
 private:
+    float * modelViewProjectionMatrix;
     float * viewProjectionMatrix;
     float * projectionMatrix;
     float * viewMatrix;

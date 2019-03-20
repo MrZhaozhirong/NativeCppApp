@@ -39,3 +39,37 @@ Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceDestroy(JNIEnv *env, jobject insta
     delete testRender;
     delete glThread;
 }
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_zzrblog_nativecpp_NativeEGL_handleMultiTouch(JNIEnv *env, jobject instance, jfloat distance)
+{
+    if(testRender!=NULL) {
+        testRender->handleMultiTouch(distance);
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_zzrblog_nativecpp_NativeEGL_handleTouchDown(JNIEnv *env, jobject instance, jfloat x, jfloat y)
+{
+    if(testRender!=NULL) {
+        testRender->handleTouchDown(x,y);
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_zzrblog_nativecpp_NativeEGL_handleTouchDrag(JNIEnv *env, jobject instance, jfloat x, jfloat y)
+{
+    if(testRender!=NULL) {
+        testRender->handleTouchDrag(x,y);
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_zzrblog_nativecpp_NativeEGL_handleTouchUp(JNIEnv *env, jobject instance, jfloat x, jfloat y)
+{
+    if(testRender!=NULL) {
+        testRender->handleTouchUp(x,y);
+    }
+}

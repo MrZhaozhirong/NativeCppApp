@@ -63,6 +63,7 @@ void *glThreadImpl(void *context)
             glThread->mRender->renderOnDraw();
         }
     }
+    LOGI("GLThread exist.");
     return 0;
 }
 

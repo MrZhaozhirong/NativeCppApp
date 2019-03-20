@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-namespace CELL
+namespace CELLMath
 {
     #define PI                 3.14159265358979323
     #define TWO_PI             6.28318530717958647
@@ -24,13 +24,6 @@ namespace CELL
          */
         static void multiplyMM(float* re, const float* lhs, const float* rhs)
         {
-            int re_length = sizeof(re) / sizeof(re[0]);
-            int lhs_length = sizeof(lhs) / sizeof(lhs[0]);
-            int rhs_length = sizeof(rhs) / sizeof(rhs[0]);
-
-            if(re_length<16 || lhs_length<16 || rhs_length<16)
-                return;
-
             for (int i=0 ; i<4 ; i++) {
                 const float rhs_i0 = rhs[ I(i,0) ];
                 float ri0 = lhs[ I(0,0) ] * rhs_i0;
@@ -58,10 +51,6 @@ namespace CELL
          */
         static void multiplyMV(float* r, const float* lhs, const float* rhs)
         {
-            int lhs_lenght = sizeof(lhs) / sizeof(lhs[0]);
-            int rhs_lenght = sizeof(rhs) / sizeof(rhs[0]);
-            if(lhs_lenght<4||rhs_lenght<16)
-                return;
             mx4transform(rhs[0], rhs[1], rhs[2], rhs[3], lhs, r);
         }
 
@@ -79,10 +68,6 @@ namespace CELL
          */
         static void setIdentityM(float* sm, int smOffset)
         {
-            int sm_length = sizeof(sm) / sizeof(sm[0]);
-            if(sm_length-smOffset < 16)
-                return;
-
             for (int i=0 ; i<16 ; i++) {
                 sm[smOffset + i] = 0;
             }
@@ -166,12 +151,22 @@ namespace CELL
         }
 
         // Translates matrix m by x, y, and z in place.
-        static
-        void translateM(float* m, int mOffset, float x, float y, float z)
+        static void translateM(float* m, int mOffset, float x, float y, float z)
         {
             for (int i=0 ; i<4 ; i++) {
                 int mi = mOffset + i;
                 m[12 + mi] += m[mi] * x + m[4 + mi] * y + m[8 + mi] * z;
+            }
+        }
+
+        // Scales matrix m in place by sx, sy, and sz.
+        static void scaleM(float* m, int mOffset, float x, float y, float z)
+        {
+            for (int i=0 ; i<4 ; i++) {
+                int mi = mOffset + i;
+                m[     mi] *= x;
+                m[ 4 + mi] *= y;
+                m[ 8 + mi] *= z;
             }
         }
     };

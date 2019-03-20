@@ -18,5 +18,12 @@ public class NativeEGL {
     public native void onSurfaceDestroy();
 
 
+    public native void handleMultiTouch(float distance);
+
+    public native void handleTouchDown(float x, float y);
+
+    public native void handleTouchDrag(float x, float y);
+
+    public native void handleTouchUp(float x, float y);
 
 }

@@ -26,8 +26,8 @@ GLuint compileShader(GLenum type, const char * shaderCode) {
         return 0;
     }
     glShaderSource(shaderObjectId,  1, &shaderCode, NULL);
-
     glCompileShader(shaderObjectId);
+    LOGI("CompileShader:  %s",shaderCode);
 
     GLint compiled = GL_FALSE;
     glGetShaderiv(shaderObjectId, GL_COMPILE_STATUS, &compiled);
