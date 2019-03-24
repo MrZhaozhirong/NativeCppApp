@@ -23,7 +23,7 @@ public class NativeGLActivity extends AppCompatActivity {
         SurfaceView surfaceview = findViewById(R.id.easy_surface_view);
         surfaceview.getHolder().setFormat(PixelFormat.RGBA_8888);
 
-        nativeEGL = new NativeEGL();
+        nativeEGL = new NativeEGL(this);
 
         surfaceview.getHolder().addCallback(new SurfaceHolder.Callback() {
 

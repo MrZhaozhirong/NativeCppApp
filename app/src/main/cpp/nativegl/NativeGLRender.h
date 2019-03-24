@@ -27,6 +27,8 @@ public:
     void handleTouchDown(float x, float y);
     void handleTouchDrag(float x, float y);
     void handleTouchUp(float x, float y);
+
+
 private:
     float * modelViewProjectionMatrix;
     float * viewProjectionMatrix;
@@ -41,6 +43,8 @@ private:
     CubeShaderProgram * cubeShaderProgram;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
+
+    void init();
 };
 
 

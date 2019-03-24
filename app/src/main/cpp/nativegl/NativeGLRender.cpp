@@ -4,12 +4,19 @@
 
 #include <assert.h>
 #include <GLES2/gl2.h>
+#include <jni.h>
 #include "NativeGLRender.h"
 #include "../common/zzr_common.h"
 #include "../common/CELLMath.hpp"
 
 
+
+
 NativeGLRender::NativeGLRender() {
+    init();
+}
+
+void NativeGLRender::init() {
     mEglCore = NULL;
     mWindowSurface = NULL;
 
@@ -26,7 +33,22 @@ NativeGLRender::NativeGLRender() {
 }
 
 NativeGLRender::~NativeGLRender() {
-
+    if(viewMatrix!=NULL) {
+        delete [] viewMatrix;
+        viewMatrix = NULL;
+    }
+    if(projectionMatrix!=NULL) {
+        delete [] projectionMatrix;
+        projectionMatrix = NULL;
+    }
+    if(viewProjectionMatrix!=NULL) {
+        delete [] viewProjectionMatrix;
+        viewProjectionMatrix = NULL;
+    }
+    if(modelViewProjectionMatrix!=NULL) {
+        delete [] modelViewProjectionMatrix;
+        modelViewProjectionMatrix = NULL;
+    }
 }
 
 void NativeGLRender::surfaceCreated(ANativeWindow *window)
@@ -40,6 +62,8 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     mWindowSurface->makeCurrent();
     cube = new CubeIndex();
     cubeShaderProgram = new CubeShaderProgram();
+
+
 }
 void NativeGLRender::surfaceChanged(int width, int height)
 {
@@ -82,6 +106,14 @@ void NativeGLRender::renderOnDraw()
 void NativeGLRender::surfaceDestroyed(void)
 {
     // 清空自定义模型，纹理，各种BufferObject
+    if(cubeShaderProgram!=NULL) {
+        delete cubeShaderProgram;
+        cubeShaderProgram = NULL;
+    }
+    if(cube!=NULL) {
+        delete cube;
+        cube = NULL;
+    }
     if (mWindowSurface) {
         mWindowSurface->release();
         delete mWindowSurface;
@@ -92,23 +124,11 @@ void NativeGLRender::surfaceDestroyed(void)
         delete mEglCore;
         mEglCore = NULL;
     }
-    if(viewMatrix!=NULL) {
-        delete [] viewMatrix;
-        viewMatrix = NULL;
-    }
-    if(projectionMatrix!=NULL) {
-        delete [] projectionMatrix;
-        projectionMatrix = NULL;
-    }
-    if(viewProjectionMatrix!=NULL) {
-        delete [] viewProjectionMatrix;
-        viewProjectionMatrix = NULL;
-    }
-    if(modelViewProjectionMatrix!=NULL) {
-        delete [] modelViewProjectionMatrix;
-        modelViewProjectionMatrix = NULL;
-    }
 }
+
+
+
+
 
 
 void NativeGLRender::handleMultiTouch(float distance) {
@@ -131,6 +151,7 @@ void NativeGLRender::handleTouchDrag(float x, float y) {
 void NativeGLRender::handleTouchUp(float x, float y) {
     // TODO
 }
+
 
 
 
