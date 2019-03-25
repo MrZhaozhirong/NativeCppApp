@@ -40,7 +40,8 @@ Java_org_zzrblog_nativecpp_NativeEGL_initBeforeEGL(JNIEnv *env, jobject instance
     }
     struct zip_stat fstat;
     zip_stat_init(&fstat);
-
+    // 指定要解压出"assets/mipmap/"这类前缀的文件
+    const char *prefix = "assets/mipmap/";
     int numFiles = zip_get_num_files(apkArchive);
     LOGI("File numFiles %i \n",numFiles);
     for (int i=0; i<numFiles; i++) {
@@ -50,9 +51,22 @@ Java_org_zzrblog_nativecpp_NativeEGL_initBeforeEGL(JNIEnv *env, jobject instance
             return;
         }
         zip_stat(apkArchive,name,0,&fstat);
-        LOGD("Index %i:%s      Uncompressed Size:%d    Compressed Size:%d", i, fstat.name, fstat.size, fstat.comp_size);
+        LOGD("Index %i:%s，Uncompressed Size:%d，Compressed Size:%d", i, fstat.name, fstat.size, fstat.comp_size);
 
+        const char * ret = strstr(fstat.name, prefix);
+        if(ret) {
+            //LOGD("find it! : %s",ret);
+            struct zip_file* file = zip_fopen(apkArchive, fstat.name, 0);
+
+            //char *buffer=(char *)malloc(fstat.size+1);
+            //buffer[fstat.size]=0;
+            //int numBytesRead =  zip_fread(file, buffer,fstat.size);;
+
+            zip_fclose(file);
+        }
     }
+    zip_close(apkArchive);
+
     env->ReleaseStringUTFChars(compressed_apk_path_jstr, compressed_apk_path_cstr);
     env->ReleaseStringUTFChars(release_res_path_jstr, release_res_path_cstr);
 }
