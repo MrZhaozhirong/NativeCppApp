@@ -38,6 +38,13 @@ target_link_libraries( # Specifies the target library.
 
 
 
+# 引入外部so libzip 供源文件编译
+add_library(zip
+            SHARED
+            IMPORTED )
+set_target_properties(zip PROPERTIES IMPORTED_LOCATION
+            ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libzip.so)
+set_target_properties(zip PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library(
         native-egl
@@ -53,5 +60,6 @@ target_link_libraries(
         EGL
         GLESv2
         android
+        zip
         log)
 
