@@ -21,13 +21,13 @@ Java_org_zzrblog_nativecpp_NativeEGL_initBeforeEGL(JNIEnv *env, jobject instance
                                                         "()Ljava/lang/String;");
     jstring compressed_apk_path_jstr = static_cast<jstring>(env->CallObjectMethod(instance, getResAbsolutePath_mid));
     const char *compressed_apk_path_cstr = env->GetStringUTFChars(compressed_apk_path_jstr, GL_FALSE);
-    LOGD("资源压缩apk文件：%s", compressed_apk_path_cstr);
+    LOGI("资源压缩apk文件：%s", compressed_apk_path_cstr);
 
     jmethodID getResourceCacheDir_mid = env->GetMethodID(j_native_egl_class, "getResourceCacheDir",
                                                         "()Ljava/lang/String;");
     jstring release_res_path_jstr = static_cast<jstring>(env->CallObjectMethod(instance, getResourceCacheDir_mid));
     const char *release_res_path_cstr = env->GetStringUTFChars(release_res_path_jstr, GL_FALSE);
-    LOGD("本地解压缩路径：%s", release_res_path_cstr);
+    LOGI("本地解压缩路径：%s", release_res_path_cstr);
 
 
     int iErr = 0;
@@ -50,7 +50,7 @@ Java_org_zzrblog_nativecpp_NativeEGL_initBeforeEGL(JNIEnv *env, jobject instance
             return;
         }
         zip_stat(apkArchive,name,0,&fstat);
-        LOGI("Index %i:%s      Uncompressed Size:%d    Compressed Size:%d", i, fstat.name, fstat.size, fstat.comp_size);
+        LOGD("Index %i:%s      Uncompressed Size:%d    Compressed Size:%d", i, fstat.name, fstat.size, fstat.comp_size);
 
     }
     env->ReleaseStringUTFChars(compressed_apk_path_jstr, compressed_apk_path_cstr);
