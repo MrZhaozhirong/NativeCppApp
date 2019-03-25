@@ -53,5 +53,5 @@ target_link_libraries(
         EGL
         GLESv2
         android
-        ${log-lib})
+        log)
 
