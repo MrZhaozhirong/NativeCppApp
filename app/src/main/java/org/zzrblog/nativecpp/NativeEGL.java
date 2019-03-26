@@ -24,9 +24,11 @@ public class NativeEGL {
     public String getPackageResourceAPK() {
         return ctx.getPackageResourcePath();
         // /data/app/org.zzrblog.nativecpp-zzIu0MPPws9Df9SN-U1BRA==/base.apk
-        // 类似这种以根目录开头的，apk后缀的压缩文件，然后再NDK层用zip库解压缩。
+        // 类似这种以根目录开头的，apk后缀的压缩文件，然后再在JNI层用zip库解压缩。
+        // 解压出 assets/mipmap/filename到getResourceCacheDir()相应的目录下
     }
     public String getResourceCacheDir() {
+        // /storage/emulated/0/Android/data/org.zzrblog.nativecpp/cache
         File externalCacheDir = ctx.getExternalCacheDir();
         assert externalCacheDir != null;
         return externalCacheDir.getAbsolutePath();

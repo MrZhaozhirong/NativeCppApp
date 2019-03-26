@@ -19,7 +19,7 @@ NativeGLRender::NativeGLRender() {
 void NativeGLRender::init() {
     mEglCore = NULL;
     mWindowSurface = NULL;
-
+    res_path = NULL;
     viewMatrix = new float[16];
     CELLMath::Matrix::setIdentityM(viewMatrix, 0);
     projectionMatrix = new float[16];
@@ -49,6 +49,16 @@ NativeGLRender::~NativeGLRender() {
         delete [] modelViewProjectionMatrix;
         modelViewProjectionMatrix = NULL;
     }
+    if(res_path!=NULL) {
+        delete res_path;
+        res_path = NULL;
+    }
+}
+
+void NativeGLRender::setResPath(char *string) {
+    res_path = new char[250];
+    strcpy(res_path, string);
+    LOGI("setResPath : %s\n", res_path);
 }
 
 void NativeGLRender::surfaceCreated(ANativeWindow *window)
@@ -62,8 +72,6 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     mWindowSurface->makeCurrent();
     cube = new CubeIndex();
     cubeShaderProgram = new CubeShaderProgram();
-
-
 }
 void NativeGLRender::surfaceChanged(int width, int height)
 {
@@ -151,9 +159,6 @@ void NativeGLRender::handleTouchDrag(float x, float y) {
 void NativeGLRender::handleTouchUp(float x, float y) {
     // TODO
 }
-
-
-
 
 
 

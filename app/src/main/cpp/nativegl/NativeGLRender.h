@@ -29,16 +29,18 @@ public:
     void handleTouchUp(float x, float y);
 
 
+    void setResPath(char *string);
+
 private:
     float * modelViewProjectionMatrix;
     float * viewProjectionMatrix;
     float * projectionMatrix;
     float * viewMatrix;
 
+    char * res_path;
 
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
-
     CubeIndex * cube;
     CubeShaderProgram * cubeShaderProgram;
 private:
