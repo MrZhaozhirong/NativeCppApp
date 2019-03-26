@@ -9,6 +9,10 @@
 
 
 CubeIndex::CubeIndex() {
+    modelMatrix = new float[16];
+    CELLMath::Matrix::setIdentityM(modelMatrix, 0);
+
+
     CUBE_VERTEX_DATA = new int8_t[48];
     int8_t * p = CUBE_VERTEX_DATA;
     p[0]=-1;  p[1]=1;    p[2]=1;    p[3]=1;   p[4]=0;   p[5]=0;
@@ -25,24 +29,27 @@ CubeIndex::CubeIndex() {
     //        1,   1,   1,    1, 0, 1, // 1 right top near
     //        -1,  -1,   1,   0, 0, 1, // 2 left bottom near
     //        1,  -1,   1,    0, 1, 0, // 3 right bottom near
-    //        -1,   1,  -1,   0, 1, 0, // 4 left top ar
+    //        -1,   1,  -1,   0, 1, 0, // 4 left top far
     //        1,   1,  -1,    0, 0, 1, // 5 right top far
     //        -1,  -1,  -1,   1, 0, 1, // 6 left bottom far
     //        1,  -1,  -1,    1, 0, 0  // 7 right bottom far
     //};
-    CUBE_INDEX = new int8_t[36];
-    CUBE_INDEX[0]=1;  CUBE_INDEX[1]=0;  CUBE_INDEX[2]=2;
-    CUBE_INDEX[3]=1;  CUBE_INDEX[4]=2;  CUBE_INDEX[5]=3;
-    CUBE_INDEX[6]=5;  CUBE_INDEX[7]=4;  CUBE_INDEX[8]=6;
-    CUBE_INDEX[9]=5;  CUBE_INDEX[10]=6; CUBE_INDEX[11]=7;
-    CUBE_INDEX[12]=4; CUBE_INDEX[13]=0; CUBE_INDEX[14]=2;
-    CUBE_INDEX[15]=4; CUBE_INDEX[16]=2; CUBE_INDEX[17]=6;
-    CUBE_INDEX[18]=5; CUBE_INDEX[19]=1; CUBE_INDEX[20]=3;
-    CUBE_INDEX[21]=5; CUBE_INDEX[22]=3; CUBE_INDEX[23]=7;
-    CUBE_INDEX[24]=5; CUBE_INDEX[25]=4; CUBE_INDEX[26]=0;
-    CUBE_INDEX[27]=5; CUBE_INDEX[28]=0; CUBE_INDEX[29]=1;
-    CUBE_INDEX[30]=7; CUBE_INDEX[31]=6; CUBE_INDEX[32]=2;
-    CUBE_INDEX[33]=7; CUBE_INDEX[34]=2; CUBE_INDEX[35]=3;
+
+
+
+    //CUBE_INDEX = new int8_t[36];
+    //CUBE_INDEX[0]=1;  CUBE_INDEX[1]=0;  CUBE_INDEX[2]=2;
+    //CUBE_INDEX[3]=1;  CUBE_INDEX[4]=2;  CUBE_INDEX[5]=3;
+    //CUBE_INDEX[6]=5;  CUBE_INDEX[7]=4;  CUBE_INDEX[8]=6;
+    //CUBE_INDEX[9]=5;  CUBE_INDEX[10]=6; CUBE_INDEX[11]=7;
+    //CUBE_INDEX[12]=4; CUBE_INDEX[13]=0; CUBE_INDEX[14]=2;
+    //CUBE_INDEX[15]=4; CUBE_INDEX[16]=2; CUBE_INDEX[17]=6;
+    //CUBE_INDEX[18]=5; CUBE_INDEX[19]=1; CUBE_INDEX[20]=3;
+    //CUBE_INDEX[21]=5; CUBE_INDEX[22]=3; CUBE_INDEX[23]=7;
+    //CUBE_INDEX[24]=5; CUBE_INDEX[25]=4; CUBE_INDEX[26]=0;
+    //CUBE_INDEX[27]=5; CUBE_INDEX[28]=0; CUBE_INDEX[29]=1;
+    //CUBE_INDEX[30]=7; CUBE_INDEX[31]=6; CUBE_INDEX[32]=2;
+    //CUBE_INDEX[33]=7; CUBE_INDEX[34]=2; CUBE_INDEX[35]=3;
     //{
     //        //front
     //        1, 0, 2,
@@ -63,8 +70,29 @@ CubeIndex::CubeIndex() {
     //        7, 6, 2,
     //        7, 2, 3
     //};
-    modelMatrix = new float[16];
-    CELLMath::Matrix::setIdentityM(modelMatrix, 0);
+
+
+    CUBE_INDEX = new int8_t[24];
+    CUBE_INDEX[0]=0;  CUBE_INDEX[1]=1;  CUBE_INDEX[2]=2;  CUBE_INDEX[3]=3;
+    CUBE_INDEX[4]=4;  CUBE_INDEX[5]=5;  CUBE_INDEX[6]=6;  CUBE_INDEX[7]=7;
+    CUBE_INDEX[8]=4;  CUBE_INDEX[9]=0;  CUBE_INDEX[10]=6; CUBE_INDEX[11]=2;
+    CUBE_INDEX[12]=1; CUBE_INDEX[13]=5; CUBE_INDEX[14]=3; CUBE_INDEX[15]=7;
+    CUBE_INDEX[16]=4; CUBE_INDEX[17]=5; CUBE_INDEX[18]=0; CUBE_INDEX[19]=1;
+    CUBE_INDEX[20]=6; CUBE_INDEX[21]=7; CUBE_INDEX[22]=2; CUBE_INDEX[23]=3;
+    //{
+    //    //front
+    //    0,1,2,3,
+    //    //back
+    //    4,5,6,7,
+    //    //left
+    //    4,0,6,2,
+    //    //right
+    //    1,5,3,7,
+    //    //top
+    //    4,5,0,1,
+    //    //bottom
+    //    6,7,2,3
+    //};
 }
 
 CubeIndex::~CubeIndex() {
@@ -89,7 +117,9 @@ void CubeIndex::bindData(CubeShaderProgram* shaderProgram) {
 
 void CubeIndex::draw() {
     // 正方体 六个面，每个面两个三角形，每个三角形三个点
-    glDrawElements(GL_TRIANGLES, 6*2*3, GL_UNSIGNED_BYTE, CUBE_INDEX );
+    //glDrawElements(GL_TRIANGLES, 6*2*3, GL_UNSIGNED_BYTE, CUBE_INDEX );
+    // 正方体 六个面，每个面四个点
+    glDrawElements(GL_TRIANGLE_STRIP, 6*4, GL_UNSIGNED_BYTE, CUBE_INDEX );
 }
 
 
