@@ -22,7 +22,8 @@ public:
 public:
     GLint uMatrixLocation;
     GLint aPositionLocation;
-    GLint aColorLocation;
+    GLint aTexUvLocation;
+    GLint uTextureUnit;
 
 private:
     DISALLOW_EVIL_CONSTRUCTORS(CubeShaderProgram);

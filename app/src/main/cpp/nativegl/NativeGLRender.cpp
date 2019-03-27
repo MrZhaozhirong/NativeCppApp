@@ -5,11 +5,11 @@
 #include <assert.h>
 #include <GLES2/gl2.h>
 #include <jni.h>
+#include <cstdio>
 #include "NativeGLRender.h"
 #include "../common/zzr_common.h"
 #include "../common/CELLMath.hpp"
-
-
+#include "../utils/TextureHelper.h"
 
 
 NativeGLRender::NativeGLRender() {
@@ -70,8 +70,14 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
+
     cube = new CubeIndex();
     cubeShaderProgram = new CubeShaderProgram();
+
+    char _res_name[250]={0};
+    sprintf(_res_name, "%s%s", res_path, "test.jpg");
+    // 输入资源文件的绝对路径，创建纹理
+    animation_texure = TextureHelper::createTextureFromImage(_res_name);
 }
 void NativeGLRender::surfaceChanged(int width, int height)
 {
@@ -103,8 +109,10 @@ void NativeGLRender::renderOnDraw()
     //    r_count = 0;
     //}
     //glClearColor((r_count / 100.0), 0.6, (1.0 - r_count / 100.0), 1.0);
-
     cubeShaderProgram->ShaderProgram::userProgram();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, animation_texure);
+    glUniform1i(cubeShaderProgram->uTextureUnit, 0);
     CELLMath::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
     cubeShaderProgram->setUniforms(modelViewProjectionMatrix);
     cube->bindData(cubeShaderProgram);

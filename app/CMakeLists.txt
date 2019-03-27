@@ -9,6 +9,7 @@ aux_source_directory(./src/main/cpp/egl      EGL_SRC )
 aux_source_directory(./src/main/cpp/objects  OBJECTS_SRC )
 aux_source_directory(./src/main/cpp/program  PROGRAM_SRC )
 aux_source_directory(./src/main/cpp/nativegl NATIVE_GL_SRC )
+aux_source_directory(./src/main/cpp/utils    UTILS_SRC )
 
 # 为log_common.h 指定平台
 IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
@@ -16,26 +17,6 @@ IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
 ELSE (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
     ADD_DEFINITIONS(-DLinux)
 ENDIF ()
-
-find_library( # Sets the name of the path variable.
-        log-lib
-        # Specifies the name of the NDK library that you want CMake to locate.
-        log)
-# AS CMake sample
-add_library( # Sets the name of the library.
-        native-lib
-        # Sets the library as a shared library.
-        SHARED
-        # Provides a relative path to your source file(s).
-        src/main/cpp/native-lib.cpp)
-
-target_link_libraries( # Specifies the target library.
-        native-lib
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
-
-
 
 
 # 引入外部so libzip 供源文件编译
@@ -54,6 +35,7 @@ add_library(
         ${OBJECTS_SRC}
         ${PROGRAM_SRC}
         ${NATIVE_GL_SRC}
+        ${UTILS_SRC}
         )
 target_link_libraries(
         native-egl
@@ -63,3 +45,29 @@ target_link_libraries(
         zip
         log)
 
+
+
+
+
+
+
+
+
+
+
+# AS CMake sample
+find_library( # Sets the name of the path variable.
+        log-lib
+        # Specifies the name of the NDK library that you want CMake to locate.
+        log)
+add_library( # Sets the name of the library.
+        native-lib
+        # Sets the library as a shared library.
+        SHARED
+        # Provides a relative path to your source file(s).
+        src/main/cpp/native-lib.cpp)
+target_link_libraries( # Specifies the target library.
+        native-lib
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib})

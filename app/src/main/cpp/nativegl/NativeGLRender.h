@@ -37,7 +37,8 @@ private:
     float * projectionMatrix;
     float * viewMatrix;
 
-    char * res_path;
+    char  * res_path;
+    GLuint  animation_texure;
 
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;

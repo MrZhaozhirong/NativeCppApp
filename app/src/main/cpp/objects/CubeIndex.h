@@ -12,7 +12,8 @@ class CubeIndex {
 public:
     static const int POSITION_COMPONENT_COUNT = 3;
     static const int COLOR_COMPONENT_COUNT = 3;
-    static const int STRIDE = 3+3;
+    static const int TEXTURE_COORDINATE_COMPONENT_COUNT = 2;
+    static const int STRIDE = POSITION_COMPONENT_COUNT + TEXTURE_COORDINATE_COMPONENT_COUNT;
 public:
     CubeIndex();
     ~CubeIndex();
@@ -26,8 +27,6 @@ public:
 private:
     int8_t * CUBE_VERTEX_DATA;
     int8_t * CUBE_INDEX;
-
-
 };
 
 
