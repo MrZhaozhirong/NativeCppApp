@@ -141,8 +141,8 @@ EGLConfig EglCore::getConfig(int flags, int version)
             EGL_GREEN_SIZE, 8,
             EGL_BLUE_SIZE, 8,
             EGL_ALPHA_SIZE, 8,
-            //EGL_DEPTH_SIZE, 16,
-            //EGL_STENCIL_SIZE, 8,
+            EGL_DEPTH_SIZE, 16,
+            EGL_STENCIL_SIZE, 8,
             EGL_RENDERABLE_TYPE, renderableType,
             EGL_NONE, 0,      // placeholder for recordable [@-3]
             EGL_NONE
