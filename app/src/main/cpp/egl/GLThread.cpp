@@ -27,7 +27,7 @@ void *glThreadImpl(void *context)
     {
         if (glThread->isExit)
         {
-            LOGI("GLThread onDestroy.");
+            LOGD("GLThread onDestroy.");
             if(glThread->mRender!=NULL)
             {
                 glThread->mRender->surfaceDestroyed();
@@ -39,7 +39,7 @@ void *glThreadImpl(void *context)
         if (glThread->isCreate)
         {
             glThread->isCreate = false;
-            LOGI("GLThread onCreate.");
+            LOGD("GLThread onCreate.");
             if(glThread->mRender!=NULL)
             {
                 glThread->mRender->surfaceCreated(glThread->window);
@@ -50,7 +50,7 @@ void *glThreadImpl(void *context)
         {
             glThread->isChange = false;
             glThread->isStart = true;
-            LOGI("GLThread onChange.");
+            LOGD("GLThread onChange.");
             if(glThread->mRender!=NULL)
             {
                 glThread->mRender->surfaceChanged(glThread->width,glThread->height);
@@ -59,11 +59,11 @@ void *glThreadImpl(void *context)
         //onDraw
         if(glThread->isStart)
         {
-            //LOGI("GLThread onDraw.");
+            //LOGD("GLThread onDraw.");
             glThread->mRender->renderOnDraw();
         }
     }
-    LOGI("GLThread exist.");
+    LOGD("GLThread exist.");
     return 0;
 }
 
@@ -91,5 +91,7 @@ void GLThread::setGLRender(GLRender * render) {
 }
 
 void GLThread::release() {
-
+    void* reval;
+    pthread_join(mThreadImpl, &reval);
+    LOGD("GLThread release %d",(int)reval);
 }

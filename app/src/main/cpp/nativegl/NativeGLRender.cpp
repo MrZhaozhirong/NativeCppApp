@@ -20,8 +20,10 @@ void NativeGLRender::init() {
     mEglCore = NULL;
     mWindowSurface = NULL;
     res_path = NULL;
+    // 视图矩阵V
     viewMatrix = new float[16];
     CELLMath::Matrix::setIdentityM(viewMatrix, 0);
+    // 投影矩阵P
     projectionMatrix = new float[16];
     CELLMath::Matrix::setIdentityM(projectionMatrix, 0);
     // 投影矩阵P x 视图矩阵V = VP
@@ -76,7 +78,7 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
 
     char _res_name[250]={0};
     sprintf(_res_name, "%s%s", res_path, "test.jpg");
-    // 输入资源文件的绝对路径，创建纹理
+    // 输入资源文件的资源路径，创建纹理，返回纹理id
     animation_texure = TextureHelper::createTextureFromImage(_res_name);
 }
 void NativeGLRender::surfaceChanged(int width, int height)
@@ -97,7 +99,7 @@ void NativeGLRender::surfaceChanged(int width, int height)
 }
 void NativeGLRender::renderOnDraw()
 {
-    if (mEglCore == NULL) {
+    if (mEglCore==NULL || mWindowSurface==NULL) {
         LOGW("Skipping drawFrame after shutdown");
         return;
     }

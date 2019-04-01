@@ -8,8 +8,8 @@ aux_source_directory(./src/main/cpp/common   COMMON_SRC )
 aux_source_directory(./src/main/cpp/egl      EGL_SRC )
 aux_source_directory(./src/main/cpp/objects  OBJECTS_SRC )
 aux_source_directory(./src/main/cpp/program  PROGRAM_SRC )
-aux_source_directory(./src/main/cpp/nativegl NATIVE_GL_SRC )
 aux_source_directory(./src/main/cpp/utils    UTILS_SRC )
+aux_source_directory(./src/main/cpp/nativegl PROJECT_SRC )
 
 # 为log_common.h 指定平台
 IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
@@ -34,8 +34,8 @@ add_library(
         ${EGL_SRC}
         ${OBJECTS_SRC}
         ${PROGRAM_SRC}
-        ${NATIVE_GL_SRC}
         ${UTILS_SRC}
+        ${PROJECT_SRC}
         )
 target_link_libraries(
         native-egl

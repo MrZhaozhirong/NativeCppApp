@@ -155,11 +155,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceDestroy(JNIEnv *env, jobject instance)
 {
-    glThread->setGLRender(NULL);
     glThread->onSurfaceDestroy();
     glThread->release();
+    glThread = NULL;
     delete renderer;
-    delete glThread;
 }
 
 
