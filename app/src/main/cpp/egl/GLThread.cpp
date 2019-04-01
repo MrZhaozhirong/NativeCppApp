@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include "GLThread.h"
 #include "../common/zzr_common.h"
+#include "../common/CELLTimeCounter.hpp"
 #include <unistd.h>
 
 GLThread::GLThread() {
@@ -23,6 +24,7 @@ void *glThreadImpl(void *context)
     GLThread *glThread = static_cast<GLThread *>(context);
     glThread->isExit = false;
 
+    CELL::TimeCounter tm;
     while(true)
     {
         if (glThread->isExit)
@@ -57,11 +59,13 @@ void *glThreadImpl(void *context)
             }
         }
         //onDraw
+        double  second  =   tm.getElapsedTimeInMilliSec();
         if(glThread->isStart)
         {
             //LOGD("GLThread onDraw.");
-            glThread->mRender->renderOnDraw();
+            glThread->mRender->renderOnDraw(second);
         }
+        tm.update();
     }
     LOGD("GLThread exist.");
     return 0;

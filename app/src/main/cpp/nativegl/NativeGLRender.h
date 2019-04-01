@@ -20,7 +20,7 @@ public:
 
     void surfaceCreated(ANativeWindow *window) ;
     void surfaceChanged(int width, int height) ;
-    void renderOnDraw() ;
+    void renderOnDraw(double elpasedInMilliSec) ;
     void surfaceDestroyed(void) ;
 
     void handleMultiTouch(float distance);

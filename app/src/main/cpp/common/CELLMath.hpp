@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-namespace CELLMath
+namespace CELL
 {
     #define PI                 3.14159265358979323
     #define TWO_PI             6.28318530717958647

@@ -10,7 +10,7 @@
 
 CubeIndex::CubeIndex() {
     modelMatrix = new float[16];
-    CELLMath::Matrix::setIdentityM(modelMatrix, 0);
+    CELL::Matrix::setIdentityM(modelMatrix, 0);
 
 
     CUBE_VERTEX_DATA = new int8_t[60];

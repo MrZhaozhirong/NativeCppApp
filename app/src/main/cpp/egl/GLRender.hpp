@@ -16,7 +16,7 @@ public:
 
     virtual void surfaceCreated(ANativeWindow *window)=0;
     virtual void surfaceChanged(int width, int height)=0;
-    virtual void renderOnDraw()=0;
+    virtual void renderOnDraw(double elpasedInMilliSec)=0;
     virtual void surfaceDestroyed(void)=0;
 
 };

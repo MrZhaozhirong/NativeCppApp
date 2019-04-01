@@ -22,10 +22,10 @@ void NativeGLRender::init() {
     res_path = NULL;
     // 视图矩阵V
     viewMatrix = new float[16];
-    CELLMath::Matrix::setIdentityM(viewMatrix, 0);
+    CELL::Matrix::setIdentityM(viewMatrix, 0);
     // 投影矩阵P
     projectionMatrix = new float[16];
-    CELLMath::Matrix::setIdentityM(projectionMatrix, 0);
+    CELL::Matrix::setIdentityM(projectionMatrix, 0);
     // 投影矩阵P x 视图矩阵V = VP
     viewProjectionMatrix = new float[16];
     memset(viewProjectionMatrix, 0, sizeof(float) * 16);
@@ -88,16 +88,16 @@ void NativeGLRender::surfaceChanged(int width, int height)
     glViewport(0,0, width, height);
     glEnable(GL_DEPTH_TEST);
 
-    CELLMath::Matrix::perspectiveM(projectionMatrix, 45.0f, (float)width/(float)height, 1.0f, 100.0f);
-    CELLMath::Matrix::setLookAtM(viewMatrix, 0,
+    CELL::Matrix::perspectiveM(projectionMatrix, 45.0f, (float)width/(float)height, 1.0f, 100.0f);
+    CELL::Matrix::setLookAtM(viewMatrix, 0,
                              4.0f, 4.0f, 4.0f,
                              0.0f, 0.0f, 0.0f,
                              0.0f, 1.0f, 0.0f);
-    CELLMath::Matrix::multiplyMM(viewProjectionMatrix,  projectionMatrix, viewMatrix);
+    CELL::Matrix::multiplyMM(viewProjectionMatrix,  projectionMatrix, viewMatrix);
 
     mWindowSurface->swapBuffers();
 }
-void NativeGLRender::renderOnDraw()
+void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
 {
     if (mEglCore==NULL || mWindowSurface==NULL) {
         LOGW("Skipping drawFrame after shutdown");
@@ -115,7 +115,7 @@ void NativeGLRender::renderOnDraw()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, animation_texure);
     glUniform1i(cubeShaderProgram->uTextureUnit, 0);
-    CELLMath::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
+    CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
     cubeShaderProgram->setUniforms(modelViewProjectionMatrix);
     cube->bindData(cubeShaderProgram);
     cube->draw();
@@ -152,9 +152,9 @@ void NativeGLRender::surfaceDestroyed(void)
 void NativeGLRender::handleMultiTouch(float distance) {
     float OBJECT_SCALE_FLOAT = 1.1f;
     if(distance > 0) {
-        CELLMath::Matrix::scaleM(cube->modelMatrix,0, OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT);
+        CELL::Matrix::scaleM(cube->modelMatrix,0, OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT);
     } else {
-        CELLMath::Matrix::scaleM(cube->modelMatrix,0, 1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT);
+        CELL::Matrix::scaleM(cube->modelMatrix,0, 1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT);
     }
 }
 
