@@ -65,7 +65,9 @@ void *glThreadImpl(void *context)
             //LOGD("GLThread onDraw.");
             glThread->mRender->renderOnDraw(second);
         }
-        tm.update();
+        //tm.update();
+        // 不update就是就算整个应用的运行时长
+        // update之后就是计算其执行步伐间执行时长
     }
     LOGD("GLThread exist.");
     return 0;
