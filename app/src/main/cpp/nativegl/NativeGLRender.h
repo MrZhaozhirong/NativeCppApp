@@ -11,6 +11,7 @@
 #include "../egl/EglCore.h"
 #include "../egl/WindowSurface.h"
 #include "../objects/CubeIndex.h"
+#include "../program/GPUAnimationProgram.h"
 
 class NativeGLRender : public GLRender{
 
@@ -43,7 +44,8 @@ private:
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
     CubeIndex * cube;
-    CubeShaderProgram * cubeShaderProgram;
+    //CubeShaderProgram * cubeShaderProgram;
+    GPUAnimationProgram * gpuAnimationProgram;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 

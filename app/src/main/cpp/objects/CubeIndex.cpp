@@ -6,6 +6,7 @@
 #include <string.h>
 #include "CubeIndex.h"
 #include "../common/CELLMath.hpp"
+#include "../program/GPUAnimationProgram.h"
 
 
 CubeIndex::CubeIndex() {
@@ -77,6 +78,20 @@ CubeIndex::~CubeIndex() {
     delete [] CUBE_VERTEX_DATA;
     delete [] CUBE_INDEX;
     delete [] modelMatrix;
+}
+
+void CubeIndex::bindData(GPUAnimationProgram* shaderProgram) {
+    glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aPositionLocation),
+                          POSITION_COMPONENT_COUNT, GL_BYTE,
+                          GL_FALSE, STRIDE,
+                          CUBE_VERTEX_DATA);
+    glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aPositionLocation));
+
+    glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aTexUvLocation),
+                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_BYTE,
+                          GL_FALSE, STRIDE,
+                          &CUBE_VERTEX_DATA[POSITION_COMPONENT_COUNT]);
+    glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aTexUvLocation));
 }
 
 void CubeIndex::bindData(CubeShaderProgram* shaderProgram) {

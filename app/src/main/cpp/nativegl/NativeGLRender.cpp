@@ -58,7 +58,11 @@ NativeGLRender::~NativeGLRender() {
 }
 
 void NativeGLRender::setResPath(char *string) {
-    res_path = new char[250];
+    if(res_path==NULL) {
+        res_path = new char[250];
+    } else {
+        memset(res_path, 0, strlen(res_path));
+    }
     strcpy(res_path, string);
     LOGI("setResPath : %s\n", res_path);
 }
@@ -74,10 +78,10 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     mWindowSurface->makeCurrent();
 
     cube = new CubeIndex();
-    cubeShaderProgram = new CubeShaderProgram();
+    gpuAnimationProgram = new GPUAnimationProgram();
 
     char _res_name[250]={0};
-    sprintf(_res_name, "%s%s", res_path, "test.jpg");
+    sprintf(_res_name, "%s%s", res_path, "animation_test.png");
     // 输入资源文件的资源路径，创建纹理，返回纹理id
     animation_texure = TextureHelper::createTextureFromImage(_res_name);
 }
@@ -105,28 +109,26 @@ void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
     }
     mWindowSurface->makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    //static int r_count = 0;
-    //r_count++;
-    //if(r_count > 255) {
-    //    r_count = 0;
-    //}
-    //glClearColor((r_count / 100.0), 0.6, (1.0 - r_count / 100.0), 1.0);
-    cubeShaderProgram->ShaderProgram::userProgram();
+
+    int     frame   =   int(elpasedInMilliSec/1000 * 16)%16;
+
+    gpuAnimationProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, animation_texure);
-    glUniform1i(cubeShaderProgram->uTextureUnit, 0);
+    glUniform1i(gpuAnimationProgram->uTextureUnit, 0);
     CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
-    cubeShaderProgram->setUniforms(modelViewProjectionMatrix);
-    cube->bindData(cubeShaderProgram);
+    gpuAnimationProgram->setMVPUniforms(modelViewProjectionMatrix);
+    gpuAnimationProgram->setAnimUniforms(4,4,frame);
+    cube->bindData(gpuAnimationProgram);
     cube->draw();
     mWindowSurface->swapBuffers();
 }
 void NativeGLRender::surfaceDestroyed(void)
 {
     // 清空自定义模型，纹理，各种BufferObject
-    if(cubeShaderProgram!=NULL) {
-        delete cubeShaderProgram;
-        cubeShaderProgram = NULL;
+    if(gpuAnimationProgram!=NULL) {
+        delete gpuAnimationProgram;
+        gpuAnimationProgram = NULL;
     }
     if(cube!=NULL) {
         delete cube;
