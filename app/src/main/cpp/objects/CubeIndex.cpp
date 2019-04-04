@@ -13,7 +13,8 @@ CubeIndex::CubeIndex() {
     modelMatrix = new float[16];
     CELL::Matrix::setIdentityM(modelMatrix, 0);
 
-
+    // CubeShaderProgram
+    // GPUAnimationProgram 共用
     CUBE_VERTEX_DATA = new int8_t[60];
     int8_t * p = CUBE_VERTEX_DATA;
     p[0]=-1;   p[1]=1;    p[2]=1;    p[3]=0;   p[4]=0;
@@ -29,7 +30,6 @@ CubeIndex::CubeIndex() {
     p[45]=1;   p[46]=1;   p[47]=-1;  p[48]=1;  p[49]=0;
     p[50]=-1;  p[51]=1;   p[52]=1;   p[53]=0;  p[54]=1;
     p[55]=1;   p[56]=1;   p[57]= 1;  p[58]=1;  p[59]=1;
-
     //{
     //        //x,   y,  z    s, t,
     //        -1,   1,   1,   0, 0,  // 0 left top near
@@ -47,9 +47,6 @@ CubeIndex::CubeIndex() {
     //        -1,   1,   1,   0, 1,  // 10 left top near
     //        1,   1,   1,    1, 1,  // 11 right top near
     //};
-
-
-
 
     CUBE_INDEX = new int8_t[24];
     CUBE_INDEX[0 ]= 8;  CUBE_INDEX[1 ]= 9;  CUBE_INDEX[2 ]=10;  CUBE_INDEX[3 ]=11;

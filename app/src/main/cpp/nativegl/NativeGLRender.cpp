@@ -91,6 +91,7 @@ void NativeGLRender::surfaceChanged(int width, int height)
     LOGD("render surface change ... update MVP!");
     glViewport(0,0, width, height);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
 
     CELL::Matrix::perspectiveM(projectionMatrix, 45.0f, (float)width/(float)height, 1.0f, 100.0f);
     CELL::Matrix::setLookAtM(viewMatrix, 0,
