@@ -6,6 +6,7 @@
 #define NATIVECPPAPP_CELLMATH_HPP
 
 #include <cmath>
+#include <assert.h>
 
 namespace CELL
 {
@@ -170,5 +171,132 @@ namespace CELL
             }
         }
     };
+
+
+
+
+
+
+
+
+    template <typename T>
+    struct tvec3
+    {
+        typedef T               value_type;
+        typedef std::size_t     size_type;
+        typedef tvec3<T>        type;
+
+        value_type  x;
+        value_type  y;
+        value_type  z;
+
+        size_type   length() const
+        {
+            return 3;
+        }
+
+        value_type & operator[](size_type i)
+        {
+            assert(i < this->length());
+            return (&x)[i];
+        }
+
+        value_type const & operator[](size_type i) const
+        {
+            assert(i < this->length());
+            return (&x)[i];
+        }
+
+        inline tvec3() : x(value_type(0)), y(value_type(0)), z(value_type(0)) {}
+
+        inline tvec3(tvec3<T> const & v) : x(v.x), y(v.y), z(v.z) {}
+
+        inline tvec3(value_type s) : x(s), y(s), z(s) {}
+
+        inline tvec3(value_type s0, value_type s1, value_type s2) :
+                x(s0), y(s1), z(s2) {}
+
+        tvec3<T> & operator= (tvec3<T> const & v)
+        {
+            this->x = v.x;
+            this->y = v.y;
+            this->z = v.z;
+            return *this;
+        }
+        tvec3<T> & operator+=(tvec3 const & v)
+        {
+            this->x += v.x;
+            this->y += v.y;
+            this->z += v.z;
+            return *this;
+        }
+        tvec3<T> & operator-=(tvec3 const & s)
+        {
+            this->x -= s.x;
+            this->y -= s.y;
+            this->z -= s.z;
+            return *this;
+        }
+        tvec3<T> & operator*=(tvec3 const & v)
+        {
+            this->x *= v.x;
+            this->y *= v.y;
+            this->z *= v.z;
+            return *this;
+        }
+        tvec3<T> & operator/=(tvec3 const & v)
+        {
+            this->x /= v.x;
+            this->y /= v.y;
+            this->z /= v.z;
+            return *this;
+        }
+        tvec3<T> & operator++()
+        {
+            ++this->x;
+            ++this->y;
+            ++this->z;
+            return *this;
+        }
+        tvec3<T> & operator--()
+        {
+            --this->x;
+            --this->y;
+            --this->z;
+            return *this;
+        }
+
+        void    makeFloor( const tvec3<T>& cmp )
+        {
+            if( cmp.x < x ) x = cmp.x;
+            if( cmp.y < y ) y = cmp.y;
+            if( cmp.z < z ) z = cmp.z;
+        }
+        void    makeCeil( const tvec3<T>& cmp )
+        {
+            if( cmp.x > x ) x = cmp.x;
+            if( cmp.y > y ) y = cmp.y;
+            if( cmp.z > z ) z = cmp.z;
+        }
+        T       lengthf() const
+        {
+            return (T)sqrtf( x * x + y * y + z * z );
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+    typedef tvec3<int>        int3;
+    typedef tvec3<unsigned>   uint3;
+    typedef tvec3<float>      float3;
+    typedef tvec3<double>     double3;
 }
 #endif //NATIVECPPAPP_CELLMATH_HPP
