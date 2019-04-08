@@ -35,7 +35,7 @@ int ShaderProgram::getShaderProgramId() {
 
 void ShaderProgram::deleteProgram() {
     glDeleteProgram(programId);
-    programId = -1;
+    programId = 0;
 }
 
 
