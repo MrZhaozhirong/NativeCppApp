@@ -38,7 +38,7 @@ CubeShaderProgram::CubeShaderProgram()
 }
 
 
-void CubeShaderProgram::setUniforms(float* matrix){
+void CubeShaderProgram::setMVPUniforms(float* matrix){
     glUniformMatrix4fv(uMatrixLocation, 1, GL_FALSE, matrix);
 }
 

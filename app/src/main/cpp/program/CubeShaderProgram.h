@@ -17,7 +17,7 @@ public:
     CubeShaderProgram();
     ~CubeShaderProgram();
 
-    void setUniforms(float matrix[]);
+    void setMVPUniforms(float matrix[]);
 
 public:
     GLint uMatrixLocation;
