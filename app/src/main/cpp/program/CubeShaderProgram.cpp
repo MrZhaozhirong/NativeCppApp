@@ -44,5 +44,5 @@ void CubeShaderProgram::setMVPUniforms(float* matrix){
 
 
 CubeShaderProgram::~CubeShaderProgram() {
-
+    glDeleteProgram(programId);
 }
