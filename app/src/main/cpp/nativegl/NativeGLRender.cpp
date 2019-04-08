@@ -78,13 +78,16 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     mWindowSurface->makeCurrent();
 
     cube = new CubeIndex();
-    gpuAnimationProgram = new GPUAnimationProgram();
+    gpuFlatSlidingProgram = new GPUFlatSlidingProgram();
 
-    char _res_name[250]={0};
-    sprintf(_res_name, "%s%s", res_path, "animation_test.png");
+    char res_name[250]={0};
+    sprintf(res_name, "%s%s", res_path, "test.jpg");
     // 输入资源文件的资源路径，创建纹理，返回纹理id
-    animation_texure = TextureHelper::createTextureFromImage(_res_name);
+    texture_0_id = TextureHelper::createTextureFromImage(res_name);
+    sprintf(res_name, "%s%s", res_path, "n2.jpg");
+    texture_1_id = TextureHelper::createTextureFromImage(res_name);
 }
+
 void NativeGLRender::surfaceChanged(int width, int height)
 {
     mWindowSurface->makeCurrent();
@@ -95,13 +98,14 @@ void NativeGLRender::surfaceChanged(int width, int height)
 
     CELL::Matrix::perspectiveM(projectionMatrix, 45.0f, (float)width/(float)height, 1.0f, 100.0f);
     CELL::Matrix::setLookAtM(viewMatrix, 0,
-                             4.0f, 4.0f, 4.0f,
-                             0.0f, 0.0f, 0.0f,
-                             0.0f, 1.0f, 0.0f);
+                             10.0f, 10.0f, 10.0f,
+                             0.0f,  0.0f,  0.0f,
+                             0.0f,  1.0f,  0.0f);
     CELL::Matrix::multiplyMM(viewProjectionMatrix,  projectionMatrix, viewMatrix);
 
     mWindowSurface->swapBuffers();
 }
+
 void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
 {
     if (mEglCore==NULL || mWindowSurface==NULL) {
@@ -111,25 +115,38 @@ void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
     mWindowSurface->makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+    // GPUAnimationProgram所需
     int     frame   =   int(elpasedInMilliSec/1000 * 16)%16;
+    // GPUMixShaderProgram和GPUFlatSlidingProgram所需
+    double _hasElasped = elpasedInMilliSec/1000 * 0.1f;
+    if (_hasElasped > 1.0f)
+    {
+        _hasElasped = 1.0f;
+    }
 
-    gpuAnimationProgram->ShaderProgram::userProgram();
+    gpuFlatSlidingProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, animation_texure);
-    glUniform1i(gpuAnimationProgram->uTextureUnit, 0);
+    glBindTexture(GL_TEXTURE_2D, texture_0_id);
+    glUniform1i(gpuFlatSlidingProgram->uTextureUnit0, 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_1_id);
+    glUniform1i(gpuFlatSlidingProgram->uTextureUnit1, 1);
+
     CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
-    gpuAnimationProgram->setMVPUniforms(modelViewProjectionMatrix);
-    gpuAnimationProgram->setAnimUniforms(4,4,frame);
-    cube->bindData(gpuAnimationProgram);
+    gpuFlatSlidingProgram->setMVPUniforms(modelViewProjectionMatrix);
+    //gpuAnimationProgram->setAnimUniforms(4,4,frame);
+    gpuFlatSlidingProgram->setOffsetUniform(_hasElasped);
+    cube->bindData(gpuFlatSlidingProgram);
     cube->draw();
     mWindowSurface->swapBuffers();
 }
+
 void NativeGLRender::surfaceDestroyed(void)
 {
     // 清空自定义模型，纹理，各种BufferObject
-    if(gpuAnimationProgram!=NULL) {
-        delete gpuAnimationProgram;
-        gpuAnimationProgram = NULL;
+    if(gpuFlatSlidingProgram!=NULL) {
+        delete gpuFlatSlidingProgram;
+        gpuFlatSlidingProgram = NULL;
     }
     if(cube!=NULL) {
         delete cube;

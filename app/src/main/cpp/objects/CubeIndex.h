@@ -8,6 +8,8 @@
 
 #include "../program/CubeShaderProgram.h"
 #include "../program/GPUAnimationProgram.h"
+#include "../program/GPUMixShaderProgram.h"
+#include "../program/GPUFlatSlidingProgram.h"
 
 class CubeIndex {
 public:
@@ -22,7 +24,8 @@ public:
     void draw();
     void bindData(CubeShaderProgram * shaderProgram);
     void bindData(GPUAnimationProgram * shaderProgram);
-
+    void bindData(GPUMixShaderProgram * shaderProgram);
+    void bindData(GPUFlatSlidingProgram * shaderProgram);
 public:
     float * modelMatrix;
 

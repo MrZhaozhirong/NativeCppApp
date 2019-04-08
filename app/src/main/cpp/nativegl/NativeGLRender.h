@@ -12,6 +12,8 @@
 #include "../egl/WindowSurface.h"
 #include "../objects/CubeIndex.h"
 #include "../program/GPUAnimationProgram.h"
+#include "../program/GPUMixShaderProgram.h"
+#include "../program/GPUFlatSlidingProgram.h"
 
 class NativeGLRender : public GLRender{
 
@@ -39,13 +41,16 @@ private:
     float * viewMatrix;
 
     char  * res_path;
-    GLuint  animation_texure;
+    GLuint  texture_0_id;
+    GLuint  texture_1_id;
 
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
     CubeIndex * cube;
     //CubeShaderProgram * cubeShaderProgram;
-    GPUAnimationProgram * gpuAnimationProgram;
+    //GPUAnimationProgram * gpuAnimationProgram;
+    //GPUMixShaderProgram * gpuMixShaderProgram;
+    GPUFlatSlidingProgram * gpuFlatSlidingProgram;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 
