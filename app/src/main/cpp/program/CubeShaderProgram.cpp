@@ -8,7 +8,9 @@
 
 
 
-
+/**
+ * 正方体静态纹理 着色器程序
+ */
 CubeShaderProgram::CubeShaderProgram()
 {
     const char * vertexShaderResourceStr = const_cast<char *>(" uniform mat4    u_Matrix;\n\
@@ -44,5 +46,5 @@ void CubeShaderProgram::setMVPUniforms(float* matrix){
 
 
 CubeShaderProgram::~CubeShaderProgram() {
-    glDeleteProgram(programId);
+
 }

@@ -6,7 +6,9 @@
 
 #include "ShaderHelper.h"
 
-
+/**
+ * 正方体动态火花 着色器程序
+ */
 GPUAnimationProgram::GPUAnimationProgram()
 {
     const char * vertexShaderResourceStr = const_cast<char *> ("uniform mat4    u_Matrix;\n\
