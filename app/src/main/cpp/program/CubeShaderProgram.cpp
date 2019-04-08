@@ -9,7 +9,6 @@
 
 
 
-
 CubeShaderProgram::CubeShaderProgram()
 {
     const char * vertexShaderResourceStr = const_cast<char *>(" uniform mat4    u_Matrix;\n\
