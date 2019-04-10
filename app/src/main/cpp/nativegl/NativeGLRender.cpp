@@ -122,8 +122,7 @@ void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
     // GPUMixShaderProgram和GPUFlatSlidingProgram所需
     double _hasElasped = elpasedInMilliSec/1000 * 0.1f;
 
-
-
+    // 画正方体
     cubeShaderProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_0_id);
@@ -136,8 +135,7 @@ void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
     cube->bindData(cubeShaderProgram);
     cube->draw();
 
-
-
+    // 画草地
     landProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture_1_id);
