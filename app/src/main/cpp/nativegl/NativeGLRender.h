@@ -14,6 +14,8 @@
 #include "../program/GPUAnimationProgram.h"
 #include "../program/GPUMixShaderProgram.h"
 #include "../program/GPUFlatSlidingProgram.h"
+#include "../program/GrasslandProgram.hpp"
+#include "../objects/Grassland.h"
 
 class NativeGLRender : public GLRender{
 
@@ -47,10 +49,14 @@ private:
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
     CubeIndex * cube;
-    //CubeShaderProgram * cubeShaderProgram;
+    CubeShaderProgram * cubeShaderProgram;
     //GPUAnimationProgram * gpuAnimationProgram;
     //GPUMixShaderProgram * gpuMixShaderProgram;
-    GPUFlatSlidingProgram * gpuFlatSlidingProgram;
+    //GPUFlatSlidingProgram * gpuFlatSlidingProgram;
+
+    Grassland * land;
+    GrasslandProgram * landProgram;
+
 private:
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 

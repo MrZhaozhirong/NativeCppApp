@@ -77,14 +77,16 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
 
-    cube = new CubeIndex();
-    gpuFlatSlidingProgram = new GPUFlatSlidingProgram();
+    cube = new CubeIndex(0.5f);
+    cubeShaderProgram = new CubeShaderProgram();
+    land = new Grassland();
+    landProgram = new GrasslandProgram();
+
 
     char res_name[250]={0};
     sprintf(res_name, "%s%s", res_path, "test.jpg");
-    // 输入资源文件的资源路径，创建纹理，返回纹理id
     texture_0_id = TextureHelper::createTextureFromImage(res_name);
-    sprintf(res_name, "%s%s", res_path, "n2.jpg");
+    sprintf(res_name, "%s%s", res_path, "land.jpg");
     texture_1_id = TextureHelper::createTextureFromImage(res_name);
 }
 
@@ -119,36 +121,44 @@ void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
     int     frame   =   int(elpasedInMilliSec/1000 * 16)%16;
     // GPUMixShaderProgram和GPUFlatSlidingProgram所需
     double _hasElasped = elpasedInMilliSec/1000 * 0.1f;
-    if (_hasElasped > 1.0f)
-    {
-        _hasElasped = 1.0f;
-    }
 
-    gpuFlatSlidingProgram->ShaderProgram::userProgram();
+
+
+    cubeShaderProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_0_id);
-    glUniform1i(gpuFlatSlidingProgram->uTextureUnit0, 0);
+    glUniform1i(cubeShaderProgram->uTextureUnit, 0);
+    CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
+    cubeShaderProgram->setMVPUniforms(modelViewProjectionMatrix);
+    //gpuAnimationProgram->setAnimUniforms(4,4,frame);
+    //gpuFlatSlidingProgram->setOffsetUniform(_hasElasped);
+    //gpuMixShaderProgram->setMixUniform(_hasElasped);
+    cube->bindData(cubeShaderProgram);
+    cube->draw();
+
+
+
+    landProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture_1_id);
-    glUniform1i(gpuFlatSlidingProgram->uTextureUnit1, 1);
+    glUniform1i(landProgram->uTextureUnit, 1);
+    CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, land->modelMatrix);
+    landProgram->setMVPUniforms(modelViewProjectionMatrix);
+    land->bindData(landProgram);
+    land->draw();
+    land->unbind(landProgram);
 
-    CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, cube->modelMatrix);
-    gpuFlatSlidingProgram->setMVPUniforms(modelViewProjectionMatrix);
-    //gpuAnimationProgram->setAnimUniforms(4,4,frame);
-    gpuFlatSlidingProgram->setOffsetUniform(_hasElasped);
-    cube->bindData(gpuFlatSlidingProgram);
-    cube->draw();
     mWindowSurface->swapBuffers();
 }
 
 void NativeGLRender::surfaceDestroyed(void)
 {
     // 清空自定义模型，纹理，各种BufferObject
-    if(gpuFlatSlidingProgram!=NULL) {
-        delete gpuFlatSlidingProgram;
-        gpuFlatSlidingProgram = NULL;
+    if (cubeShaderProgram!=NULL) {
+        delete cubeShaderProgram;
+        cubeShaderProgram = NULL;
     }
-    if(cube!=NULL) {
+    if (cube!=NULL) {
         delete cube;
         cube = NULL;
     }
@@ -172,9 +182,9 @@ void NativeGLRender::surfaceDestroyed(void)
 void NativeGLRender::handleMultiTouch(float distance) {
     float OBJECT_SCALE_FLOAT = 1.1f;
     if(distance > 0) {
-        CELL::Matrix::scaleM(cube->modelMatrix,0, OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT);
+        //CELL::Matrix::scaleM(cube->modelMatrix,0, OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT,OBJECT_SCALE_FLOAT);
     } else {
-        CELL::Matrix::scaleM(cube->modelMatrix,0, 1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT);
+        //CELL::Matrix::scaleM(cube->modelMatrix,0, 1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT,1/OBJECT_SCALE_FLOAT);
     }
 }
 

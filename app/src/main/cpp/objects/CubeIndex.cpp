@@ -15,8 +15,8 @@ CubeIndex::CubeIndex() {
 
     // CubeShaderProgram
     // GPUAnimationProgram 共用
-    CUBE_VERTEX_DATA = new int8_t[60];
-    int8_t * p = CUBE_VERTEX_DATA;
+    CUBE_VERTEX_DATA = new float[60];
+    float * p = CUBE_VERTEX_DATA;
     p[0]=-1;   p[1]=1;    p[2]=1;    p[3]=0;   p[4]=0;
     p[5]=1;    p[6]=1;    p[7]= 1;   p[8]=1;   p[9]=0;
     p[10]=-1;  p[11]=-1;  p[12]= 1;  p[13]=0;  p[14]=1;
@@ -71,6 +71,35 @@ CubeIndex::CubeIndex() {
     //};
 }
 
+CubeIndex::CubeIndex(float cube_size) {
+    modelMatrix = new float[16];
+    CELL::Matrix::setIdentityM(modelMatrix, 0);
+
+    CUBE_VERTEX_DATA = new float[60];
+    float * p = CUBE_VERTEX_DATA;
+    p[0]=-cube_size;   p[1]=cube_size;    p[2]=cube_size;    p[3]=0;   p[4]=0;
+    p[5]=cube_size;    p[6]=cube_size;    p[7]= cube_size;   p[8]=1;   p[9]=0;
+    p[10]=-cube_size;  p[11]=-cube_size;  p[12]= cube_size;  p[13]=0;  p[14]=1;
+    p[15]=cube_size;   p[16]=-cube_size;  p[17]= cube_size;  p[18]=1;  p[19]=1;
+    p[20]=-cube_size;  p[21]= cube_size;  p[22]=-cube_size;  p[23]=1;  p[24]=0;
+    p[25]=cube_size;   p[26]=cube_size;   p[27]=-cube_size;  p[28]=0;  p[29]=0;
+    p[30]=-cube_size;  p[31]=-cube_size;  p[32]=-cube_size;  p[33]=1;  p[34]=1;
+    p[35]=cube_size;   p[36]=-cube_size;  p[37]=-cube_size;  p[38]=0;  p[39]=1;
+
+    p[40]=-cube_size;  p[41]= cube_size;  p[42]=-cube_size;  p[43]=0;  p[44]=0;
+    p[45]=cube_size;   p[46]=cube_size;   p[47]=-cube_size;  p[48]=1;  p[49]=0;
+    p[50]=-cube_size;  p[51]=cube_size;   p[52]=cube_size;   p[53]=0;  p[54]=1;
+    p[55]=cube_size;   p[56]=cube_size;   p[57]= cube_size;  p[58]=1;  p[59]=1;
+
+    CUBE_INDEX = new int8_t[24];
+    CUBE_INDEX[0 ]= 8;  CUBE_INDEX[1 ]= 9;  CUBE_INDEX[2 ]=10;  CUBE_INDEX[3 ]=11;
+    CUBE_INDEX[4 ]= 6;  CUBE_INDEX[5 ]= 7;  CUBE_INDEX[6 ]=2;   CUBE_INDEX[7 ]=3;
+    CUBE_INDEX[8 ]= 0;  CUBE_INDEX[9 ]= 1;  CUBE_INDEX[10]=2;   CUBE_INDEX[11]=3;
+    CUBE_INDEX[12]= 4;  CUBE_INDEX[13]= 5;  CUBE_INDEX[14]=6;   CUBE_INDEX[15]=7;
+    CUBE_INDEX[16]= 4;  CUBE_INDEX[17]= 0;  CUBE_INDEX[18]=6;   CUBE_INDEX[19]=2;
+    CUBE_INDEX[20]= 1;  CUBE_INDEX[21]= 5;  CUBE_INDEX[22]=3;   CUBE_INDEX[23]=7;
+}
+
 CubeIndex::~CubeIndex() {
     delete [] CUBE_VERTEX_DATA;
     delete [] CUBE_INDEX;
@@ -79,56 +108,56 @@ CubeIndex::~CubeIndex() {
 
 void CubeIndex::bindData(GPUFlatSlidingProgram *shaderProgram) {
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aPositionLocation),
-                          POSITION_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          POSITION_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           CUBE_VERTEX_DATA);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aPositionLocation));
 
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aTexUvLocation),
-                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           &CUBE_VERTEX_DATA[POSITION_COMPONENT_COUNT]);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aTexUvLocation));
 }
 
 void CubeIndex::bindData(GPUMixShaderProgram* shaderProgram) {
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aPositionLocation),
-                          POSITION_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          POSITION_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           CUBE_VERTEX_DATA);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aPositionLocation));
 
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aTexUvLocation),
-                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           &CUBE_VERTEX_DATA[POSITION_COMPONENT_COUNT]);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aTexUvLocation));
 }
 
 void CubeIndex::bindData(GPUAnimationProgram* shaderProgram) {
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aPositionLocation),
-                          POSITION_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          POSITION_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           CUBE_VERTEX_DATA);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aPositionLocation));
 
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aTexUvLocation),
-                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           &CUBE_VERTEX_DATA[POSITION_COMPONENT_COUNT]);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aTexUvLocation));
 }
 
 void CubeIndex::bindData(CubeShaderProgram* shaderProgram) {
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aPositionLocation),
-                          POSITION_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          POSITION_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           CUBE_VERTEX_DATA);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aPositionLocation));
 
     glVertexAttribPointer(static_cast<GLuint>(shaderProgram->aTexUvLocation),
-                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_BYTE,
-                          GL_FALSE, STRIDE,
+                          TEXTURE_COORDINATE_COMPONENT_COUNT, GL_FLOAT,
+                          GL_FALSE, sizeof(Vertex),
                           &CUBE_VERTEX_DATA[POSITION_COMPONENT_COUNT]);
     glEnableVertexAttribArray(static_cast<GLuint>(shaderProgram->aTexUvLocation));
 }
@@ -139,6 +168,8 @@ void CubeIndex::draw() {
     // 正方体 六个面，每个面四个点
     glDrawElements(GL_TRIANGLE_STRIP, 6*4, GL_UNSIGNED_BYTE, CUBE_INDEX );
 }
+
+
 
 
 

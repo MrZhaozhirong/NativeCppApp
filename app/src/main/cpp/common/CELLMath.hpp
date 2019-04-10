@@ -293,7 +293,8 @@ namespace CELL
 
 
 
-
+    typedef double            real;
+    typedef tvec3<real>       real3;
     typedef tvec3<int>        int3;
     typedef tvec3<unsigned>   uint3;
     typedef tvec3<float>      float3;

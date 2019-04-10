@@ -13,11 +13,19 @@
 
 class CubeIndex {
 public:
+    struct  Vertex
+    {
+        float   x, y, z;
+        float   u, v;
+    };
+public:
     static const int POSITION_COMPONENT_COUNT = 3;
     static const int COLOR_COMPONENT_COUNT = 3;
     static const int TEXTURE_COORDINATE_COMPONENT_COUNT = 2;
-    static const int STRIDE = POSITION_COMPONENT_COUNT + TEXTURE_COORDINATE_COMPONENT_COUNT;
+    static const int BYTES_PER_FLOAT = 4;
+    static const int STRIDE = (POSITION_COMPONENT_COUNT + TEXTURE_COORDINATE_COMPONENT_COUNT)*BYTES_PER_FLOAT;
 public:
+    CubeIndex(float cube_size);
     CubeIndex();
     ~CubeIndex();
 
@@ -30,7 +38,7 @@ public:
     float * modelMatrix;
 
 private:
-    int8_t * CUBE_VERTEX_DATA;
+    float * CUBE_VERTEX_DATA;
     int8_t * CUBE_INDEX;
 };
 
