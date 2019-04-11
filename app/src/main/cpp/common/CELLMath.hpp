@@ -178,7 +178,7 @@ namespace CELL
 
 
 
-
+    // tvec3
     template <typename T>
     struct tvec3
     {
@@ -195,6 +195,15 @@ namespace CELL
             return 3;
         }
 
+        inline tvec3() : x(value_type(0)), y(value_type(0)), z(value_type(0)) {}
+
+        inline tvec3(tvec3<T> const & v) : x(v.x), y(v.y), z(v.z) {}
+
+        inline tvec3(value_type s) : x(s), y(s), z(s) {}
+
+        inline tvec3(value_type s0, value_type s1, value_type s2) :
+                x(s0), y(s1), z(s2) {}
+
         value_type & operator[](size_type i)
         {
             assert(i < this->length());
@@ -206,15 +215,6 @@ namespace CELL
             assert(i < this->length());
             return (&x)[i];
         }
-
-        inline tvec3() : x(value_type(0)), y(value_type(0)), z(value_type(0)) {}
-
-        inline tvec3(tvec3<T> const & v) : x(v.x), y(v.y), z(v.z) {}
-
-        inline tvec3(value_type s) : x(s), y(s), z(s) {}
-
-        inline tvec3(value_type s0, value_type s1, value_type s2) :
-                x(s0), y(s1), z(s2) {}
 
         tvec3<T> & operator= (tvec3<T> const & v)
         {
@@ -283,6 +283,97 @@ namespace CELL
             return (T)sqrtf( x * x + y * y + z * z );
         }
     };
+
+    template <typename T>
+    tvec3<T> operator- (tvec3<T> const & v1, tvec3<T> const & v2)
+    {
+        return tvec3<T>(
+                v1.x - T(v2.x),
+                v1.y - T(v2.y),
+                v1.z - T(v2.z));
+    }
+    template <typename T>
+    tvec3<T> operator- (T const & s, tvec3<T> const & v)
+    {
+        return tvec3<T>(
+                T(s) - v.x,
+                T(s) - v.y,
+                T(s) - v.z);
+    }
+    template <typename T>
+    tvec3<T> operator- (tvec3<T> const & v, T const & s)
+    {
+        return tvec3<T>(
+                v.x - T(s),
+                v.y - T(s),
+                v.z - T(s));
+    }
+    template <typename T>
+    tvec3<T> operator- (tvec3<T> const & v)
+    {
+        return tvec3<T>(
+                -v.x,
+                -v.y,
+                -v.z);
+    }
+    template <typename T>
+    tvec3<T> operator+(tvec3<T> const & v, T const & s)
+    {
+        return tvec3<T>(
+                v.x + T(s),
+                v.y + T(s),
+                v.z + T(s));
+    }
+    template <typename T>
+    tvec3<T> operator+ ( T const & s, tvec3<T> const & v)
+    {
+        return tvec3<T>(
+                T(s) + v.x,
+                T(s) + v.y,
+                T(s) + v.z);
+    }
+    template <typename T>
+    tvec3<T> operator+ (tvec3<T> const & v1, tvec3<T> const & v2)
+    {
+        return tvec3<T>(
+                v1.x + T(v2.x),
+                v1.y + T(v2.y),
+                v1.z + T(v2.z));
+    }
+    // tvec3 end.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    template <typename T>
+    T inversesqrt(T x)
+    {
+        return T(1) / sqrt(x);
+    }
+    template <typename T>
+    tvec3<T> normalize(tvec3<T> const & x)
+    {
+        typename tvec3<T>::value_type sqr = x.x * x.x + x.y * x.y + x.z * x.z;
+        return x * inversesqrt(sqr);
+    }
+
+
+
+
 
 
 
