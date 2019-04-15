@@ -10,6 +10,7 @@
 #include "../program/GPUAnimationProgram.h"
 #include "../program/GPUMixShaderProgram.h"
 #include "../program/GPUFlatSlidingProgram.h"
+#include "../common/CELLMath.hpp"
 
 class CubeIndex {
 public:
@@ -36,7 +37,7 @@ public:
     void bindData(GPUFlatSlidingProgram * shaderProgram);
 public:
     float * modelMatrix;
-
+    CELL::matrix4   matModel;
 private:
     float * CUBE_VERTEX_DATA;
     int8_t * CUBE_INDEX;

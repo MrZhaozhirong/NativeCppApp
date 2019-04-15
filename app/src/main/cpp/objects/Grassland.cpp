@@ -30,6 +30,9 @@ Grassland::Grassland() {
     VERTEX_DATA = new GrasslandVertex[6];
     memset(VERTEX_DATA, 0, sizeof(VERTEX_DATA));
     memcpy(VERTEX_DATA, grounds, sizeof(grounds));
+
+
+    matModel.identify();
 }
 
 Grassland::~Grassland() {

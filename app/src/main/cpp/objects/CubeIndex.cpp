@@ -12,7 +12,7 @@
 CubeIndex::CubeIndex() {
     modelMatrix = new float[16];
     CELL::Matrix::setIdentityM(modelMatrix, 0);
-
+    matModel.identify();
     // CubeShaderProgram
     // GPUAnimationProgram 共用
     CUBE_VERTEX_DATA = new float[60];
@@ -74,6 +74,7 @@ CubeIndex::CubeIndex() {
 CubeIndex::CubeIndex(float cube_size) {
     modelMatrix = new float[16];
     CELL::Matrix::setIdentityM(modelMatrix, 0);
+    matModel.identify();
 
     CUBE_VERTEX_DATA = new float[60];
     float * p = CUBE_VERTEX_DATA;

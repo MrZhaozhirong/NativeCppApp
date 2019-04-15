@@ -7,6 +7,7 @@
 
 
 #include "../program/GrasslandProgram.hpp"
+#include "../common/CELLMath.hpp"
 
 class Grassland {
 public:
@@ -25,6 +26,7 @@ public:
     void unbind(GrasslandProgram * shaderProgram);
 public:
     float * modelMatrix;
+    CELL::matrix4   matModel;
 
 private:
     GrasslandVertex * VERTEX_DATA;

@@ -72,7 +72,14 @@ public:
     {
         return  _right;
     }
-
+    real3   getUp() const
+    {
+        return _up;
+    }
+    void    setUp(CELL::real3 val)
+    {
+        _up = val;
+    }
     void    setViewPort(const real2& viewSize)
     {
         _ViewPortSize   =   viewSize;
