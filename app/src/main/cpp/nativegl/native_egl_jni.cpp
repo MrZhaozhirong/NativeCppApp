@@ -6,12 +6,13 @@
 #include "NativeGLRender.h"
 #include "../common/zzr_common.h"
 #include "../include/zip.h"
+#include "GL3DRender.h"
 #include <sys/stat.h>
 #include <unistd.h>
 
 GLThread *glThread = NULL;
 NativeGLRender* renderer = NULL;
-
+GL3DRender* m3d_renderer = NULL;
 
 void unzipAssetsResFile(const char *compressed_apk_path_cstr, const char *release_res_path_cstr)
 {
@@ -121,12 +122,12 @@ Java_org_zzrblog_nativecpp_NativeEGL_initBeforeEGL(JNIEnv *env, jobject instance
     // 解压纹理资源文件
     unzipAssetsResFile(compressed_apk_path_cstr, release_res_path_cstr);
 
-    renderer = new NativeGLRender();
+    m3d_renderer = new GL3DRender();
     char res_path[250]={0};
     strcat (res_path, release_res_path_cstr);
     strcat (res_path, "/");
     strcat (res_path, "assets/mipmap/");
-    renderer->setResPath(res_path);
+    m3d_renderer->setResPath(res_path);
 
     env->ReleaseStringUTFChars(compressed_apk_path_jstr, compressed_apk_path_cstr);
     env->ReleaseStringUTFChars(release_res_path_jstr, release_res_path_cstr);
@@ -139,7 +140,7 @@ Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceCreate(JNIEnv *env, jobject instan
     ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
 
     glThread = new GLThread();
-    glThread->setGLRender(renderer);
+    glThread->setGLRender(m3d_renderer);
     glThread->onSurfaceCreate(nativeWindow);
 }
 
@@ -158,7 +159,8 @@ Java_org_zzrblog_nativecpp_NativeEGL_onSurfaceDestroy(JNIEnv *env, jobject insta
     glThread->onSurfaceDestroy();
     glThread->release();
     glThread = NULL;
-    delete renderer;
+    if(renderer!=NULL) delete renderer;
+    if(m3d_renderer !=NULL)delete m3d_renderer;
 }
 
 
@@ -169,31 +171,31 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_nativecpp_NativeEGL_handleMultiTouch(JNIEnv *env, jobject instance, jfloat distance)
 {
-    if(renderer!=NULL) {
-        renderer->handleMultiTouch(distance);
+    if(m3d_renderer!=NULL) {
+        m3d_renderer->handleMultiTouch(distance);
     }
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_nativecpp_NativeEGL_handleTouchDown(JNIEnv *env, jobject instance, jfloat x, jfloat y)
 {
-    if(renderer!=NULL) {
-        renderer->handleTouchDown(x,y);
+    if(m3d_renderer!=NULL) {
+        m3d_renderer->handleTouchDown(x,y);
     }
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_nativecpp_NativeEGL_handleTouchDrag(JNIEnv *env, jobject instance, jfloat x, jfloat y)
 {
-    if(renderer!=NULL) {
-        renderer->handleTouchDrag(x,y);
+    if(m3d_renderer!=NULL) {
+        m3d_renderer->handleTouchDrag(x,y);
     }
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_nativecpp_NativeEGL_handleTouchUp(JNIEnv *env, jobject instance, jfloat x, jfloat y)
 {
-    if(renderer!=NULL) {
-        renderer->handleTouchUp(x,y);
+    if(m3d_renderer!=NULL) {
+        m3d_renderer->handleTouchUp(x,y);
     }
 }

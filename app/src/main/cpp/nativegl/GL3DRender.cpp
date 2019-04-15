@@ -181,16 +181,26 @@ void GL3DRender::handleMultiTouch(float distance) {
 }
 
 void GL3DRender::handleTouchDown(float x, float y) {
-    // TODO
+    this->mLastX = x;
+    this->mLastY = y;
 }
 
 void GL3DRender::handleTouchDrag(float x, float y) {
-    // TODO
-    mCamera3D.rotateViewY(1);
+    float offsetX = this->mLastX - x;
+    offsetX /= 10;
+    mCamera3D.rotateViewY(offsetX);
+
+    float offsetY = this->mLastY - y;
+    offsetY /= 10;
+    mCamera3D.rotateViewX(offsetY);
+
+    this->mLastX = x;
+    this->mLastY = y;
 }
 
 void GL3DRender::handleTouchUp(float x, float y) {
-    // TODO
+    this->mLastX = 0;
+    this->mLastY = 0;
 }
 
 

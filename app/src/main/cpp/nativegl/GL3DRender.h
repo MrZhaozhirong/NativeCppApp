@@ -34,11 +34,14 @@ public:
     void handleTouchDrag(float x, float y);
     void handleTouchUp(float x, float y);
 
-
-    void setResPath(char *string);
+    void setResPath(char *path);
 
 private:
     Camera3D mCamera3D;
+    float mLastX;
+    float mLastY;
+
+private:
 
     char  * res_path;
     GLuint  texture_0_id;
