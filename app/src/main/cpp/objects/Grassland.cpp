@@ -11,10 +11,10 @@ Grassland::Grassland() {
     modelMatrix = new float[16];
     CELL::Matrix::setIdentityM(modelMatrix, 0);
 
-    float   gSizeX = 5;
-    float   gSizeZ = 5;
+    float   gSizeX = 10;
+    float   gSizeZ = 10;
     float   gPos = -1;
-    float   rept = 5;
+    float   rept = 10;
 
     GrasslandVertex grounds[] =
     {

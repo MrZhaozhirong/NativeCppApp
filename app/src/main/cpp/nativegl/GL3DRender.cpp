@@ -77,7 +77,7 @@ void GL3DRender::surfaceCreated(ANativeWindow *window)
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
 
-    cube = new CubeIndex(0.5f);
+    cube = new CubeIndex(1.0f);
     cubeShaderProgram = new CubeShaderProgram();
     land = new Grassland();
     landProgram = new GrasslandProgram();
@@ -99,7 +99,7 @@ void GL3DRender::surfaceChanged(int width, int height)
     glViewport(0,0, width, height);
     mCamera3D.setViewPort(width, height);
     mCamera3D.perspective(45, (float)width/(float)height, 0.1f, 1000.0f);
-    mCamera3D.setEye(CELL::real3(0,15,15));
+    mCamera3D.setEye(CELL::real3(0,20,20));
     mCamera3D.setTarget(CELL::real3(0,0,0));
     mCamera3D.setUp(CELL::float3(0,1,0));
     mCamera3D.setRight(CELL::float3(1,0,0));
@@ -177,7 +177,10 @@ void GL3DRender::surfaceDestroyed(void)
 
 
 void GL3DRender::handleMultiTouch(float distance) {
-
+    LOGD("handleMultiTouch distance:%f", distance);
+    real    present =   distance > 0 ? 0.9f : 1.1f;
+    real3 target = mCamera3D.getTarget();
+    mCamera3D.scaleCameraByPos(target, present);
 }
 
 void GL3DRender::handleTouchDown(float x, float y) {
@@ -191,7 +194,7 @@ void GL3DRender::handleTouchDrag(float x, float y) {
     mCamera3D.rotateViewY(offsetX);
 
     float offsetY = this->mLastY - y;
-    offsetY /= 10;
+    offsetY /= 50;
     mCamera3D.rotateViewX(offsetY);
 
     this->mLastX = x;

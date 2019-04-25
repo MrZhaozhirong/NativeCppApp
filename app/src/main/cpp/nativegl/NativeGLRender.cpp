@@ -79,9 +79,6 @@ void NativeGLRender::surfaceCreated(ANativeWindow *window)
 
     cube = new CubeIndex(0.5f);
     cubeShaderProgram = new CubeShaderProgram();
-    land = new Grassland();
-    landProgram = new GrasslandProgram();
-
 
     char res_name[250]={0};
     sprintf(res_name, "%s%s", res_path, "test.jpg");
@@ -135,16 +132,6 @@ void NativeGLRender::renderOnDraw(double elpasedInMilliSec)
     cube->bindData(cubeShaderProgram);
     cube->draw();
 
-    // 画草地
-    landProgram->ShaderProgram::userProgram();
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture_1_id);
-    glUniform1i(landProgram->uTextureUnit, 1);
-    CELL::Matrix::multiplyMM(modelViewProjectionMatrix, viewProjectionMatrix, land->modelMatrix);
-    landProgram->setMVPUniforms(modelViewProjectionMatrix);
-    land->bindData(landProgram);
-    land->draw();
-    land->unbind(landProgram);
 
     mWindowSurface->swapBuffers();
 }

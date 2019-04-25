@@ -54,9 +54,6 @@ private:
     //GPUMixShaderProgram * gpuMixShaderProgram;
     //GPUFlatSlidingProgram * gpuFlatSlidingProgram;
 
-    Grassland * land;
-    GrasslandProgram * landProgram;
-
 private:
     DISALLOW_EVIL_CONSTRUCTORS(NativeGLRender);
 
