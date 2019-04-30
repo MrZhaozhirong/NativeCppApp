@@ -198,6 +198,7 @@ public:
     {
         real        len(0);
         matrix4r    mat(1);
+        //mat.rotate(angle, _up);
         mat.rotate(angle, real3(0, 1, 0));
         _dir        =   _dir * mat;
         _up         =   _up * mat;
@@ -213,6 +214,7 @@ public:
         real        len(0);
         matrix4r    mat(1);
         mat.rotate(angle, _right);
+        //mat.rotate(angle, real3(1, 0, 0));
         _dir        =   _dir * mat;
         _up         =   _up * mat;
         _right      =   CELL::normalize(cross(_dir,_up));
