@@ -117,11 +117,6 @@ void GL3DRender::renderOnDraw(double elpasedInMilliSec)
     mWindowSurface->makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    // GPUAnimationProgram所需
-    int     frame   =   int(elpasedInMilliSec/1000 * 16)%16;
-    // GPUMixShaderProgram和GPUFlatSlidingProgram所需
-    double _hasElasped = elpasedInMilliSec/1000 * 0.1f;
-
     CELL::matrix4   vp =   mCamera3D.getProject() * mCamera3D.getView();
 
     // 画正方体
