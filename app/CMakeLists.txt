@@ -40,7 +40,7 @@ add_library(
 target_link_libraries(
         native-egl
         EGL
-        GLESv2
+        GLESv3
         android
         zip
         log)

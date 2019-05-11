@@ -2,7 +2,7 @@
 #define NATIVECPPAPP_SHADERHELPER_H
 
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include "../common/zzr_common.h"
 
 class ShaderHelper {

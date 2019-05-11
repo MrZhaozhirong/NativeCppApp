@@ -12,10 +12,12 @@ namespace CELL {
 //////////////////////////public methods//////////////////////////
     CELLTimer::CELLTimer() :
             m_second(0), m_microsecond(0) {
+        thread_timer = -1;
     }
 
     CELLTimer::CELLTimer(long second, long microsecond) :
             m_second(second), m_microsecond(microsecond) {
+        thread_timer = -1;
     }
 
     CELLTimer::~CELLTimer() {
@@ -29,14 +31,14 @@ namespace CELL {
     }
 
     void CELLTimer::startTimer() {
-        if (thread_timer == NULL)
+        if (thread_timer == -1)
             pthread_create(&thread_timer, NULL, OnTimer_stub, this);
     }
 
     void CELLTimer::stopTimer() {
         isStop = true;
         //pthread_join(thread_timer, NULL); //wait the thread stopped
-        thread_timer = NULL;
+        thread_timer = -1;
     }
 
 //////////////////////////private methods//////////////////////////

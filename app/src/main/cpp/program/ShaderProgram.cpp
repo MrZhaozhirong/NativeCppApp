@@ -2,7 +2,7 @@
 // Created by nicky on 2019/3/18.
 //
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include "ShaderProgram.h"
 #include "../common/zzr_common.h"
 #include "ShaderHelper.h"

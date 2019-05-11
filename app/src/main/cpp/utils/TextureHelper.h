@@ -5,7 +5,7 @@
 #ifndef NATIVECPPAPP_TEXTUREHELPER_H
 #define NATIVECPPAPP_TEXTUREHELPER_H
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 
 class TextureHelper {
 

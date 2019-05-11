@@ -6,7 +6,7 @@
 #define NATIVECPPAPP_SHADERPROGRAM_H
 
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 
 class ShaderProgram {
 protected:

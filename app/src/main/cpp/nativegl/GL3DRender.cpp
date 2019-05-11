@@ -3,7 +3,7 @@
 //
 
 #include <assert.h>
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include <jni.h>
 #include <cstdio>
 #include "GL3DRender.h"
@@ -70,23 +70,31 @@ void GL3DRender::setResPath(char *string) {
 void GL3DRender::surfaceCreated(ANativeWindow *window)
 {
     if (mEglCore == NULL) {
-        mEglCore = new EglCore(NULL, FLAG_RECORDABLE);
+        mEglCore = new EglCore(NULL, FLAG_TRY_GLES3);
     }
     mWindowSurface = new WindowSurface(mEglCore, window, true);
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
 
-    cube = new CubeIndex(1.0f);
-    cubeShaderProgram = new CubeShaderProgram();
-    land = new Grassland();
-    landProgram = new GrasslandProgram();
-
     char res_name[250]={0};
     sprintf(res_name, "%s%s", res_path, "test.jpg");
     texture_0_id = TextureHelper::createTextureFromImage(res_name);
     sprintf(res_name, "%s%s", res_path, "land.jpg");
     texture_1_id = TextureHelper::createTextureFromImage(res_name);
+    sprintf(res_name, "%s%s", res_path, "grass.png");
+    texture_greenery_id = TextureHelper::createTextureFromImage(res_name);
+
+    cube = new CubeIndex(1.0f);
+    cubeShaderProgram = new CubeShaderProgram();
+    land = new Grassland();
+    landProgram = new GrasslandProgram();
+
+    greeneryMgr.init(texture_greenery_id);
+
+
+    const GLubyte * glslVersionStr = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    LOGW("GL_SHADING_LANGUAGE_VERSION : %s", glslVersionStr);
 }
 
 void GL3DRender::surfaceChanged(int width, int height)
@@ -139,6 +147,8 @@ void GL3DRender::renderOnDraw(double elpasedInMilliSec)
     land->bindData(landProgram);
     land->draw();
     land->unbind(landProgram);
+
+    greeneryMgr.render(mCamera3D);
 
     mWindowSurface->swapBuffers();
 }

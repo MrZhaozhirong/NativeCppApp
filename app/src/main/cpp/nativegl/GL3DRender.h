@@ -17,6 +17,7 @@
 #include "../program/GrasslandProgram.hpp"
 #include "../objects/Grassland.h"
 #include "../common/Camera3D.hpp"
+#include "../objects/GreeneryMgr.hpp"
 
 class GL3DRender : public GLRender{
 
@@ -42,10 +43,10 @@ private:
     float mLastY;
 
 private:
-
     char  * res_path;
     GLuint  texture_0_id;
     GLuint  texture_1_id;
+    GLuint  texture_greenery_id;
 
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
@@ -55,6 +56,7 @@ private:
     Grassland * land;
     GrasslandProgram * landProgram;
 
+    GreeneryMgr    greeneryMgr;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(GL3DRender);
 

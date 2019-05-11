@@ -2,7 +2,7 @@
 // Created by nicky on 2019/3/15.
 //
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include "EglSurfaceBase.h"
 #include "../common/zzr_common.h"
 
