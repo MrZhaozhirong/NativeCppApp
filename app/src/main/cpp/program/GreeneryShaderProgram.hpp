@@ -24,13 +24,13 @@ public:
     {
         const char * vertexShaderResourceStr =
         {
-
-                "uniform     vec3     _rightDir; \n\
+               "#version 320 es\n\
+                uniform     vec3     _rightDir; \n\
                 uniform     vec3     _upDir; \n\
                 uniform     mat4     _mvp; \n\
-                attribute   vec3     _pos; \n\
-                varying     vec2     _texcoord;\n\
-                void main(void ) \n\
+                in          vec3     _pos; \n\
+                out         vec2     _texcoord;\n\
+                void main() \n\
                 {\n\
                     const vec2 uvData[6] = vec2[6]( \n\
                                             vec2(0.0, 0.0),\n\
@@ -39,7 +39,7 @@ public:
                                             vec2(0.0, 0.0),\n\
                                             vec2(1.0, 1.0),\n\
                                             vec2(1.0, 0.0) );\n\
-                    _texcoord       =   uvData[gl_VertexID];\n\
+                    _texcoord               =   uvData[gl_VertexID];\n\
                     float _texcoord_x       =   _texcoord.x;\n\
                     float _texcoord_y       =   _texcoord.y;\n\
                     vec3 newPs      =   _pos + ((_texcoord_x - 0.5)* 4.0)* _rightDir + (_texcoord_y * 4.0) * _upDir;\n\
@@ -49,14 +49,18 @@ public:
 
         const char * fragmentShaderResourceStr =
         {
-                "uniform sampler2D  _texture;\n\
-                 varying vec2       _texcoord;\n\
-                 void main(void)\n\
-                 {\n\
-                    vec4   color   =   texture2D(_texture,vec2(_texcoord.x, 1.0-_texcoord.y)); \n\
+                "#version 320 es\n\
+                precision mediump float;\n\
+                uniform   sampler2D  _texture;\n\
+                in        vec2       _texcoord;\n\
+                //use your own output instead of gl_FragColor \n\
+                out vec4 fragColor;\n\
+                void main()\n\
+                {\n\
+                    vec4   color   =   texture(_texture, vec2(_texcoord.x, 1.0-_texcoord.y)); \n\
                     if(color.a < 0.2) discard;\n\
-                    gl_FragColor   =   color;\n\
-                 }\n"
+                    fragColor   =   color;\n\
+                }\n"
         };
 
         programId = ShaderHelper::buildProgram(vertexShaderResourceStr, fragmentShaderResourceStr);
