@@ -13,7 +13,7 @@
 #include "../program/GreeneryShaderProgram.hpp"
 #include <vector>
 
-using namespace CELL;
+//using namespace CELL;
 //using namespace std;
 
 class GreeneryMgr {
@@ -38,34 +38,33 @@ public:
         _program.initialize();
 
         //  每一棵小草堆的位置索引
-        for (float x = -2 ; x < 4 ; x += 2)
+        for (float x = -3 ; x < 6 ; x += 3)
         {
-            for (float z = -2 ; z < 4 ; z += 2)
+            for (float z = -3 ; z < 6 ; z += 3)
             {
                 if(x==0&&z==0) continue;
-                mGrassesPos.push_back(float3(x,-1,z));
+                mGrassesPos.push_back(CELL::float3(x,-1,z));
             }
         }
         // 把草堆实例的位置索引寄存到vbo
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(mGrassesPos.size()*sizeof(float3)),
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(mGrassesPos.size()*sizeof(CELL::float3)),
                      &mGrassesPos.front(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER,0);
-
     }
 
     void    render(Camera3D& camera)
     {
-        glActiveTexture(GL_TEXTURE0);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,  mTexGrasses );
-
         CELL::matrix4   MVP     =   camera._matProj * camera._matView;
 
         _program.begin();
         {
+            glActiveTexture(GL_TEXTURE0);
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D,  mTexGrasses );
             glUniform1i(_program._texture, 0);
+
             glUniform3f(_program._rightDir,
                         static_cast<GLfloat>(camera._right.x),
                         static_cast<GLfloat>(camera._right.y),
@@ -80,7 +79,7 @@ public:
 
             /// 这个将vbo点数据传递给shader
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glVertexAttribPointer(_program._position, 3, GL_FLOAT, GL_FALSE, sizeof(float3), 0);
+            glVertexAttribPointer(_program._position, 3, GL_FLOAT, GL_FALSE, sizeof(CELL::float3), 0);
             /// 启用_position顶点属性的多实例特性
             glVertexAttribDivisor(_program._position, 1);
             /// 绘制函数,完成绘制
