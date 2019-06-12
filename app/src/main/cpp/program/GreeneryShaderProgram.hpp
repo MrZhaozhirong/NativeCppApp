@@ -42,7 +42,7 @@ public:
                     _texcoord               =   uvData[gl_VertexID];\n\
                     float _texcoord_x       =   _texcoord.x;\n\
                     float _texcoord_y       =   _texcoord.y;\n\
-                    vec3 newPs      =   _pos + ((_texcoord_x - 0.5)* 4.0)* _rightDir + (_texcoord_y * 4.0) * _upDir;\n\
+                    vec3 newPs      =   _pos + ((_texcoord_x - 0.5)* 2.0)* _rightDir + (_texcoord_y * 2.0) * _upDir;\n\
                     gl_Position     =   _mvp * vec4(newPs.x,newPs.y,newPs.z,1);\n\
                 }\n"
         };
