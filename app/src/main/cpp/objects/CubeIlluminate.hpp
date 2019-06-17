@@ -10,7 +10,7 @@
 
 class CubeIlluminate {
 public:
-    struct V3N3 {
+    struct V3N3T2 {
         float x, y, z; //位置坐标
         float nx, ny, nz; //法向量
         float u,v; //纹理坐标
@@ -18,11 +18,11 @@ public:
 public:
     CubeIlluminateProgram   sprogram;
     GLuint                  mCubeSurfaceTexId;
-    V3N3                    _data[36];
+    V3N3T2                  _data[36];
 
     void        init(const CELL::float3 &halfSize, GLuint tex)
     {
-        V3N3 verts[] =
+        V3N3T2 verts[] =
         {
                 {+halfSize.x, -halfSize.y, +halfSize.z, 0.0f,  -1.0f, 0.0f,  0.0f,0.0f},
                 {-halfSize.x, -halfSize.y, +halfSize.z, 0.0f,  -1.0f, 0.0f,  1.0f,0.0f},
@@ -84,7 +84,7 @@ public:
         sprogram.begin();
         static  float   angle = 0;
         angle += 0.1f;
-        CELL::matrix4   matRot;
+        CELL::matrix4   matRot;model
         matRot.rotateYXZ(angle, 0, 0);
         CELL::matrix4   vp = camera.getProject() * camera.getView();
         CELL::matrix4   mvp = (vp * matRot);
@@ -96,7 +96,7 @@ public:
         glUniform1i(sprogram._texture, 0);
 
         glUniform3f(sprogram._lightDiffuse, 0.1f, 0.1f, 0.1f); // 漫反射 环境光
-        glUniform3f(sprogram._lightColor, 0.0f, 0.0f, 1.0f); // 定向光源的颜色
+        glUniform3f(sprogram._lightColor, 1.0f, 1.0f, 1.0f); // 定向光源的颜色
         glUniform3f(sprogram._lightDir, // 定向光源的方向
                     static_cast<GLfloat>(camera._dir.x),
                     static_cast<GLfloat>(camera._dir.y),
