@@ -84,7 +84,7 @@ public:
         sprogram.begin();
         static  float   angle = 0;
         angle += 0.1f;
-        CELL::matrix4   matRot;model
+        CELL::matrix4   matRot;
         matRot.rotateYXZ(angle, 0, 0);
         CELL::matrix4   vp = camera.getProject() * camera.getView();
         CELL::matrix4   mvp = (vp * matRot);
@@ -103,11 +103,11 @@ public:
                     static_cast<GLfloat>(camera._dir.z));
 
         glVertexAttribPointer(static_cast<GLuint>(sprogram._position), 3, GL_FLOAT, GL_FALSE,
-                              sizeof(CubeIlluminate::V3N3), &_data[0].x);
+                              sizeof(CubeIlluminate::V3N3T2), &_data[0].x);
         glVertexAttribPointer(static_cast<GLuint>(sprogram._normal),   3, GL_FLOAT, GL_FALSE,
-                              sizeof(CubeIlluminate::V3N3), &_data[0].nx);
+                              sizeof(CubeIlluminate::V3N3T2), &_data[0].nx);
         glVertexAttribPointer(static_cast<GLuint>(sprogram._uv),       2, GL_FLOAT, GL_FALSE,
-                              sizeof(CubeIlluminate::V3N3), &_data[0].u);
+                              sizeof(CubeIlluminate::V3N3T2), &_data[0].u);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         sprogram.end();
     }
