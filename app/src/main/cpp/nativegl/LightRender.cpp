@@ -39,7 +39,7 @@ void LightRender::surfaceCreated(ANativeWindow *window)
     sprintf(res_name, "%s%s", res_path, "test.jpg");
     GLuint  texture_cube_id = TextureHelper::createTextureFromImage(res_name);
 
-    lightCube.init(CELL::float3(2,2,2), texture_cube_id);
+    lightCube.init(CELL::float3(4,4,4), texture_cube_id);
 }
 
 

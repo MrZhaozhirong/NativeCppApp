@@ -1796,6 +1796,11 @@ namespace CELL
             return 3;
         }
 
+        T const *   data() const
+        {
+            return  &this->value[0][0];
+        }
+
         tmat3x3() {
             value_type const Zero(0);
             value_type const One(1);
@@ -1886,6 +1891,13 @@ namespace CELL
             this->value[2] = col_type(m[2]);
         }
 
+        tmat3x3<T> _transpose() const {
+            return tmat3x3<T>(
+                    this->value[0][0], this->value[1][0], this->value[2][0],
+                    this->value[0][1], this->value[1][1], this->value[2][1],
+                    this->value[0][2], this->value[1][2], this->value[2][2]
+            );
+        }
 
         tmat3x3<T> _inverse() const {
             T S00 = value[0][0];
@@ -3422,6 +3434,15 @@ namespace CELL
             return *this;
         }
     };
+
+    template <typename T>
+    tmat3x3<T> mat4_to_mat3(const tmat4x4<T> & m)
+    {
+        return  tmat3x3<T>(
+                tvec3<T>(m[0][0],m[0][1],m[0][2])
+                ,tvec3<T>(m[1][0],m[1][1],m[1][2])
+                ,tvec3<T>(m[2][0],m[2][1],m[2][2]));
+    }
 
 
     template<typename T>

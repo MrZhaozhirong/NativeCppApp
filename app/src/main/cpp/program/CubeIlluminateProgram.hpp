@@ -12,6 +12,7 @@ class CubeIlluminateProgram : public ShaderProgram
 {
 public:
     GLint       _mvp;
+    GLint       _normalMatrix;
     GLint       _lightDir;
     GLint       _lightColor;
     GLint       _lightDiffuse;
@@ -24,6 +25,7 @@ public:
     {
         const char* vs  =  "#version 320 es\n\
                             uniform mat4   _mvp;\n\
+                            uniform mat3   _normalMatrix;\n\
                             uniform vec3   _lightDir;\n\
                             uniform vec3   _lightColor;\n\
                             uniform vec3   _lightDiffuse;\n\
@@ -35,7 +37,8 @@ public:
                             void main()\n\
                             {\n\
                                 _outUV                =   _uv; \n\
-                                float lightStrength   =   max(dot(_normal, -_lightDir), 0.0); \n\
+                                vec3    normal        =   normalize(_normalMatrix * _normal);\n\
+                                float lightStrength   =   max(dot(normal, -_lightDir), 0.0); \n\
                                 _outComposeColor =   vec4(_lightColor * lightStrength + _lightDiffuse, 1);\n\
                                 gl_Position      =   _mvp * vec4(_position,1.0);\n\
                             }";
@@ -52,17 +55,18 @@ public:
                                 _fragColor      =   color * _outComposeColor;\n\
                             }";
 
-        programId = ShaderHelper::buildProgram(vs, fs);
-        _mvp        =   glGetUniformLocation(programId,  "_mvp");
-        _lightDir   =   glGetUniformLocation(programId,  "_lightDir");
-        _lightColor =   glGetUniformLocation(programId,  "_lightColor");
-        _lightDiffuse = glGetUniformLocation(programId,  "_lightDiffuse");
+        programId   =   ShaderHelper::buildProgram(vs, fs);
+        _mvp        =   glGetUniformLocation(programId, "_mvp");
+        _normalMatrix = glGetUniformLocation(programId, "_normalMatrix");
+        _lightDir   =   glGetUniformLocation(programId, "_lightDir");
+        _lightColor =   glGetUniformLocation(programId, "_lightColor");
+        _lightDiffuse = glGetUniformLocation(programId, "_lightDiffuse");
 
-        _position   =   glGetAttribLocation(programId,   "_position");
-        _normal     =   glGetAttribLocation(programId,   "_normal");
-        _uv         =   glGetAttribLocation(programId,   "_uv");
+        _position   =   glGetAttribLocation(programId,  "_position");
+        _normal     =   glGetAttribLocation(programId,  "_normal");
+        _uv         =   glGetAttribLocation(programId,  "_uv");
 
-        _texture    =   glGetUniformLocation(programId,  "_texture");
+        _texture    =   glGetUniformLocation(programId, "_texture");
     }
 
 
