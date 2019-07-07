@@ -79,21 +79,20 @@ public:
     {
         sprogram.begin();
         static  float   angle = 0;
-        angle += 0.1f;
+        angle += 0.3f;
         CELL::matrix4   matRot;
         matRot.rotateYXZ(angle, 0.0f, 0.0f);
         // 这里的模型矩阵只进行简单进行旋转操作。
-        CELL::matrix4   model   =   mModelMatrix * matRot;
-
-        // 法线矩阵 = 模型矩阵的逆矩阵的转置
-        //CELL::matrix3   matNormal(1);
-        //CELL::matrix3   matNormal=   mat4_to_mat3(model)._inverse();
-        CELL::matrix3   matNormal=   mat4_to_mat3(model)._inverse()._transpose();
-        glUniformMatrix3fv(sprogram._normalMatrix, 1, GL_FALSE, matNormal.data());
-
+        CELL::matrix4   model   =   mModelMatrix * matRot; //mModelMatrix只是一个简单的单位矩阵
         CELL::matrix4   vp = camera.getProject() * camera.getView();
         CELL::matrix4   mvp = (vp * model);
         glUniformMatrix4fv(sprogram._mvp, 1, GL_FALSE, mvp.data());
+
+        // 法线矩阵 = 模型矩阵的逆矩阵的转置
+        //CELL::matrix3   matNormal(1);
+        CELL::matrix3   matNormal=   mat4_to_mat3(model)._inverse();
+        //CELL::matrix3   matNormal=   mat4_to_mat3(model)._inverse()._transpose();
+        glUniformMatrix3fv(sprogram._normalMatrix, 1, GL_FALSE, matNormal.data());
 
         glActiveTexture(GL_TEXTURE0);
         glEnable(GL_TEXTURE_2D);
