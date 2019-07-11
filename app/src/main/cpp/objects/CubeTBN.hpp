@@ -8,6 +8,8 @@
 
 #include <GLES3/gl3.h>
 #include "../common/CELLMath.hpp"
+#include "../program/CubeTbnProgram.hpp"
+#include "../common/Camera3D.hpp"
 
 class CubeTBN {
 public:
@@ -27,12 +29,15 @@ public:
     };
 
 public:
-    V3N3UV2TBN6 _data[36];
-    GLuint      _texMaterial;
-    GLuint      _texNormal;
+    V3N3UV2TBN6      _data[36];
+    GLuint           _texMaterial;
+    GLuint           _texNormal;
+    CubeTbnProgram   _program;
+    CELL::matrix4    _modelMatrix;
 
     CubeTBN(const CELL::float3& halfSize) {
         init(halfSize);
+        _modelMatrix.identify();
     }
 
     void        init(const CELL::float3 &halfSize)
@@ -84,6 +89,8 @@ public:
         };
         // 根据位置/纹理 -> TBN
         convertTBN(verts, _data);
+
+        _modelMatrix.identify();
     }
 
     void setMaterialTexID(GLuint material_texID) {
@@ -93,7 +100,10 @@ public:
         _texNormal = normal_texID;
     }
 
+    void        render(Camera3D& camera)
+    {
 
+    }
 private:
     void convertTBN(V3N3UV2* vertices,V3N3UV2TBN6* nmVerts)
     {
