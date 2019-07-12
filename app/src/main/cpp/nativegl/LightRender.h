@@ -13,6 +13,7 @@
 #include "../egl/WindowSurface.h"
 #include "../common/Camera3D.hpp"
 #include "../objects/CubeIlluminate.hpp"
+#include "../objects/CubeTBN.hpp"
 
 class LightRender : public GLRender{
 
@@ -52,6 +53,7 @@ private:
     char  * res_path;
 
     CubeIlluminate lightCube;
+    CubeTBN        tbnCube;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(LightRender);
 };

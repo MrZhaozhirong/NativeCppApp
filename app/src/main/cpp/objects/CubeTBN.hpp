@@ -1,7 +1,7 @@
 //
 // Created by nicky on 2019/7/11.
 //
-
+#pragma once
 #ifndef NATIVECPPAPP_CUBETBN_HPP
 #define NATIVECPPAPP_CUBETBN_HPP
 
@@ -34,11 +34,6 @@ public:
     GLuint           _texNormal;
     CubeTbnProgram   _program;
     CELL::matrix4    _modelMatrix;
-
-    CubeTBN(const CELL::float3& halfSize) {
-        init(halfSize);
-        _modelMatrix.identify();
-    }
 
     void        init(const CELL::float3 &halfSize)
     {
@@ -89,7 +84,7 @@ public:
         };
         // 根据位置/纹理 -> TBN
         convertTBN(verts, _data);
-
+        _program.initialize();
         _modelMatrix.identify();
     }
 
@@ -102,8 +97,47 @@ public:
 
     void        render(Camera3D& camera)
     {
+        _program.begin();
+        static  float   angle = 0;
+        angle += 0.1f;
+        CELL::matrix4   matRot;
+        matRot.rotateYXZ(angle, 0.0f, 0.0f);
+        CELL::matrix4   model   =   _modelMatrix * matRot;
+        glUniformMatrix4fv(_program._matModel, 1, GL_FALSE, model.data());
 
+        CELL::matrix4   vp = camera.getProject() * camera.getView();
+        CELL::matrix4   mvp = (vp * model);
+        glUniformMatrix4fv(_program._mvp, 1, GL_FALSE, mvp.data());
+
+        CELL::matrix3   matNormal = mat4_to_mat3(model)._inverse();
+        //CELL::matrix3   matNormal = mat4_to_mat3(model)._inverse()._transpose();
+        glUniformMatrix3fv(_program._normalMatrix, 1, GL_FALSE, matNormal.data());
+
+        glUniform3f(_program._lightDiffuse, 0.1f, 0.1f, 0.1f); // 漫反射 环境光
+        glUniform3f(_program._lightColor, 1.0f, 1.0f, 1.0f);  // 定向光源的颜色
+
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,  _texMaterial);
+        glUniform1i(_program._texture, 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,  _texNormal);
+        glUniform1i(_program._texNormal, 1);
+
+        glUniform3f(_program._lightPos, camera._eye.x, camera._eye.y, camera._eye.z);
+        glUniform3f(_program._cameraPos, camera._eye.x, camera._eye.y, camera._eye.z);
+
+        glVertexAttribPointer(_program._position, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), _data);
+        glVertexAttribPointer(_program._normal, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].nx);
+        glVertexAttribPointer(_program._uv, 2, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].u);
+        glVertexAttribPointer(_program._tagent, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].tx);
+        glVertexAttribPointer(_program._biTagent, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].bx);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        _program.end();
     }
+
 private:
     void convertTBN(V3N3UV2* vertices,V3N3UV2TBN6* nmVerts)
     {

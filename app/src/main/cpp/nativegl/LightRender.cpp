@@ -36,10 +36,15 @@ void LightRender::surfaceCreated(ANativeWindow *window)
 
     // 加载需要用到的资源文件
     char res_name[250]={0};
-    sprintf(res_name, "%s%s", res_path, "test.jpg");
+    sprintf(res_name, "%s%s", res_path, "z3.jpg");
     GLuint  texture_cube_id = TextureHelper::createTextureFromImage(res_name);
+    sprintf(res_name, "%s%s", res_path, "z3n.jpg");
+    GLuint  texNormal_cube_id = TextureHelper::createTextureFromImage(res_name);
 
-    lightCube.init(CELL::float3(4,4,4), texture_cube_id);
+    //lightCube.init(CELL::float3(4,4,4), texture_cube_id);
+    tbnCube.init(CELL::float3(5,5,5));
+    tbnCube.setMaterialTexID(texture_cube_id);
+    tbnCube.setMormalTexID(texNormal_cube_id);
 }
 
 
@@ -71,7 +76,8 @@ void LightRender::renderOnDraw(double elpasedInMilliSec)
     mWindowSurface->makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    lightCube.render(mCamera3D);
+    //lightCube.render(mCamera3D);
+    tbnCube.render(mCamera3D);
 
     mWindowSurface->swapBuffers();
 }
