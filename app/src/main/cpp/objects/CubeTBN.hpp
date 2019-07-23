@@ -19,7 +19,7 @@ public:
         float u,v; //纹理坐标
     };
 
-    struct V3N3UV2TBN6
+    struct V3N3UV2TB6
     {
         float x, y, z;
         float nx, ny, nz;
@@ -29,7 +29,7 @@ public:
     };
 
 public:
-    V3N3UV2TBN6      _data[36];
+    V3N3UV2TB6       _data[36];
     GLuint           _texMaterial;
     GLuint           _texNormal;
     CubeTbnProgram   _program;
@@ -129,17 +129,17 @@ public:
         glUniform3f(_program._lightPos, camera._eye.x, camera._eye.y, camera._eye.z);
         glUniform3f(_program._cameraPos, camera._eye.x, camera._eye.y, camera._eye.z);
 
-        glVertexAttribPointer(_program._position, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), _data);
-        glVertexAttribPointer(_program._normal, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].nx);
-        glVertexAttribPointer(_program._uv, 2, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].u);
-        glVertexAttribPointer(_program._tagent, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].tx);
-        glVertexAttribPointer(_program._biTagent, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TBN6), &_data[0].bx);
+        glVertexAttribPointer(_program._position, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TB6), _data);
+        glVertexAttribPointer(_program._normal, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TB6), &_data[0].nx);
+        glVertexAttribPointer(_program._uv, 2, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TB6), &_data[0].u);
+        glVertexAttribPointer(_program._tagent, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TB6), &_data[0].tx);
+        glVertexAttribPointer(_program._biTagent, 3, GL_FLOAT, GL_FALSE, sizeof(V3N3UV2TB6), &_data[0].bx);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         _program.end();
     }
 
 private:
-    void convertTBN(V3N3UV2* vertices,V3N3UV2TBN6* nmVerts)
+    void convertTBN(V3N3UV2* vertices,V3N3UV2TB6* nmVerts)
     {
         for (size_t i = 0; i <36; i += 3) // 一次操作一个三角形的三个点
         {
@@ -189,6 +189,7 @@ private:
             CELL::float3 tangent    = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y)*r; // 得出切线
             CELL::float3 binormal   = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r; // 得出副切线
 
+            // 赋值到t b
             nmVerts[i + 0].tx = tangent.x;  nmVerts[i + 0].bx = binormal.x;
             nmVerts[i + 0].ty = tangent.y;  nmVerts[i + 0].by = binormal.y;
             nmVerts[i + 0].tz = tangent.z;  nmVerts[i + 0].bz = binormal.z;
