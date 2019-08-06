@@ -139,37 +139,37 @@ public:
     }
 
 private:
-    void convertTBN(V3N3UV2* vertices,V3N3UV2TB6* nmVerts)
+    void convertTBN(V3N3UV2* vertices,V3N3UV2TB6* target_verts)
     {
         for (size_t i = 0; i <36; i += 3) // 一次操作一个三角形的三个点
         {
             // copy xyz normal uv
-            nmVerts[i + 0].x  = vertices[i + 0].x;
-            nmVerts[i + 0].y  = vertices[i + 0].y;
-            nmVerts[i + 0].z  = vertices[i + 0].z;
-            nmVerts[i + 0].nx = vertices[i + 0].nx;
-            nmVerts[i + 0].ny = vertices[i + 0].ny;
-            nmVerts[i + 0].nz = vertices[i + 0].nz;
-            nmVerts[i + 0].u  = vertices[i + 0].u;
-            nmVerts[i + 0].v  = vertices[i + 0].v;
+            target_verts[i + 0].x  = vertices[i + 0].x;
+            target_verts[i + 0].y  = vertices[i + 0].y;
+            target_verts[i + 0].z  = vertices[i + 0].z;
+            target_verts[i + 0].nx = vertices[i + 0].nx;
+            target_verts[i + 0].ny = vertices[i + 0].ny;
+            target_verts[i + 0].nz = vertices[i + 0].nz;
+            target_verts[i + 0].u  = vertices[i + 0].u;
+            target_verts[i + 0].v  = vertices[i + 0].v;
 
-            nmVerts[i + 1].x  = vertices[i + 1].x;
-            nmVerts[i + 1].y  = vertices[i + 1].y;
-            nmVerts[i + 1].z  = vertices[i + 1].z;
-            nmVerts[i + 1].nx = vertices[i + 1].nx;
-            nmVerts[i + 1].ny = vertices[i + 1].ny;
-            nmVerts[i + 1].nz = vertices[i + 1].nz;
-            nmVerts[i + 1].u  = vertices[i + 1].u;
-            nmVerts[i + 1].v  = vertices[i + 1].v;
+            target_verts[i + 1].x  = vertices[i + 1].x;
+            target_verts[i + 1].y  = vertices[i + 1].y;
+            target_verts[i + 1].z  = vertices[i + 1].z;
+            target_verts[i + 1].nx = vertices[i + 1].nx;
+            target_verts[i + 1].ny = vertices[i + 1].ny;
+            target_verts[i + 1].nz = vertices[i + 1].nz;
+            target_verts[i + 1].u  = vertices[i + 1].u;
+            target_verts[i + 1].v  = vertices[i + 1].v;
 
-            nmVerts[i + 2].x  = vertices[i + 2].x;
-            nmVerts[i + 2].y  = vertices[i + 2].y;
-            nmVerts[i + 2].z  = vertices[i + 2].z;
-            nmVerts[i + 2].nx = vertices[i + 2].nx;
-            nmVerts[i + 2].ny = vertices[i + 2].ny;
-            nmVerts[i + 2].nz = vertices[i + 2].nz;
-            nmVerts[i + 2].u  = vertices[i + 2].u;
-            nmVerts[i + 2].v  = vertices[i + 2].v;
+            target_verts[i + 2].x  = vertices[i + 2].x;
+            target_verts[i + 2].y  = vertices[i + 2].y;
+            target_verts[i + 2].z  = vertices[i + 2].z;
+            target_verts[i + 2].nx = vertices[i + 2].nx;
+            target_verts[i + 2].ny = vertices[i + 2].ny;
+            target_verts[i + 2].nz = vertices[i + 2].nz;
+            target_verts[i + 2].u  = vertices[i + 2].u;
+            target_verts[i + 2].v  = vertices[i + 2].v;
 
             // Shortcuts for vertices
             CELL::float3  v0  = CELL::float3(vertices[i + 0].x,vertices[i + 0].y,vertices[i + 0].z);
@@ -190,17 +190,17 @@ private:
             CELL::float3 binormal   = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x)*r; // 得出副切线
 
             // 赋值到t b
-            nmVerts[i + 0].tx = tangent.x;  nmVerts[i + 0].bx = binormal.x;
-            nmVerts[i + 0].ty = tangent.y;  nmVerts[i + 0].by = binormal.y;
-            nmVerts[i + 0].tz = tangent.z;  nmVerts[i + 0].bz = binormal.z;
+            target_verts[i + 0].tx = tangent.x;  target_verts[i + 0].bx = binormal.x;
+            target_verts[i + 0].ty = tangent.y;  target_verts[i + 0].by = binormal.y;
+            target_verts[i + 0].tz = tangent.z;  target_verts[i + 0].bz = binormal.z;
 
-            nmVerts[i + 1].tx = tangent.x;  nmVerts[i + 1].bx = binormal.x;
-            nmVerts[i + 1].ty = tangent.y;  nmVerts[i + 1].by = binormal.y;
-            nmVerts[i + 1].tz = tangent.z;  nmVerts[i + 1].bz = binormal.z;
+            target_verts[i + 1].tx = tangent.x;  target_verts[i + 1].bx = binormal.x;
+            target_verts[i + 1].ty = tangent.y;  target_verts[i + 1].by = binormal.y;
+            target_verts[i + 1].tz = tangent.z;  target_verts[i + 1].bz = binormal.z;
 
-            nmVerts[i + 2].tx = tangent.x;  nmVerts[i + 2].bx = binormal.x;
-            nmVerts[i + 2].ty = tangent.y;  nmVerts[i + 2].by = binormal.y;
-            nmVerts[i + 2].tz = tangent.z;  nmVerts[i + 2].bz = binormal.z;
+            target_verts[i + 2].tx = tangent.x;  target_verts[i + 2].bx = binormal.x;
+            target_verts[i + 2].ty = tangent.y;  target_verts[i + 2].by = binormal.y;
+            target_verts[i + 2].tz = tangent.z;  target_verts[i + 2].bz = binormal.z;
         }
     }
 };
