@@ -136,7 +136,6 @@ void GL3DRender::renderOnDraw(double elpasedInMilliSec)
     cubeShaderProgram->setMVPUniforms(const_cast<float *>(cube_mvp.data()));
     cube->bindData(cubeShaderProgram);
     cube->draw();
-
     // 画草地
     landProgram->ShaderProgram::userProgram();
     glActiveTexture(GL_TEXTURE1);
@@ -147,7 +146,7 @@ void GL3DRender::renderOnDraw(double elpasedInMilliSec)
     land->bindData(landProgram);
     land->draw();
     land->unbind(landProgram);
-
+    // 画草堆
     greeneryMgr.render(mCamera3D);
 
     mWindowSurface->swapBuffers();
