@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="org.zzrblog.nativecpp.NativeGLActivity"/>
+        <activity android:name="org.zzrblog.nativecpp.NativeGLActivity"
+                  android:screenOrientation="landscape"/>
 
     </application>
 
