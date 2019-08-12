@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-GLThread *glThread = NULL;
+GLThread* glThread = NULL;
 NativeGLRender* renderer = NULL;
 GL3DRender* m3dRenderer = NULL;
 LightRender* lightRenderer = NULL;
