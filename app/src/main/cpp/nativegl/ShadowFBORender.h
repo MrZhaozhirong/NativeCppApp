@@ -11,6 +11,7 @@
 #include "../common/Camera3D.hpp"
 #include "../egl/EglCore.h"
 #include "../egl/WindowSurface.h"
+#include "../objects/Land.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -40,8 +41,8 @@ public:
     }
 
 
-
-
+private:
+    Land    land;
 
 private:
     EglCore * mEglCore;
