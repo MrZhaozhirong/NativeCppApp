@@ -3,6 +3,7 @@
 //
 
 #include <GLES3/gl3.h>
+#include <assert.h>
 #include "ShadowFBORender.h"
 #include "../common/zzr_common.h"
 #include "../utils/TextureHelper.h"
@@ -14,7 +15,7 @@ ShadowFBORender::ShadowFBORender() {
 }
 
 ShadowFBORender::~ShadowFBORender() {
-    if(res_path!=NULL) {
+    if( res_path!= NULL) {
         delete res_path;
         res_path = NULL;
     }
@@ -31,8 +32,10 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     mWindowSurface->makeCurrent();
 
     char res_name[250]={0};
-    sprintf(res_name, "%s%s", res_path, "z3.jpg");
-    GLuint  texture_cube_id = TextureHelper::createTextureFromImage(res_name);
+    sprintf(res_name, "%s%s", res_path, "land.jpg");
+    GLuint land_texture_id = TextureHelper::createTextureFromImage(res_name);
+
+    land.init(10, -1, land_texture_id);
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
@@ -63,12 +66,14 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     mWindowSurface->makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+    land.render(mCamera3D);
     // draw something
     mWindowSurface->swapBuffers();
 }
 
 void ShadowFBORender::surfaceDestroyed(void)
 {
+    land.destroy();
     // 清空自定义模型，纹理，各种BufferObject
     if (mWindowSurface) {
         mWindowSurface->release();
