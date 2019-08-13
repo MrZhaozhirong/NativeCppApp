@@ -13,9 +13,9 @@
 #include <unistd.h>
 
 GLThread* glThread = NULL;
-NativeGLRender* renderer = NULL;
-GL3DRender* m3dRenderer = NULL;
-LightRender* lightRenderer = NULL;
+//NativeGLRender* renderer = NULL;
+//GL3DRender* m3dRenderer = NULL;
+//LightRender* lightRenderer = NULL;
 ShadowFBORender* shadowRender = NULL;
 
 void unzipAssetsResFile(const char *compressed_apk_path_cstr, const char *release_res_path_cstr)

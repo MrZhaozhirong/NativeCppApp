@@ -36,13 +36,13 @@ public:
             { gSizeX, y_pos,  gSizeZ, 0,1,0, size, size}, // right near
             {-gSizeX, y_pos, -gSizeZ, 0,1,0, 0.0f, 0.0f}, // left far
             { gSizeX, y_pos,  gSizeZ, 0,1,0, size, size}, // right near
-            {-gSizeX, y_pos,  gSizeZ, 0,1,0, 0.0f, size}, // left near
+            {-gSizeX, y_pos,  gSizeZ, 0,1,0, 0.0f, size}  // left near
         };
         memcpy(_data, verts, sizeof(verts));
         _texId = tex;
         _modelMatrix.identify();
 
-        if(_sprogram != NULL) {
+        if( _sprogram != nullptr) {
             delete _sprogram;
         }
         _sprogram = new GrasslandProgram();

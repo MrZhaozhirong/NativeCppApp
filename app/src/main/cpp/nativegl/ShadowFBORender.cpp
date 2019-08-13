@@ -34,7 +34,10 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     char res_name[250]={0};
     sprintf(res_name, "%s%s", res_path, "land.jpg");
     GLuint land_texture_id = TextureHelper::createTextureFromImage(res_name);
+    sprintf(res_name, "%s%s", res_path, "test.jpg");
+    GLuint texture_cube_id = TextureHelper::createTextureFromImage(res_name);
 
+    lightCube.init(CELL::float3(1,1,1), texture_cube_id);
     land.init(10, -1, land_texture_id);
 }
 
@@ -54,6 +57,7 @@ void ShadowFBORender::surfaceChanged(int width, int height)
     mCamera3D.setRight(CELL::float3(1,0,0));
     mCamera3D.update();
 
+    depthFBO.setup(width/4, height/4, FBO_DEPTH);
     mWindowSurface->swapBuffers();
 }
 
@@ -65,9 +69,10 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     }
     mWindowSurface->makeCurrent();
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-    land.render(mCamera3D);
     // draw something
+    lightCube.render(mCamera3D);
+    land.render(mCamera3D);
+    renderFBO();
     mWindowSurface->swapBuffers();
 }
 
@@ -116,4 +121,11 @@ void ShadowFBORender::handleTouchDrag(float x, float y) {
 void ShadowFBORender::handleTouchUp(float x, float y) {
     this->mLastX = 0;
     this->mLastY = 0;
+}
+
+void ShadowFBORender::renderFBO() {
+    depthFBO.begin();
+        lightCube.render(mCamera3D);
+        land.render(mCamera3D);
+    depthFBO.end();
 }

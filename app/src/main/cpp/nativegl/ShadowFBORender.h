@@ -12,6 +12,8 @@
 #include "../egl/EglCore.h"
 #include "../egl/WindowSurface.h"
 #include "../objects/Land.hpp"
+#include "../objects/CubeIlluminate.hpp"
+#include "../common/FrameBufferObject.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -42,8 +44,10 @@ public:
 
 
 private:
-    Land    land;
+    Land            land;
+    CubeIlluminate  lightCube;
 
+    FrameBufferObject   depthFBO;
 private:
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
@@ -55,5 +59,7 @@ private:
     char  * res_path;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(ShadowFBORender);
+
+    void renderFBO();
 };
 #endif //SHADOW_FBO_RENDER_H
