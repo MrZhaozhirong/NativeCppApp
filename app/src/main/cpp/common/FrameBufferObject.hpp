@@ -75,10 +75,10 @@ public:
             glDrawBuffers(0, NULL); // 不再绘制颜色缓冲区
             glReadBuffer(GL_NONE);  // 只用来计算深度
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texObj, 0);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_DEPTH_BUFFER_BIT);
         }else if(_type == FBO_RGBA) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _texObj, 0);
-            glClear(GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
         }
 
         GLint err = glGetError();
