@@ -8,6 +8,8 @@
 #include "../common/zzr_common.h"
 #include "../utils/TextureHelper.h"
 
+GLuint texture_id;
+
 ShadowFBORender::ShadowFBORender() {
     mEglCore = NULL;
     mWindowSurface = NULL;
@@ -37,27 +39,38 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     sprintf(res_name, "%s%s", res_path, "test.jpg");
     GLuint texture_cube_id = TextureHelper::createTextureFromImage(res_name);
 
+    texture_id = texture_cube_id;
+
     lightCube.init(CELL::float3(1,1,1), texture_cube_id);
     land.init(10, -1, land_texture_id);
+
+    depthShader.initialize();
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
 {
     mWindowSurface->makeCurrent();
+    LOGD("render surface change ... update MVP!");
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    LOGD("render surface change ... update MVP!");
+    this->mViewHeight = height;
+    this->mViewWidth = width;
 
     glViewport(0,0, width, height);
     mCamera3D.setViewPort(width, height);
     mCamera3D.perspective(45, (float)width/(float)height, 0.1f, 1000.0f);
-    mCamera3D.setEye(CELL::real3(0,20,20));
+    mCamera3D.setEye(CELL::real3(0,15,15));
     mCamera3D.setTarget(CELL::real3(0,0,0));
     mCamera3D.setUp(CELL::float3(0,1,0));
     mCamera3D.setRight(CELL::float3(1,0,0));
     mCamera3D.update();
 
+    GLint depth_bits;
+    glGetIntegerv(GL_DEPTH_BITS, &depth_bits);
+    LOGW("OS.GL_DEPTH_BITS : %d", depth_bits);
+
     depthFBO.setup(width/4, height/4, FBO_DEPTH);
+
     mWindowSurface->swapBuffers();
 }
 
@@ -68,11 +81,13 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
         return;
     }
     mWindowSurface->makeCurrent();
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    // draw something
-    lightCube.render(mCamera3D);
-    land.render(mCamera3D);
-    renderFBO();
+    renderDepthFBO();
+
+    //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    //glViewport(0,0, mViewWidth, mViewHeight);
+    //lightCube.render(mCamera3D);
+    //land.render(mCamera3D);
+
     mWindowSurface->swapBuffers();
 }
 
@@ -123,9 +138,40 @@ void ShadowFBORender::handleTouchUp(float x, float y) {
     this->mLastY = 0;
 }
 
-void ShadowFBORender::renderFBO() {
+void ShadowFBORender::renderDepthFBO() {
     depthFBO.begin();
+    {
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         lightCube.render(mCamera3D);
         land.render(mCamera3D);
+    }
     depthFBO.end();
+
+    //struct  VertexPUV
+    //{
+    //    float   x, y, z;
+    //    float   u, v;
+    //};
+    //VertexPUV  rect[] =
+    //{
+    //        {0,  1,  0,   0,  1},
+    //        {1,  1,  0,   1,  1},
+    //        {0,  0,  0,   0,  0},
+    //        {1,  0,  0,   1,  0},
+    //};
+
+    //glViewport(0,0, depthFBO._width, depthFBO._height);
+    //depthShader.begin();
+    //{
+    //    CELL::matrix4   orth    =   CELL::ortho<float>(0,depthFBO._width,depthFBO._height,0, -100,+100);
+    //    glActiveTexture(GL_TEXTURE0);
+    //    //glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(depthFBO.getTextureId()));
+    //    glBindTexture(GL_TEXTURE_2D, texture_id);
+    //    glUniform1i(depthShader._tex, 0);
+    //    glUniformMatrix4fv(depthShader._mvp, 1, GL_FALSE, orth.data());
+    //    glVertexAttribPointer(depthShader._position,    3, GL_FLOAT, GL_FALSE, sizeof(VertexPUV), rect);
+    //    glVertexAttribPointer(depthShader._uv,          2, GL_FLOAT, GL_FALSE, sizeof(VertexPUV), &rect[0].u);
+    //    glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+    //}
+    //depthShader.end();
 }

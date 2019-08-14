@@ -14,6 +14,7 @@
 #include "../objects/Land.hpp"
 #include "../objects/CubeIlluminate.hpp"
 #include "../common/FrameBufferObject.hpp"
+#include "../program/DepthOrthoShader.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -48,6 +49,7 @@ private:
     CubeIlluminate  lightCube;
 
     FrameBufferObject   depthFBO;
+    DepthOrthoShader    depthShader;
 private:
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
@@ -55,11 +57,13 @@ private:
     Camera3D mCamera3D;
     float mLastX;
     float mLastY;
+    int   mViewWidth;
+    int   mViewHeight;
 
     char  * res_path;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(ShadowFBORender);
 
-    void renderFBO();
+    void renderDepthFBO();
 };
 #endif //SHADOW_FBO_RENDER_H
