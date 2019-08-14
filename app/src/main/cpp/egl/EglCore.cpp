@@ -212,7 +212,7 @@ void EglCore::makeCurrent(EGLSurface eglSurface) {
         LOGD("NOTE: makeCurrent w/o display");
     }
     if (!eglMakeCurrent(mEglDisplay, eglSurface, eglSurface, mEglContext)) {
-        //TODO throw new RuntimeException("eglMakeCurrent failed");
+        LOGE("NOTE: eglMakeCurrent failed");
     }
 }
 //Makes our EGL context current, using the supplied "draw" and "read" surfaces.
