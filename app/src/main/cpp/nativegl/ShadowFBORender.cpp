@@ -39,20 +39,17 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     sprintf(res_name, "%s%s", res_path, "test.jpg");
     GLuint texture_cube_id = TextureHelper::createTextureFromImage(res_name);
 
-    texture_id = texture_cube_id;
+    texture_id = land_texture_id;
 
     lightCube.init(CELL::float3(1,1,1), texture_cube_id);
     land.init(10, -1, land_texture_id);
-
-    depthShader.initialize();
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
 {
     mWindowSurface->makeCurrent();
     LOGD("render surface change ... update MVP!");
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+
     this->mViewHeight = height;
     this->mViewWidth = width;
 
@@ -69,7 +66,8 @@ void ShadowFBORender::surfaceChanged(int width, int height)
     glGetIntegerv(GL_DEPTH_BITS, &depth_bits);
     LOGW("OS.GL_DEPTH_BITS : %d", depth_bits);
 
-    depthFBO.setup(width/4, height/4, FBO_DEPTH);
+    depthFBO.setup(width, height, FBO_RGBA);
+    pip.init(width, height);
 
     mWindowSurface->swapBuffers();
 }
@@ -81,13 +79,28 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
         return;
     }
     mWindowSurface->makeCurrent();
-    renderDepthFBO();
 
-    //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    //glViewport(0,0, mViewWidth, mViewHeight);
-    //lightCube.render(mCamera3D);
-    //land.render(mCamera3D);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glViewport(0,0, mViewWidth, mViewHeight);
+    lightCube.render(mCamera3D);
+    land.render(mCamera3D);
 
+    depthFBO.begin();
+    {
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        lightCube.render(mCamera3D);
+        land.render(mCamera3D);
+    }
+    depthFBO.end();
+
+    pip.setTextureId(depthFBO.getTextureId());
+    pip.render();
+
+    //renderDepthFBO();
     mWindowSurface->swapBuffers();
 }
 
@@ -141,37 +154,12 @@ void ShadowFBORender::handleTouchUp(float x, float y) {
 void ShadowFBORender::renderDepthFBO() {
     depthFBO.begin();
     {
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
         lightCube.render(mCamera3D);
         land.render(mCamera3D);
     }
     depthFBO.end();
 
-    //struct  VertexPUV
-    //{
-    //    float   x, y, z;
-    //    float   u, v;
-    //};
-    //VertexPUV  rect[] =
-    //{
-    //        {0,  1,  0,   0,  1},
-    //        {1,  1,  0,   1,  1},
-    //        {0,  0,  0,   0,  0},
-    //        {1,  0,  0,   1,  0},
-    //};
-
-    //glViewport(0,0, depthFBO._width, depthFBO._height);
-    //depthShader.begin();
-    //{
-    //    CELL::matrix4   orth    =   CELL::ortho<float>(0,depthFBO._width,depthFBO._height,0, -100,+100);
-    //    glActiveTexture(GL_TEXTURE0);
-    //    //glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(depthFBO.getTextureId()));
-    //    glBindTexture(GL_TEXTURE_2D, texture_id);
-    //    glUniform1i(depthShader._tex, 0);
-    //    glUniformMatrix4fv(depthShader._mvp, 1, GL_FALSE, orth.data());
-    //    glVertexAttribPointer(depthShader._position,    3, GL_FLOAT, GL_FALSE, sizeof(VertexPUV), rect);
-    //    glVertexAttribPointer(depthShader._uv,          2, GL_FLOAT, GL_FALSE, sizeof(VertexPUV), &rect[0].u);
-    //    glDrawArrays(GL_TRIANGLE_STRIP,0,4);
-    //}
-    //depthShader.end();
+    pip.setTextureId(depthFBO.getTextureId());
+    pip.render();
 }

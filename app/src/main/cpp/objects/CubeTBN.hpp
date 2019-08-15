@@ -117,12 +117,10 @@ public:
         glUniform3f(_program._lightColor, 1.0f, 1.0f, 1.0f);  // 定向光源的颜色
 
         glActiveTexture(GL_TEXTURE0);
-        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D,  _texMaterial);
         glUniform1i(_program._texture, 0);
 
         glActiveTexture(GL_TEXTURE1);
-        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D,  _texNormal);
         glUniform1i(_program._texNormal, 1);
 

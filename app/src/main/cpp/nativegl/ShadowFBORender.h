@@ -15,6 +15,7 @@
 #include "../objects/CubeIlluminate.hpp"
 #include "../common/FrameBufferObject.hpp"
 #include "../program/DepthOrthoShader.hpp"
+#include "../objects/PIPicture.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -49,7 +50,7 @@ private:
     CubeIlluminate  lightCube;
 
     FrameBufferObject   depthFBO;
-    DepthOrthoShader    depthShader;
+    PIPicture           pip;
 private:
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;

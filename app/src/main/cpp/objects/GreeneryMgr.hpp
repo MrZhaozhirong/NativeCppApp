@@ -61,7 +61,6 @@ public:
         _program.begin();
         {
             glActiveTexture(GL_TEXTURE0);
-            glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D,  mTexGrasses );
             glUniform1i(_program._texture, 0);
 

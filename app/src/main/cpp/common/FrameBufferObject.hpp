@@ -40,8 +40,8 @@ private:
             //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         }else if(_type == FBO_DEPTH) {
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _width, _height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-            glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, _width, _height);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+            //glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, _width, _height);
         }
         //err = glGetError();
         //LOGE("createFBOTexture check err 4 : 0x%08x\n", err);
@@ -90,22 +90,22 @@ public:
 
     void    begin()
     {
-        //if( _texObj==0 ) {
-        //    createFBOTexture();
-        //}
+        LOGE("before glBindFramebuffer: 0x%08x\n", glGetError());
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
         LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
 
         if(_type == FBO_DEPTH) {
-            //glDrawBuffers(0, GL_NONE); // 不再绘制颜色缓冲区
-            //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
-            //glReadBuffer(GL_NONE);  // 只用来计算深度
-            //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
+            glDrawBuffers(0, GL_NONE); // 不再绘制颜色缓冲区
+            LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
+            glReadBuffer(GL_NONE);  // 只用来计算深度
+            LOGE("after glReadBuffer: 0x%08x\n", glGetError());
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, _texObj, 0);
+            LOGE("after glFramebufferTexture2D: 0x%08x\n", glGetError());
         }else if(_type == FBO_RGBA) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texObj, 0);
+            LOGE("after glFramebufferTexture2D: 0x%08x\n", glGetError());
         }
-        LOGE("after glFramebufferTexture2D: 0x%08x\n", glGetError());
+
     }
 
     void    end()

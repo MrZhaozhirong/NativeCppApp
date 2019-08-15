@@ -83,7 +83,7 @@ public:
         CELL::matrix4   matRot;
         matRot.rotateYXZ(angle, 0.0f, 0.0f);
         // 这里的模型矩阵只进行简单进行旋转操作。
-        CELL::matrix4   model   =   mModelMatrix * matRot; //mModelMatrix只是一个简单的单位矩阵
+        CELL::matrix4   model   =   mModelMatrix;// * matRot;   //按需调试旋不旋转
         CELL::matrix4   vp = camera.getProject() * camera.getView();
         CELL::matrix4   mvp = (vp * model);
         glUniformMatrix4fv(sprogram._mvp, 1, GL_FALSE, mvp.data());
@@ -114,7 +114,6 @@ public:
                               sizeof(CubeIlluminate::V3N3T2), &_data[0].u);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
         sprogram.end();
     }
 

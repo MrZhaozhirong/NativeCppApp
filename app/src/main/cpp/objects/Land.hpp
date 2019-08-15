@@ -50,13 +50,10 @@ public:
 
     void        render(Camera3D& camera)
     {
-        _sprogram->ShaderProgram::userProgram();
-
-        glEnable(GL_TEXTURE_2D);
+        _sprogram->userProgram();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, _texId);
         glUniform1i(_sprogram->uTextureUnit, 0);
-
         CELL::matrix4   vp =   camera.getProject() * camera.getView();
         CELL::matrix4 land_mvp = vp * _modelMatrix;
         glUniformMatrix4fv(_sprogram->uMVPMatrixLocation, 1, GL_FALSE, land_mvp.data());
@@ -78,7 +75,6 @@ public:
         glDisableVertexAttribArray(static_cast<GLuint>(_sprogram->aNormalLocation));
         glDisableVertexAttribArray(static_cast<GLuint>(_sprogram->aTexUvLocation));
 
-        glBindTexture(GL_TEXTURE_2D, 0);
         glUseProgram(0);
     }
 

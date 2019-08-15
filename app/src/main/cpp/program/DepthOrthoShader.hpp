@@ -32,8 +32,8 @@ public:
 
         const char* fs =    "#version 320 es\n\
                             precision mediump float;\n\
-                            in      vec2         _outUV;\n\
-                            uniform sampler2D    _tex;\n\
+                            in      vec2        _outUV;\n\
+                            uniform sampler2D   _tex;\n\
                             out     vec4        _fragColor;\n\
                             float restDepth(vec4 RGBA){\n\
                                 const float rMask = 1.0;\n\
@@ -63,7 +63,7 @@ public:
     {
         glUseProgram(programId);
         glEnableVertexAttribArray(_position);
-        glDisableVertexAttribArray(_uv);
+        glEnableVertexAttribArray(_uv);
     }
 
     virtual void    end()
