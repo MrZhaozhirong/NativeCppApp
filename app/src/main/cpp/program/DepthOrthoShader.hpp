@@ -47,7 +47,7 @@ public:
                             {\n\
                                 vec4    color = texture(_tex, _outUV);\n\
                                 float   dd = restDepth(color);\n\
-                                _fragColor = vec4(dd,dd,dd,1);\n\
+                                _fragColor = color;//vec4(dd,dd,dd,1);\n\
                             }";
 
         programId   =   ShaderHelper::buildProgram(vs, fs);

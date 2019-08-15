@@ -39,10 +39,13 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     sprintf(res_name, "%s%s", res_path, "test.jpg");
     GLuint texture_cube_id = TextureHelper::createTextureFromImage(res_name);
 
-    texture_id = land_texture_id;
+    texture_id = texture_cube_id;
 
     lightCube.init(CELL::float3(1,1,1), texture_cube_id);
     land.init(10, -1, land_texture_id);
+
+    //cube = new CubeIndex(1.0f);
+    //cubeShaderProgram = new CubeShaderProgram();
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
@@ -79,9 +82,10 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
         return;
     }
     mWindowSurface->makeCurrent();
+    CELL::matrix4   vp =   mCamera3D.getProject() * mCamera3D.getView();
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+    glDepthFunc(GL_LESS);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glViewport(0,0, mViewWidth, mViewHeight);
     lightCube.render(mCamera3D);
@@ -90,7 +94,7 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     depthFBO.begin();
     {
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
+        glDepthFunc(GL_LESS);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         lightCube.render(mCamera3D);
         land.render(mCamera3D);
