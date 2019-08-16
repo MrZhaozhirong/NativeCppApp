@@ -88,6 +88,7 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     land.render(mCamera3D);
 
     renderDepthFBO();
+
     mWindowSurface->swapBuffers();
 }
 
