@@ -21,30 +21,31 @@ public:
     unsigned int   _height;
     unsigned int   _fboID;
 private:
-    unsigned int   _texObj;
+    unsigned int   _rgbaTexId;
+    unsigned int   _depthRenderbufferId;
     unsigned int   _type;
 
     void    createFBOTexture()
     {
-        glGenTextures(1, &_texObj);
-        //GLenum err = glGetError();
-        //LOGE("createFBOTexture check err 1 : 0x%08x\n", err);
-        glBindTexture(GL_TEXTURE_2D, _texObj);
-        //err = glGetError();
-        //LOGE("createFBOTexture check err 2 : 0x%08x\n", err);
+        glGenTextures(1, &_rgbaTexId);
+        //LOGE("createFBOTexture check err 1 : 0x%08x\n", glGetError());
+        glBindTexture(GL_TEXTURE_2D, _rgbaTexId);
+        //LOGE("createFBOTexture check err 2 : 0x%08x\n", glGetError());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //err = glGetError();
-        //LOGE("createFBOTexture check err 3 : 0x%08x\n", err);
-        if(_type == FBO_RGBA) {
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        }else if(_type == FBO_DEPTH) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-            //glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, _width, _height);
-        }
-        //err = glGetError();
-        //LOGE("createFBOTexture check err 4 : 0x%08x\n", err);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        //LOGE("createFBOTexture check err 3 : 0x%08x\n", glGetError());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        //LOGE("createFBOTexture check err 4 : 0x%08x\n", glGetError());
+    }
+
+    void    createDepthRenderBuffer()
+    {
+        glGenRenderbuffers( 1, &_depthRenderbufferId );
+        glBindRenderbuffer( GL_RENDERBUFFER, _depthRenderbufferId );
+        glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _width, _height );
+        LOGE("glRenderbufferStorage check err : 0x%08x\n", glGetError());
     }
 public:
     FrameBufferObject()
@@ -52,12 +53,16 @@ public:
         _width  = 0;
         _height = 0;
         _fboID  = 0;
-        _texObj = 0;
+        _rgbaTexId = 0;
+        _depthRenderbufferId = 0;
         _type   = FBO_NONE;
     }
 
     int getTextureId() {
-        return _texObj;
+        if(_type == FBO_DEPTH) {
+            return _depthRenderbufferId;
+        }
+        return _rgbaTexId;
     }
     bool isInstantiation() {
         return _width!=0||_height!=0;
@@ -75,9 +80,9 @@ public:
         glGenFramebuffers(1, &_fboID);
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
 
-        if( _texObj==0 ) {
-            createFBOTexture();
-        }
+        createFBOTexture();
+        createDepthRenderBuffer();
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         GLenum err = glGetError();
@@ -90,22 +95,31 @@ public:
 
     void    begin()
     {
-        LOGE("before glBindFramebuffer: 0x%08x\n", glGetError());
+        GLenum err = glGetError();
+        while(err!=GL_NO_ERROR) {
+            LOGE("fbo.begin : 0x%08x\n", err);
+            err = glGetError();
+        }
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
-        LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
+        //LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
 
-        if(_type == FBO_DEPTH) {
-            glDrawBuffers(0, GL_NONE); // 不再绘制颜色缓冲区
-            LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
-            glReadBuffer(GL_NONE);  // 只用来计算深度
-            LOGE("after glReadBuffer: 0x%08x\n", glGetError());
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, _texObj, 0);
-            LOGE("after glFramebufferTexture2D: 0x%08x\n", glGetError());
-        }else if(_type == FBO_RGBA) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texObj, 0);
-            LOGE("after glFramebufferTexture2D: 0x%08x\n", glGetError());
+        if(_type & FBO_DEPTH) {
+            //glDrawBuffers(0, GL_NONE); // 不再绘制颜色缓冲区
+            //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
+            //glReadBuffer(GL_NONE);  // 只用来计算深度
+            //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderbufferId);
+            //LOGE("after glFramebufferRenderbuffer : 0x%08x\n", glGetError());
+        }
+        if(_type & FBO_RGBA) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
+            //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
         }
 
+        GLenum fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if(fbo_status!=GL_FRAMEBUFFER_COMPLETE) {
+            LOGE("fbo.begin check err : 0x%08x\n", fbo_status);
+        }
     }
 
     void    end()
@@ -119,11 +133,15 @@ public:
     */
     void    destroy()
     {
-        glDeleteTextures(1,&_texObj);
+        glDeleteRenderbuffers(1, &_depthRenderbufferId);
+        glDeleteTextures(1,&_rgbaTexId);
         glDeleteFramebuffers(1, &_fboID);
-        _texObj =   0;
-        _fboID  =   0;
-        _type   =   FBO_NONE;
+        _depthRenderbufferId = 0;
+        _rgbaTexId = 0;
+        _fboID  = 0;
+        _type   = FBO_NONE;
+        _width  = 0;
+        _height = 0;
     }
 };
 #endif // FRAME_BUFFER_OBJECT_HPP
