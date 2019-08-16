@@ -42,9 +42,6 @@ public:
         _texId = tex;
         _modelMatrix.identify();
 
-        if( _sprogram != nullptr) {
-            delete _sprogram;
-        }
         _sprogram = new GrasslandProgram();
     }
 

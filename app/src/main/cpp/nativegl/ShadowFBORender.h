@@ -16,6 +16,7 @@
 #include "../common/FrameBufferObject.hpp"
 #include "../program/DepthOrthoShader.hpp"
 #include "../objects/PIPicture.hpp"
+#include "../objects/CubeIndex.h"
 
 class ShadowFBORender : public GLRender {
 
@@ -48,6 +49,8 @@ public:
 private:
     Land            land;
     CubeIlluminate  lightCube;
+    //CubeIndex * cube = nullptr;
+    //CubeShaderProgram * cubeShaderProgram= nullptr;
 
     FrameBufferObject   depthFBO;
     PIPicture           pip;
