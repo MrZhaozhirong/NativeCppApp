@@ -150,7 +150,7 @@ void ShadowFBORender::renderDepthFBO() {
     }
     depthFBO.end();
 
-    pip.setTextureId(depthFBO.getDepthTexId());
-    //pip.setTextureId(depthFBO.getRgbaTexId());
+    //pip.setTextureId(depthFBO.getDepthTexId());
+    pip.setTextureId(depthFBO.getRgbaTexId());
     pip.render();
 }

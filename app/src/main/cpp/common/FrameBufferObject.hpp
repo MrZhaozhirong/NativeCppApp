@@ -123,14 +123,14 @@ public:
         //LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
 
         if(_type & FBO_DEPTH) {
-            glDrawBuffers(0, GL_NONE); // 解绑fbo-GL_COLOR_ATTACHMENT0-的输出
+            //glDrawBuffers(0, GL_NONE); // 解绑fbo-GL_COLOR_ATTACHMENT0-的输出
             //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
             //glReadBuffer(GL_NONE);  // 只用来计算深度
             //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
             //LOGE("after glFramebufferRenderbuffer : 0x%08x\n", glGetError());
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
+            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
             //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
         }
         if(_type & FBO_RGBA) {
