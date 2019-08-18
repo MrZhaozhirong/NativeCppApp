@@ -66,7 +66,7 @@ void ShadowFBORender::surfaceChanged(int width, int height)
     glGetIntegerv(GL_DEPTH_BITS, &depth_bits);
     LOGW("OS.GL_DEPTH_BITS : %d", depth_bits);
 
-    depthFBO.setup(width, height, FBO_RGBA);
+    depthFBO.setup(width, height, FBO_RGBA|FBO_DEPTH);
     pip.init(width, height);
 
     mWindowSurface->swapBuffers();
@@ -142,12 +142,15 @@ void ShadowFBORender::handleTouchUp(float x, float y) {
 void ShadowFBORender::renderDepthFBO() {
     depthFBO.begin();
     {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         lightCube.render(mCamera3D);
         land.render(mCamera3D);
     }
     depthFBO.end();
 
-    pip.setTextureId(depthFBO.getTextureId());
+    pip.setTextureId(depthFBO.getDepthTexId());
+    //pip.setTextureId(depthFBO.getRgbaTexId());
     pip.render();
 }
