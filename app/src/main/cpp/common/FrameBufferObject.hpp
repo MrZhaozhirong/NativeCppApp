@@ -98,9 +98,24 @@ public:
         glGenFramebuffers(1, &_fboID);
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
 
-        createRgbaTexture();
-        createDepthTexture();
-        createDepthRenderBuffer();
+        if(_type & FBO_DEPTH) {
+            //glDrawBuffers(0, GL_NONE); // 解绑fbo-GL_COLOR_ATTACHMENT0-的输出
+            //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
+            //glReadBuffer(GL_NONE);  // 只用来计算深度
+            //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
+
+            createDepthTexture();
+            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
+            //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
+        }
+        if(_type & FBO_RGBA) {
+            createRgbaTexture();
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
+            //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
+            createDepthRenderBuffer();
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
+            //LOGE("after glFramebufferRenderbuffer : 0x%08x\n", glGetError());
+        }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -121,22 +136,6 @@ public:
         }
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
         //LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
-
-        if(_type & FBO_DEPTH) {
-            //glDrawBuffers(0, GL_NONE); // 解绑fbo-GL_COLOR_ATTACHMENT0-的输出
-            //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
-            //glReadBuffer(GL_NONE);  // 只用来计算深度
-            //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
-            //LOGE("after glFramebufferRenderbuffer : 0x%08x\n", glGetError());
-
-            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
-            //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
-        }
-        if(_type & FBO_RGBA) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
-            //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
-        }
 
         GLenum fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(fbo_status!=GL_FRAMEBUFFER_COMPLETE) {
