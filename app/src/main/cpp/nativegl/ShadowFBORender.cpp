@@ -145,6 +145,7 @@ void ShadowFBORender::renderDepthFBO() {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glClearDepthf(1.0f);
         lightCube.render(mCamera3D);
         land.render(mCamera3D);
     }
@@ -153,4 +154,12 @@ void ShadowFBORender::renderDepthFBO() {
     //pip.setTextureId(depthFBO.getDepthTexId());
     pip.setTextureId(depthFBO.getRgbaTexId());
     pip.render();
+
+    GLenum renderObj[] = {GL_FRONT_FACE};
+    glDrawBuffers(1, renderObj);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
+                      mViewWidth/2,0, mViewWidth,mViewHeight/2,
+                        GL_DEPTH_BUFFER_BIT, GL_LINEAR);
 }

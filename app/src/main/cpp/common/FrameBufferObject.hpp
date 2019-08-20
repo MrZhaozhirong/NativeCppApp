@@ -37,7 +37,7 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         //LOGE("createDepthTexture check err 3 : 0x%08x\n", glGetError());
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _width, _height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
         //LOGE("createDepthTexture check err 4 : 0x%08x\n", glGetError());
     }
 
@@ -103,10 +103,10 @@ public:
             //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
             //glReadBuffer(GL_NONE);  // 只用来计算深度
             //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
-
             createDepthTexture();
-            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
-            //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
+            createDepthRenderBuffer();
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
         }
         if(_type & FBO_RGBA) {
             createRgbaTexture();
