@@ -66,7 +66,7 @@ void ShadowFBORender::surfaceChanged(int width, int height)
     glGetIntegerv(GL_DEPTH_BITS, &depth_bits);
     LOGW("OS.GL_DEPTH_BITS : %d", depth_bits);
 
-    depthFBO.setup(width, height, FBO_RGBA|FBO_DEPTH);
+    depthFBO.setup(width, height, FBO_DEPTH);
     pip.init(width, height);
 
     mWindowSurface->swapBuffers();
@@ -143,23 +143,26 @@ void ShadowFBORender::renderDepthFBO() {
     depthFBO.begin();
     {
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glClearDepthf(1.0f);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
         lightCube.render(mCamera3D);
-        land.render(mCamera3D);
+        //land.render(mCamera3D);
+        glCullFace(GL_BACK);
+        glDisable(GL_CULL_FACE);
     }
     depthFBO.end();
 
-    //pip.setTextureId(depthFBO.getDepthTexId());
-    pip.setTextureId(depthFBO.getRgbaTexId());
+    pip.setTextureId(depthFBO.getDepthTexId());
+    //pip.setTextureId(depthFBO.getRgbaTexId());
     pip.render();
 
-    GLenum renderObj[] = {GL_FRONT_FACE};
-    glDrawBuffers(1, renderObj);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
-                      mViewWidth/2,0, mViewWidth,mViewHeight/2,
-                        GL_DEPTH_BUFFER_BIT, GL_LINEAR);
+    //GLenum renderObj[] = {GL_FRONT_FACE};
+    //glDrawBuffers(1, renderObj);
+    //glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
+    //glReadBuffer(GL_DEPTH_ATTACHMENT);
+    //glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
+    //                  mViewWidth/2,0, mViewWidth,mViewHeight/2,
+    //                    GL_DEPTH_BUFFER_BIT, GL_LINEAR);
 }

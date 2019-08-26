@@ -37,8 +37,16 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         //LOGE("createDepthTexture check err 3 : 0x%08x\n", glGetError());
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _width, _height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
         //LOGE("createDepthTexture check err 4 : 0x%08x\n", glGetError());
+
+        //EGL配置 EGL_DEPTH_SIZE 16
+        // GL_BYTE / GL_UNSIGNED_BYTE
+        // GL_SHORT / GL_UNSIGNED_SHORT
+        // GL_INT / GL_UNSIGNED_INT
+        // GL_FLOAT
+
+        //GL_DEPTH_COMPONENT -> GL_UNSIGNED_SHORT/GL_UNSIGNED_INT 才能生成depth深度位图
     }
 
     void    createRgbaTexture()
@@ -60,7 +68,7 @@ private:
     {
         glGenRenderbuffers( 1, &_depthRboId );
         glBindRenderbuffer( GL_RENDERBUFFER, _depthRboId );
-        glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _width, _height );
+        glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, _width, _height );
         LOGE("glRenderbufferStorage check err : 0x%08x\n", glGetError());
     }
 
@@ -103,10 +111,12 @@ public:
             //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
             //glReadBuffer(GL_NONE);  // 只用来计算深度
             //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
+            //createDepthRenderBuffer();
+            //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
             createDepthTexture();
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
-            createDepthRenderBuffer();
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
+            createRgbaTexture();
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
         }
         if(_type & FBO_RGBA) {
             createRgbaTexture();
@@ -136,6 +146,16 @@ public:
         }
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
         //LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
+
+        if(_type & FBO_DEPTH) {
+            //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
+        }
+        if(_type & FBO_RGBA) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
+        }
 
         GLenum fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(fbo_status!=GL_FRAMEBUFFER_COMPLETE) {

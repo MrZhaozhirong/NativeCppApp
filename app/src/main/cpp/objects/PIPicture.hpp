@@ -29,12 +29,12 @@ public:
         V3UV2  rect[] =
         {
                 {0,       0,        0.0f,   0.0f,  1.0f},
-                {width/4, 0,        0.0f,   1.0f,  1.0f},
-                {0,       height/4, 0.0f,   0.0f,  0.0f},
+                {width/2, 0,        0.0f,   1.0f,  1.0f},
+                {0,       height/2, 0.0f,   0.0f,  0.0f},
 
-                {width/4, 0,        0.0f,   1.0f,  1.0f},
-                {width/4, height/4, 0.0f,   1.0f,  0.0f},
-                {0,       height/4, 0.0f,   0.0f,  0.0f},
+                {width/2, 0,        0.0f,   1.0f,  1.0f},
+                {width/2, height/2, 0.0f,   1.0f,  0.0f},
+                {0,       height/2, 0.0f,   0.0f,  0.0f},
         };
         memcpy(_data, rect, sizeof(rect));
 
