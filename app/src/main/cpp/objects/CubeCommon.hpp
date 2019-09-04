@@ -89,7 +89,6 @@ public:
         //glEnable(GL_TEXTURE_2D);
         //glBindTexture(GL_TEXTURE_2D,  mCubeSurfaceTexId);
         //glUniform1i(sprogram._texture, 0);
-
         glUniform3f(sprogram._lightColor, 1.0f, 0.0f, 0.0f);
 
         glVertexAttribPointer(static_cast<GLuint>(sprogram._position), 3, GL_FLOAT, GL_FALSE,
