@@ -17,6 +17,7 @@
 #include "../program/DepthOrthoShader.hpp"
 #include "../objects/PIPicture.hpp"
 #include "../objects/CubeIndex.h"
+#include "../objects/CubeCommon.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -49,6 +50,7 @@ public:
 private:
     Land            land;
     CubeIlluminate  lightCube;
+    CubeCommon      cubePoint;
     //CubeIndex * cube = nullptr;
     //CubeShaderProgram * cubeShaderProgram= nullptr;
 
@@ -57,6 +59,9 @@ private:
 private:
     EglCore * mEglCore;
     WindowSurface * mWindowSurface;
+
+    real3       mLightPosition;//光源点
+    real3       getLightDir();
 
     Camera3D mCamera3D;
     float mLastX;

@@ -131,7 +131,7 @@ public:
 
         GLenum err = glGetError();
         while(err!=GL_NO_ERROR) {
-            LOGE("fbo.setup.glTexImage2D : 0x%08x\n", err);
+            LOGE("fbo.setup : 0x%08x\n", err);
             err = glGetError();
         }
         return  true;
@@ -141,7 +141,7 @@ public:
     {
         GLenum err = glGetError();
         while(err!=GL_NO_ERROR) {
-            LOGE("fbo.begin : 0x%08x\n", err);
+            //LOGE("fbo.begin : 0x%08x\n", err);
             err = glGetError();
         }
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);

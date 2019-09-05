@@ -12,7 +12,7 @@ class CubeComProgram : public ShaderProgram
 {
 public:
     GLint       _mvp;
-    GLint       _lightColor;
+    GLint       _color;
     GLint       _texture;
     GLint       _position;
     GLint       _normal;
@@ -37,7 +37,7 @@ public:
                             void main()\n\
                             {\n\
                                 //gl_FragColor = texture2D(_texture, out_uv);\n\
-                                gl_FragColor = _color;\n\
+                                gl_FragColor = vec4(_color, 1.0);\n\
                             }";
 
         programId   =   ShaderHelper::buildProgram(vs, fs);
@@ -45,7 +45,7 @@ public:
         _position   =   glGetAttribLocation(programId,  "_position");
         _uv         =   glGetAttribLocation(programId,  "_uv");
         _texture    =   glGetUniformLocation(programId, "_texture");
-        _lightColor =   glGetUniformLocation(programId, "_lightColor");
+        _color =   glGetUniformLocation(programId, "_color");
     }
 
 

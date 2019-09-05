@@ -75,7 +75,7 @@ public:
         sprogram.initialize();
     }
 
-    void        render(Camera3D& camera)
+    void        render(Camera3D& camera, CELL::float3 lightDir)
     {
         sprogram.begin();
         static  float   angle = 0;
@@ -99,12 +99,12 @@ public:
         glBindTexture(GL_TEXTURE_2D,  mCubeSurfaceTexId);
         glUniform1i(sprogram._texture, 0);
 
-        glUniform3f(sprogram._lightDiffuse, 0.1f, 0.1f, 0.1f); // 漫反射 环境光
+        glUniform3f(sprogram._lightDiffuse, 0.2f, 0.2f, 0.2f); // 漫反射 环境光
         glUniform3f(sprogram._lightColor, 1.0f, 1.0f, 1.0f); // 定向光源的颜色
         glUniform3f(sprogram._lightDir, // 定向光源的方向
-                    static_cast<GLfloat>(camera._dir.x),
-                    static_cast<GLfloat>(camera._dir.y),
-                    static_cast<GLfloat>(camera._dir.z));
+                    static_cast<GLfloat>(lightDir.x),
+                    static_cast<GLfloat>(lightDir.y),
+                    static_cast<GLfloat>(lightDir.z));
 
         glVertexAttribPointer(static_cast<GLuint>(sprogram._position), 3, GL_FLOAT, GL_FALSE,
                               sizeof(CubeIlluminate::V3N3T2), &_data[0].x);
@@ -116,6 +116,7 @@ public:
 
         sprogram.end();
     }
+
 
 };
 
