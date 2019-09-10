@@ -118,6 +118,43 @@ public:
     }
 
 
+    void        renderShadow(matrix4r& projMatrix, matrix4r& viewMatrix, CELL::float3 lightDir)
+    {
+        sprogram.begin();
+
+        CELL::matrix4   model   =   mModelMatrix;
+        CELL::matrix4   vp = projMatrix * viewMatrix;
+        CELL::matrix4   mvp = (vp * model);
+        glUniformMatrix4fv(sprogram._mvp, 1, GL_FALSE, mvp.data());
+
+        // 法线矩阵 = 模型矩阵的逆矩阵的转置
+        //CELL::matrix3   matNormal(1);
+        CELL::matrix3   matNormal=   mat4_to_mat3(model)._inverse();
+        //CELL::matrix3   matNormal=   mat4_to_mat3(model)._inverse()._transpose();
+        glUniformMatrix3fv(sprogram._normalMatrix, 1, GL_FALSE, matNormal.data());
+
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,  mCubeSurfaceTexId);
+        glUniform1i(sprogram._texture, 0);
+
+        glUniform3f(sprogram._lightDiffuse, 0.2f, 0.2f, 0.2f); // 漫反射 环境光
+        glUniform3f(sprogram._lightColor, 1.0f, 1.0f, 1.0f); // 定向光源的颜色
+        glUniform3f(sprogram._lightDir, // 定向光源的方向
+                    static_cast<GLfloat>(lightDir.x),
+                    static_cast<GLfloat>(lightDir.y),
+                    static_cast<GLfloat>(lightDir.z));
+
+        glVertexAttribPointer(static_cast<GLuint>(sprogram._position), 3, GL_FLOAT, GL_FALSE,
+                              sizeof(CubeIlluminate::V3N3T2), &_data[0].x);
+        glVertexAttribPointer(static_cast<GLuint>(sprogram._normal),   3, GL_FLOAT, GL_FALSE,
+                              sizeof(CubeIlluminate::V3N3T2), &_data[0].nx);
+        glVertexAttribPointer(static_cast<GLuint>(sprogram._uv),       2, GL_FLOAT, GL_FALSE,
+                              sizeof(CubeIlluminate::V3N3T2), &_data[0].u);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        sprogram.end();
+    }
 };
 
 #endif //NATIVECPPAPP_CUBELIGHT_H

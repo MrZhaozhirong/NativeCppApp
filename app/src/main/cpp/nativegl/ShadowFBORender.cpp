@@ -40,10 +40,9 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     lightCube.init(CELL::float3(1,1,1), texture_cube_id);
     land.init(10, -1, land_texture_id);
 
-    mLightPosition = CELL::real3(5, 5, 5);
-    cubePoint.init(CELL::real3(0.15f,0.15f,0.15f), 0);
-    //cubePoint.mModelMatrix.translate(0, 5, 5); // 初始化位置
-    cubePoint.mModelMatrix.translate(mLightPosition);
+    mLightPosition = CELL::real3(5, 5, 2);
+    lightPositionCube.init(CELL::real3(0.15f,0.15f,0.15f), 0);
+    lightPositionCube.mModelMatrix.translate(mLightPosition);
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
@@ -85,11 +84,14 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     glEnable(GL_BLEND);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glViewport(0,0, mViewWidth, mViewHeight);
-    lightCube.render(mCamera3D, getLightDir());
-    cubePoint.render(mCamera3D);
+    lightPositionCube.render(mCamera3D);
     land.render(mCamera3D);
+    lightCube.render(mCamera3D, getLightDir());
 
+    mLightProjectionMatrix = CELL::perspective(45.0f, (float)mViewWidth/(float)mViewHeight, 0.1f, 1000.0f);
+    mLightViewMatrix       = CELL::lookAt(mLightPosition, mCamera3D.getTarget(), mCamera3D.getUp());
     renderDepthFBO();
+
     mWindowSurface->swapBuffers();
 }
 
@@ -101,7 +103,8 @@ void ShadowFBORender::renderDepthFBO() {
         glClearDepthf(1.0f);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
-        lightCube.render(mCamera3D, getLightDir());
+
+        lightCube.renderShadow(mLightProjectionMatrix, mLightViewMatrix, getLightDir());
         glCullFace(GL_BACK);
         glDisable(GL_CULL_FACE);
     }
@@ -110,15 +113,14 @@ void ShadowFBORender::renderDepthFBO() {
     pip.setTextureId(depthFBO.getDepthTexId());
     //pip.setTextureId(depthFBO.getRgbaTexId());
     pip.render();
-
-    //GLenum renderObj[] = {GL_FRONT_FACE};
-    //glDrawBuffers(1, renderObj);
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
-    //glReadBuffer(GL_DEPTH_ATTACHMENT);
-    //glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
-    //                  mViewWidth/2,0, mViewWidth,mViewHeight/2,
-    //                    GL_DEPTH_BUFFER_BIT, GL_LINEAR);
 }
+//GLenum renderObj[] = {GL_FRONT_FACE};
+//glDrawBuffers(1, renderObj);
+//glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
+//glReadBuffer(GL_DEPTH_ATTACHMENT);
+//glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
+//                  mViewWidth/2,0, mViewWidth,mViewHeight/2,
+//                    GL_DEPTH_BUFFER_BIT, GL_LINEAR);
 
 void ShadowFBORender::surfaceDestroyed(void)
 {

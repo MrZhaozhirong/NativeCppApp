@@ -50,9 +50,7 @@ public:
 private:
     Land            land;
     CubeIlluminate  lightCube;
-    CubeCommon      cubePoint;
-    //CubeIndex * cube = nullptr;
-    //CubeShaderProgram * cubeShaderProgram= nullptr;
+    CubeCommon      lightPositionCube;
 
     FrameBufferObject   depthFBO;
     PIPicture           pip;
@@ -62,6 +60,8 @@ private:
 
     real3       mLightPosition;//光源点
     real3       getLightDir();
+    matrix4r    mLightProjectionMatrix;//光源的投影矩阵
+    matrix4r    mLightViewMatrix;//光源的观察矩阵
 
     Camera3D mCamera3D;
     float mLastX;
