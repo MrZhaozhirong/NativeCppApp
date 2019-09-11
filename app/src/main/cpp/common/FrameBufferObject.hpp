@@ -107,16 +107,12 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
 
         if(_type & FBO_DEPTH) {
-            //glDrawBuffers(0, GL_NONE); // 解绑fbo-GL_COLOR_ATTACHMENT0-的输出
-            //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
-            //glReadBuffer(GL_NONE);  // 只用来计算深度
-            //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
             //createDepthRenderBuffer();
             //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
             createDepthTexture();
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
-            createRgbaTexture();
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
+            //createRgbaTexture();
+            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
         }
         if(_type & FBO_RGBA) {
             createRgbaTexture();
@@ -148,9 +144,18 @@ public:
         //LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
 
         if(_type & FBO_DEPTH) {
+            glDrawBuffers(0, GL_NONE);
+            //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
+            glReadBuffer(GL_NONE);
+            //LOGE("after glReadBuffer: 0x%08x\n", glGetError());
+            /**
+             * 我们需要的只是在从光的透视图下渲染场景的时候深度信息，所以颜色缓冲没有用。
+             * 然而帧缓冲对象不是完全不包含颜色缓冲的，所以我们需要显式告诉OpenGL我们不适用任何颜色数据进行渲染。
+             * 我们通过将调用glDrawBuffer，glReadBuffer把读和绘制缓冲设置为GL_NONE来做这件事。
+             */
             //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
+            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
         }
         if(_type & FBO_RGBA) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
