@@ -18,6 +18,7 @@
 #include "../objects/PIPicture.hpp"
 #include "../objects/CubeIndex.h"
 #include "../objects/CubeCommon.hpp"
+#include "../program/LightShadowShader.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -55,24 +56,29 @@ private:
     FrameBufferObject   depthFBO;
     PIPicture           pip;
 private:
-    EglCore * mEglCore;
-    WindowSurface * mWindowSurface;
+    EglCore*        mEglCore;
+    WindowSurface*  mWindowSurface;
+    char*           res_path;
 
-    real3       mLightPosition;//光源点
-    real3       getLightDir();
-    matrix4r    mLightProjectionMatrix;//光源的投影矩阵
-    matrix4r    mLightViewMatrix;//光源的观察矩阵
+    __inline real3      getLightDir() {
+        return normalize(mCamera3D.getTarget() - mLightPosition);
+    }
+    real3               mLightPosition;//光源点
+    matrix4             mLightProjectionMatrix;//光源的投影矩阵
+    matrix4             mLightViewMatrix;//光源的观察矩阵
+    LightShadowShader   mShadowShader;
 
-    Camera3D mCamera3D;
-    float mLastX;
-    float mLastY;
-    int   mViewWidth;
-    int   mViewHeight;
 
-    char  * res_path;
+    Camera3D    mCamera3D;
+    float       mLastX;
+    float       mLastY;
+    int         mViewWidth;
+    int         mViewHeight;
+
 private:
     DISALLOW_EVIL_CONSTRUCTORS(ShadowFBORender);
 
     void renderDepthFBO();
+    void renderShadow();
 };
 #endif //SHADOW_FBO_RENDER_H

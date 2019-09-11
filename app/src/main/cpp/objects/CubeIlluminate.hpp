@@ -118,7 +118,7 @@ public:
     }
 
 
-    void        renderShadow(matrix4r& projMatrix, matrix4r& viewMatrix, CELL::float3 lightDir)
+    void        renderShadow(matrix4& projMatrix, matrix4& viewMatrix, CELL::float3 lightDir)
     {
         sprogram.begin();
 

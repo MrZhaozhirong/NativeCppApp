@@ -43,6 +43,8 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     mLightPosition = CELL::real3(5, 5, 2);
     lightPositionCube.init(CELL::real3(0.15f,0.15f,0.15f), 0);
     lightPositionCube.mModelMatrix.translate(mLightPosition);
+
+    mShadowShader.initialize();
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
@@ -67,7 +69,7 @@ void ShadowFBORender::surfaceChanged(int width, int height)
     LOGW("OS.GL_DEPTH_BITS : %d", depth_bits);
 
     depthFBO.setup(width, height, FBO_DEPTH);
-    pip.init(width, height);
+    //pip.init(width, height);
 
     mWindowSurface->swapBuffers();
 }
@@ -80,40 +82,76 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     }
     mWindowSurface->makeCurrent();
 
+    mLightProjectionMatrix = CELL::perspective(45.0f, (float)mViewWidth/(float)mViewHeight, 0.1f, 30.0f);
+    mLightViewMatrix       = CELL::lookAt(mLightPosition, CELL::real3(0,0,0), CELL::real3(0,1.0,0));
+    renderDepthFBO();
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
     glViewport(0,0, mViewWidth, mViewHeight);
+
+    renderShadow();
+
     lightPositionCube.render(mCamera3D);
     land.render(mCamera3D);
     lightCube.render(mCamera3D, getLightDir());
-
-    mLightProjectionMatrix = CELL::perspective(45.0f, (float)mViewWidth/(float)mViewHeight, 0.1f, 1000.0f);
-    mLightViewMatrix       = CELL::lookAt(mLightPosition, mCamera3D.getTarget(), mCamera3D.getUp());
-    renderDepthFBO();
-
+    //renderDepthFBO();
     mWindowSurface->swapBuffers();
 }
 
-void ShadowFBORender::renderDepthFBO() {
+void ShadowFBORender::renderShadow()
+{
+    CELL::matrix4   matBias =   CELL::matrix4(0.5f, 0.0f, 0.0f, 0.0f,
+                                              0.0f, 0.5f, 0.0f, 0.0f,
+                                              0.0f, 0.0f, 0.5f, 0.0f,
+                                              0.5f, 0.5f, 0.5f, 1.0f);
+    CELL::matrix4   matView   =   mCamera3D.getView();
+    CELL::matrix4   matPRJ    =   mCamera3D.getProject();
+    CELL::matrix4   matShadow =   matBias * mLightProjectionMatrix * mLightViewMatrix;
+    mShadowShader.begin();
+    {
+        glUniformMatrix4fv(mShadowShader._matShadow, 1, GL_FALSE, matShadow.data());
+        glUniformMatrix4fv(mShadowShader._matMV,  1, GL_FALSE, matView.data());
+        glUniformMatrix4fv(mShadowShader._matPRJ, 1, GL_FALSE, matPRJ.data());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, depthFBO.getDepthTexId());
+        glUniform1i(mShadowShader._shadowMap, 1);
+        glUniform4f(mShadowShader._color, 0.5f,0.5f,0.5f,1.0f);
+        //地板
+        glVertexAttribPointer(static_cast<GLuint>(mShadowShader._attrPos), 3, GL_FLOAT, GL_FALSE,
+                              sizeof(Land::V3N3UV2), &(land._data[0].x));
+        glDrawArrays(GL_TRIANGLES, 0, 2*3);
+        //正方体
+        glVertexAttribPointer(static_cast<GLuint>(mShadowShader._attrPos), 3, GL_FLOAT, GL_FALSE,
+                              sizeof(CubeIlluminate::V3N3T2), &(lightCube._data[0].x));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+    mShadowShader.end();
+}
+
+void ShadowFBORender::renderDepthFBO()
+{
     depthFBO.begin();
     {
         glEnable(GL_DEPTH_TEST);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
         glClearDepthf(1.0f);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
-
+        //land.render(mLightProjectionMatrix, mLightViewMatrix);
         lightCube.renderShadow(mLightProjectionMatrix, mLightViewMatrix, getLightDir());
         glCullFace(GL_BACK);
         glDisable(GL_CULL_FACE);
     }
     depthFBO.end();
-
-    pip.setTextureId(depthFBO.getDepthTexId());
-    //pip.setTextureId(depthFBO.getRgbaTexId());
-    pip.render();
+    //pip.setTextureId(depthFBO.getDepthTexId());
+    //pip.render();
 }
+//pip.setTextureId(depthFBO.getDepthTexId());
+//pip.setTextureId(depthFBO.getRgbaTexId());
+//pip.render();
+
 //GLenum renderObj[] = {GL_FRONT_FACE};
 //glDrawBuffers(1, renderObj);
 //glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
@@ -168,7 +206,7 @@ void ShadowFBORender::handleTouchUp(float x, float y) {
     this->mLastY = 0;
 }
 
-__inline CELL::real3 ShadowFBORender::getLightDir() {
-    return normalize(mCamera3D.getTarget() - mLightPosition);
-}
+//__inline CELL::real3 ShadowFBORender::getLightDir() {
+//    return normalize(mCamera3D.getTarget() - mLightPosition);
+//}
 
