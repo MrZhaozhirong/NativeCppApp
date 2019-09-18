@@ -106,7 +106,7 @@ public:
         glGenFramebuffers(1, &_fboID);
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
 
-        if(_type & FBO_DEPTH) {
+        if(_type == FBO_DEPTH) {
             //createDepthRenderBuffer();
             //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
             createDepthTexture();
@@ -114,7 +114,7 @@ public:
             //createRgbaTexture();
             //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
         }
-        if(_type & FBO_RGBA) {
+        if(_type == FBO_RGBA) {
             createRgbaTexture();
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
             //LOGE("after glFramebufferTexture2D : 0x%08x\n", glGetError());
@@ -143,7 +143,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
         //LOGE("after glBindFramebuffer: 0x%08x\n", glGetError());
 
-        if(_type & FBO_DEPTH) {
+        if(_type == FBO_DEPTH) {
             glDrawBuffers(0, GL_NONE);
             //LOGE("after glDrawBuffers: 0x%08x\n", glGetError());
             glReadBuffer(GL_NONE);
@@ -157,7 +157,7 @@ public:
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexId, 0);
             //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
         }
-        if(_type & FBO_RGBA) {
+        if(_type == FBO_RGBA) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rgbaTexId, 0);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRboId);
         }
