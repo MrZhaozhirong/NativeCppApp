@@ -7,7 +7,7 @@
 
 #include "ShaderProgram.h"
 #include "ShaderHelper.h"
-
+// use to debug
 class LightShadowShader : public ShaderProgram {
 public:
     GLint _matShadow;

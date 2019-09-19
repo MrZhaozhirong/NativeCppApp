@@ -100,6 +100,7 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     mWindowSurface->swapBuffers();
 }
 
+//user to debug
 void ShadowFBORender::renderShadow()
 {
     CELL::matrix4   matBias =   CELL::matrix4(0.5f, 0.0f, 0.0f, 0.0f,

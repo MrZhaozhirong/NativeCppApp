@@ -11,6 +11,7 @@
 #include "../program/CubeComProgram.hpp"
 #include "../common/Camera3D.hpp"
 
+// use to debug
 class CubeCommon {
 private:
     struct V3T2 {
@@ -90,7 +91,7 @@ public:
         //glEnable(GL_TEXTURE_2D);
         //glBindTexture(GL_TEXTURE_2D,  mCubeSurfaceTexId);
         //glUniform1i(sprogram._texture, 0);
-        glUniform3f(sprogram._color, 1.0f, 0.0f, 0.0f);
+        glUniform3f(sprogram._color, 1.0f, 1.0f, 1.0f);
 
         glVertexAttribPointer(static_cast<GLuint>(sprogram._position), 3, GL_FLOAT, GL_FALSE,
                               sizeof(CubeCommon::V3T2), &_data[0].x);
