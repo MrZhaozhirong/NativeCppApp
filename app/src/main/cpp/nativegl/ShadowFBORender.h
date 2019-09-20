@@ -54,7 +54,7 @@ private:
     CubeCommon      lightPositionCube;
 
     FrameBufferObject   depthFBO;
-    PIPicture           pip;
+    //PIPicture           pip;
 private:
     EglCore*        mEglCore;
     WindowSurface*  mWindowSurface;
