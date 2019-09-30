@@ -39,12 +39,12 @@ public:
 
         V3N3T2 verts[] =
         {
-            {-gSizeX, y_pos, -gSizeZ, 0,1,0, 0.0f, 0.0f}, // left far
-            { gSizeX, y_pos, -gSizeZ, 0,1,0, size, 0.0f}, // right far
-            { gSizeX, y_pos,  gSizeZ, 0,1,0, size, size}, // right near
-            {-gSizeX, y_pos, -gSizeZ, 0,1,0, 0.0f, 0.0f}, // left far
-            { gSizeX, y_pos,  gSizeZ, 0,1,0, size, size}, // right near
-            {-gSizeX, y_pos,  gSizeZ, 0,1,0, 0.0f, size}  // left near
+            {-gSizeX, y_pos, -gSizeZ, 0,1,0,  0.0f, 0.0f}, // left far
+            { gSizeX, y_pos, -gSizeZ, 0,1,0,  size, 0.0f}, // right far
+            { gSizeX, y_pos,  gSizeZ, 0,1,0,  size, size}, // right near
+            {-gSizeX, y_pos, -gSizeZ, 0,1,0,  0.0f, 0.0f}, // left far
+            { gSizeX, y_pos,  gSizeZ, 0,1,0,  size, size}, // right near
+            {-gSizeX, y_pos,  gSizeZ, 0,1,0,  0.0f, size}  // left near
         };
         memcpy(_data, verts, sizeof(verts));
 
