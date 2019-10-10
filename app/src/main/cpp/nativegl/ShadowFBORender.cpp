@@ -112,7 +112,7 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     mWindowSurface->swapBuffers();
 }
 
-//user to debug
+//use to debug 阴影的原理，以搬到shader。
 //void ShadowFBORender::renderShadow()
 //{
 //    CELL::matrix4   matBias =   CELL::matrix4(0.5f, 0.0f, 0.0f, 0.0f,
@@ -169,13 +169,6 @@ void ShadowFBORender::renderDepthFBO()
 //pip.setTextureId(depthFBO.getRgbaTexId());
 //pip.render();
 
-//GLenum renderObj[] = {GL_FRONT_FACE};
-//glDrawBuffers(1, renderObj);
-//glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
-//glReadBuffer(GL_DEPTH_ATTACHMENT);
-//glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
-//                  mViewWidth/2,0, mViewWidth,mViewHeight/2,
-//                    GL_DEPTH_BUFFER_BIT, GL_LINEAR);
 
 void ShadowFBORender::surfaceDestroyed(void)
 {
@@ -222,7 +215,12 @@ void ShadowFBORender::handleTouchUp(float x, float y) {
     this->mLastY = 0;
 }
 
-//__inline CELL::real3 ShadowFBORender::getLightDir() {
-//    return normalize(mCamera3D.getTarget() - mLightPosition);
-//}
 
+// 这段代码很好的理解glDrawBuffer和glReadBuffer
+//GLenum renderObj[] = {GL_FRONT_FACE};
+//glDrawBuffers(1, renderObj);
+//glBindFramebuffer(GL_READ_FRAMEBUFFER, depthFBO._fboID);
+//glReadBuffer(GL_DEPTH_ATTACHMENT);
+//glBlitFramebuffer(0, 0, mViewWidth,mViewHeight,
+//                  mViewWidth/2,0, mViewWidth,mViewHeight/2,
+//                    GL_DEPTH_BUFFER_BIT, GL_LINEAR);
