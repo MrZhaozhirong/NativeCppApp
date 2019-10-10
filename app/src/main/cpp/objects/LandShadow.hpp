@@ -54,35 +54,36 @@ public:
     }
 
 
-    void        render(Camera3D& camera, real3& lightPos, matrix4 lightSpaceMatrix)
+    void        render(matrix4 spaceProjectionMatrix, matrix4 spaceViewMatrix,
+                       real3& lightPos,
+                       matrix4 lightProjectionMatrix, matrix4 lightViewMatrix)
     {
-        sprogram.userProgram();
+        sprogram.begin();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, _texId);
         glUniform1i(sprogram._texture, 0);
+
         glActiveTexture(GL_TEXTURE1);
-        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D,  _ShadowMapId);
         glUniform1i(sprogram._shadowMap, 1);
 
         //CELL::matrix4   model = _modelMatrix;
         //CELL::matrix4   vp = camera.getProject() * camera.getView();
         //CELL::matrix4   mvp = (vp * model);
-        glUniformMatrix4fv(sprogram._projection, 1, GL_FALSE,
-                           reinterpret_cast<const GLfloat *>(camera.getProject().data()));
-        glUniformMatrix4fv(sprogram._view, 1, GL_FALSE,
-                           reinterpret_cast<const GLfloat *>(camera.getView().data()));
+        glUniformMatrix4fv(sprogram._projection, 1, GL_FALSE, spaceProjectionMatrix.data());
+        glUniformMatrix4fv(sprogram._view, 1, GL_FALSE, spaceViewMatrix.data());
         glUniformMatrix4fv(sprogram._model, 1, GL_FALSE, _modelMatrix.data());
 
         glUniform3f(sprogram._lightColor, 1.0f, 1.0f, 1.0f);
         glUniform3f(sprogram._lightPos, lightPos.x, lightPos.y, lightPos.z);
+        matrix4 lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
         glUniformMatrix4fv(sprogram._lightSpaceMatrix, 1, GL_FALSE, lightSpaceMatrix.data());
 
         glVertexAttribPointer(static_cast<GLuint>(sprogram._position), 3, GL_FLOAT, GL_FALSE,
                               sizeof(LandShadow::V3N3T2), &_data[0].x);
         glVertexAttribPointer(static_cast<GLuint>(sprogram._normal),   3, GL_FLOAT, GL_FALSE,
                               sizeof(LandShadow::V3N3T2), &_data[0].nx);
-        glVertexAttribPointer(static_cast<GLuint>(sprogram._texCoords),2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(static_cast<GLuint>(sprogram._uv),       2, GL_FLOAT, GL_FALSE,
                               sizeof(LandShadow::V3N3T2), &_data[0].u);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         sprogram.end();

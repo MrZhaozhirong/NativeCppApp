@@ -37,14 +37,19 @@ void ShadowFBORender::surfaceCreated(ANativeWindow *window)
     sprintf(res_name, "%s%s", res_path, "test.jpg");
     GLuint texture_cube_id = TextureHelper::createTextureFromImage(res_name);
 
-    lightCube.init(CELL::float3(1,1,1), texture_cube_id);
-    land.init(10, -1, land_texture_id);
+    //lightCube.init(CELL::float3(1,1,1), texture_cube_id);
+    cubeShadow.init(CELL::float3(1,1,1));
+    cubeShadow.setSurfaceTexture(texture_cube_id);
+
+    //land.init(10, -1, land_texture_id);
+    landShadow.init(10, -1);
+    landShadow.setSurfaceTexture(land_texture_id);
 
     mLightPosition = CELL::real3(5, 5, 2);
     lightPositionCube.init(CELL::real3(0.15f,0.15f,0.15f), 0);
     lightPositionCube.mModelMatrix.translate(mLightPosition);
 
-    mShadowShader.initialize();
+    //mShadowShader.initialize();
 }
 
 void ShadowFBORender::surfaceChanged(int width, int height)
@@ -69,7 +74,7 @@ void ShadowFBORender::surfaceChanged(int width, int height)
     LOGW("OS.GL_DEPTH_BITS : %d", depth_bits);
 
     depthFBO.setup(width, height, FBO_DEPTH);
-    //pip.init(width, height);
+    pip.init(width, height);
 
     mWindowSurface->swapBuffers();
 }
@@ -82,6 +87,8 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     }
     mWindowSurface->makeCurrent();
 
+    matrix4 cProj(mCamera3D.getProject());
+    matrix4 cView(mCamera3D.getView());
     mLightProjectionMatrix = CELL::perspective(45.0f, (float)mViewWidth/(float)mViewHeight, 0.1f, 30.0f);
     mLightViewMatrix       = CELL::lookAt(mLightPosition, CELL::real3(0,0,0), CELL::real3(0,1.0,0));
     renderDepthFBO();
@@ -90,46 +97,51 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
     glEnable(GL_BLEND);
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
     glViewport(0,0, mViewWidth, mViewHeight);
-
-    renderShadow();
+    //renderShadow();
 
     lightPositionCube.render(mCamera3D);
-    land.render(mCamera3D);
-    lightCube.render(mCamera3D, getLightDir());
-    //renderDepthFBO();
+
+    //land.render(mCamera3D);
+    landShadow.setShadowMap(depthFBO.getDepthTexId());
+    landShadow.render(cProj,cView, mLightPosition, mLightProjectionMatrix, mLightViewMatrix);
+
+    //lightCube.render(mCamera3D, getLightDir());
+    cubeShadow.setShadowMap(depthFBO.getDepthTexId());
+    cubeShadow.render(cProj,cView, mLightPosition, mLightProjectionMatrix, mLightViewMatrix);
+
     mWindowSurface->swapBuffers();
 }
 
 //user to debug
-void ShadowFBORender::renderShadow()
-{
-    CELL::matrix4   matBias =   CELL::matrix4(0.5f, 0.0f, 0.0f, 0.0f,
-                                              0.0f, 0.5f, 0.0f, 0.0f,
-                                              0.0f, 0.0f, 0.5f, 0.0f,
-                                              0.5f, 0.5f, 0.5f, 1.0f);
-    CELL::matrix4   matView   =   mCamera3D.getView();
-    CELL::matrix4   matPRJ    =   mCamera3D.getProject();
-    CELL::matrix4   matShadow =   matBias * mLightProjectionMatrix * mLightViewMatrix;
-    mShadowShader.begin();
-    {
-        glUniformMatrix4fv(mShadowShader._matShadow, 1, GL_FALSE, matShadow.data());
-        glUniformMatrix4fv(mShadowShader._matMV,  1, GL_FALSE, matView.data());
-        glUniformMatrix4fv(mShadowShader._matPRJ, 1, GL_FALSE, matPRJ.data());
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, depthFBO.getDepthTexId());
-        glUniform1i(mShadowShader._shadowMap, 1);
-        glUniform4f(mShadowShader._color, 0.5f,0.5f,0.5f,1.0f);
-        //地板
-        glVertexAttribPointer(static_cast<GLuint>(mShadowShader._attrPos), 3, GL_FLOAT, GL_FALSE,
-                              sizeof(Land::V3N3UV2), &(land._data[0].x));
-        glDrawArrays(GL_TRIANGLES, 0, 2*3);
-        //正方体
-        glVertexAttribPointer(static_cast<GLuint>(mShadowShader._attrPos), 3, GL_FLOAT, GL_FALSE,
-                              sizeof(CubeIlluminate::V3N3T2), &(lightCube._data[0].x));
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-    mShadowShader.end();
-}
+//void ShadowFBORender::renderShadow()
+//{
+//    CELL::matrix4   matBias =   CELL::matrix4(0.5f, 0.0f, 0.0f, 0.0f,
+//                                              0.0f, 0.5f, 0.0f, 0.0f,
+//                                              0.0f, 0.0f, 0.5f, 0.0f,
+//                                              0.5f, 0.5f, 0.5f, 1.0f);
+//    CELL::matrix4   matView   =   mCamera3D.getView();
+//    CELL::matrix4   matPRJ    =   mCamera3D.getProject();
+//    CELL::matrix4   matShadow =   matBias * mLightProjectionMatrix * mLightViewMatrix;
+//    mShadowShader.begin();
+//    {
+//        glUniformMatrix4fv(mShadowShader._matShadow, 1, GL_FALSE, matShadow.data());
+//        glUniformMatrix4fv(mShadowShader._matMV,  1, GL_FALSE, matView.data());
+//        glUniformMatrix4fv(mShadowShader._matPRJ, 1, GL_FALSE, matPRJ.data());
+//        glActiveTexture(GL_TEXTURE1);
+//        glBindTexture(GL_TEXTURE_2D, depthFBO.getDepthTexId());
+//        glUniform1i(mShadowShader._shadowMap, 1);
+//        glUniform4f(mShadowShader._color, 0.5f,0.5f,0.5f,1.0f);
+//        //地板
+//        glVertexAttribPointer(static_cast<GLuint>(mShadowShader._attrPos), 3, GL_FLOAT, GL_FALSE,
+//                              sizeof(Land::V3N3UV2), &(land._data[0].x));
+//        glDrawArrays(GL_TRIANGLES, 0, 2*3);
+//        //正方体
+//        glVertexAttribPointer(static_cast<GLuint>(mShadowShader._attrPos), 3, GL_FLOAT, GL_FALSE,
+//                              sizeof(CubeIlluminate::V3N3T2), &(lightCube._data[0].x));
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
+//    }
+//    mShadowShader.end();
+//}
 
 void ShadowFBORender::renderDepthFBO()
 {
@@ -141,7 +153,11 @@ void ShadowFBORender::renderDepthFBO()
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         //land.render(mLightProjectionMatrix, mLightViewMatrix);
-        lightCube.renderShadow(mLightProjectionMatrix, mLightViewMatrix, getLightDir());
+        //lightCube.renderShadow(mLightProjectionMatrix, mLightViewMatrix, getLightDir());
+
+        cubeShadow.render(mLightProjectionMatrix,mLightViewMatrix,
+                          mLightPosition,
+                          mLightProjectionMatrix,mLightViewMatrix);
         glCullFace(GL_BACK);
         glDisable(GL_CULL_FACE);
     }
@@ -163,7 +179,6 @@ void ShadowFBORender::renderDepthFBO()
 
 void ShadowFBORender::surfaceDestroyed(void)
 {
-    land.destroy();
     // 清空自定义模型，纹理，各种BufferObject
     if (mWindowSurface) {
         mWindowSurface->release();
@@ -178,7 +193,7 @@ void ShadowFBORender::surfaceDestroyed(void)
 }
 
 void ShadowFBORender::handleMultiTouch(float distance) {
-    LOGD("handleMultiTouch distance:%f", distance);
+    //LOGD("handleMultiTouch distance:%f", distance);
     real    present =   distance > 0 ? 0.9f : 1.1f;
     real3 target = mCamera3D.getTarget();
     mCamera3D.scaleCameraByPos(target, present);

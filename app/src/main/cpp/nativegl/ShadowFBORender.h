@@ -19,6 +19,8 @@
 #include "../objects/CubeIndex.h"
 #include "../objects/CubeCommon.hpp"
 #include "../program/LightShadowShader.hpp"
+#include "../objects/LandShadow.hpp"
+#include "../objects/CubeShadow.hpp"
 
 class ShadowFBORender : public GLRender {
 
@@ -49,12 +51,16 @@ public:
 
 
 private:
-    Land            land;
-    CubeIlluminate  lightCube;
+    //Land            land;
+    //CubeIlluminate  lightCube;
     CubeCommon      lightPositionCube;
 
+    LandShadow      landShadow;
+    CubeShadow      cubeShadow;
+
+
     FrameBufferObject   depthFBO;
-    //PIPicture           pip;
+    PIPicture           pip;
 private:
     EglCore*        mEglCore;
     WindowSurface*  mWindowSurface;
@@ -66,7 +72,7 @@ private:
     real3               mLightPosition;//光源点
     matrix4             mLightProjectionMatrix;//光源的投影矩阵
     matrix4             mLightViewMatrix;//光源的观察矩阵
-    LightShadowShader   mShadowShader;
+    //LightShadowShader   mShadowShader;
 
 
     Camera3D    mCamera3D;

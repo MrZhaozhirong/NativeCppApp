@@ -13,7 +13,7 @@ class IlluminateWithShadow : public ShaderProgram
 public:
     GLint       _position;
     GLint       _normal;
-    GLint       _texCoords;
+    GLint       _uv;
 
     GLint       _projection;
     GLint       _view;
@@ -31,9 +31,8 @@ public:
         const char* vs  =   "#version 320 es\n"
                             "in  vec3    position;\n"
                             "in  vec3    normal;\n"
-                            "in  vec2    texCoords;\n"
+                            "in  vec2    uv;\n"
                             "\n"
-                            "out vec2    TexCoords;\n"
                             "out VS_OUT {\n"
                             "    vec3 FragPosWorldSpace;\n"
                             "    vec3 Normal;\n"
@@ -49,13 +48,15 @@ public:
                             "void main()\n"
                             "{\n"
                             "    gl_Position = projection * view * model * vec4(position, 1.0f);\n"
-                            "    vs_out.TexCoords = texCoords; // 纹理uv坐标传递到fs，进行插值\n"
+                            "    vs_out.TexCoords = uv; // 纹理uv坐标传递到fs，进行插值\n"
                             "    vs_out.Normal = transpose(inverse(mat3(model))) * normal;\n"
+                            "    //vs_out.Normal = inverse(mat3(model)) * normal;\n"
                             "    vs_out.FragPosWorldSpace = vec3(model * vec4(position, 1.0));\n"
                             "    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPosWorldSpace, 1.0);\n"
                             "}";
 
         const char* fs  =   "#version 320 es\n"
+                            "precision mediump float;\n"
                             "uniform vec3        _lightColor;\n"
                             "uniform sampler2D   _texture;\n"
                             "uniform sampler2D   _shadowMap;\n"
@@ -71,7 +72,7 @@ public:
                             "\n"
                             "out     vec4        fragColor;\n"
                             "\n"
-                            "float ShadowCalculation(vec4 fragPosLightSpace)\n"
+                            "float ShadowCalculation(vec4 fragPosLightSpace,float bias)\n"
                             "{\n"
                             "    // 执行透视除法，剔除透视效果(2D->3D)\n"
                             "    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;\n"
@@ -82,7 +83,7 @@ public:
                             "    // 取得当前片元在光源视角下的深度\n"
                             "    float currentDepth = projCoords.z;\n"
                             "    // 检查当前片元是否在阴影中\n"
-                            "    float shadow = currentDepth > shadowDepth  ? 1.0 : 0.0;\n"
+                            "    float shadow = currentDepth-bias > shadowDepth ? 1.0 : 0.0;\n"
                             "    return shadow;\n"
                             "}\n"
                             "void main()\n"
@@ -91,7 +92,7 @@ public:
                             "    vec3 normal = normalize(fs_in.Normal);\n"
                             "    vec3 lightColor = _lightColor;\n"
                             "    // 周围环境\n"
-                            "    vec3 ambient = 0.15 * color;\n"
+                            "    vec3 ambient = 0.5 * color;\n"
                             "    // 漫反射\n"
                             "    vec3 lightDir = normalize(_lightPos - fs_in.FragPosWorldSpace);\n"
                             "    float diff = max(dot(lightDir, normal), 0.0);\n"
@@ -103,8 +104,10 @@ public:
                             "    //#vec3 halfwayDir = normalize(lightDir + viewDir);\n"
                             "    //#spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);\n"
                             "    //#vec3 specular = spec * lightColor;\n"
+                            "    // 阴影失真\n"
+                            "    //float bias = max(0.01 * (1.0 - dot(normal, lightDir)), 0.0005);\n"
                             "    // 计算阴影\n"
-                            "    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);\n"
+                            "    float shadow = ShadowCalculation(fs_in.FragPosLightSpace, -0.0005);\n"
                             "    //vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;\n"
                             "    vec3 lighting = (ambient + (1.0 - shadow) * diffuse) * color;\n"
                             "    fragColor = vec4(lighting, 1.0f);\n"
@@ -114,7 +117,7 @@ public:
 
         _position   =   glGetAttribLocation(programId,  "position");
         _normal     =   glGetAttribLocation(programId,  "normal");
-        _texCoords  =   glGetAttribLocation(programId,  "texCoords");
+        _uv         =   glGetAttribLocation(programId,  "uv");
 
         _projection =   glGetUniformLocation(programId, "projection");
         _view       =   glGetUniformLocation(programId, "view");
@@ -134,7 +137,7 @@ public:
     {
         glEnableVertexAttribArray(_position);
         glEnableVertexAttribArray(_normal);
-        glEnableVertexAttribArray(_texCoords);
+        glEnableVertexAttribArray(_uv);
         glUseProgram(programId);
     }
     /**
@@ -144,7 +147,7 @@ public:
     {
         glDisableVertexAttribArray(_position);
         glDisableVertexAttribArray(_normal);
-        glDisableVertexAttribArray(_texCoords);
+        glDisableVertexAttribArray(_uv);
         glUseProgram(0);
     }
 };
