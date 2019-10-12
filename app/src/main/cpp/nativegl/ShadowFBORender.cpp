@@ -89,7 +89,7 @@ void ShadowFBORender::renderOnDraw(double elpasedInMilliSec)
 
     matrix4 cProj(mCamera3D.getProject());
     matrix4 cView(mCamera3D.getView());
-    mLightProjectionMatrix = CELL::perspective(45.0f, (float)mViewWidth/(float)mViewHeight, 0.1f, 30.0f);
+    mLightProjectionMatrix = CELL::perspective(45.0f, (float)mViewWidth/(float)mViewHeight, 0.1f, 1000.0f);
     mLightViewMatrix       = CELL::lookAt(mLightPosition, CELL::real3(0,0,0), CELL::real3(0,1.0,0));
     renderDepthFBO();
 
@@ -149,17 +149,20 @@ void ShadowFBORender::renderDepthFBO()
     {
         glEnable(GL_DEPTH_TEST);
         glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-        glClearDepthf(1.0f);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
+        //glEnable(GL_CULL_FACE);
+        //glCullFace(GL_FRONT);
         //land.render(mLightProjectionMatrix, mLightViewMatrix);
         //lightCube.renderShadow(mLightProjectionMatrix, mLightViewMatrix, getLightDir());
 
+        // 地板不参与阴影遮挡的深度测试 避免造成阴影失真
+        //landShadow.render(mLightProjectionMatrix,mLightViewMatrix,
+        //                  mLightPosition,
+        //                  mLightProjectionMatrix,mLightViewMatrix);
         cubeShadow.render(mLightProjectionMatrix,mLightViewMatrix,
                           mLightPosition,
                           mLightProjectionMatrix,mLightViewMatrix);
-        glCullFace(GL_BACK);
-        glDisable(GL_CULL_FACE);
+        //glCullFace(GL_BACK);
+        //glDisable(GL_CULL_FACE);
     }
     depthFBO.end();
     //pip.setTextureId(depthFBO.getDepthTexId());

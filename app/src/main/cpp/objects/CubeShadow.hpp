@@ -86,7 +86,7 @@ public:
 
 
 
-    void        render(matrix4 spaceProjectionMatrix, matrix4 spaceViewMatrix,
+    void        render(matrix4 currentProjectionMatrix, matrix4 currentViewMatrix,
                        real3& lightPos,
                        matrix4 lightProjectionMatrix, matrix4 lightViewMatrix)
     {
@@ -94,8 +94,8 @@ public:
         //CELL::matrix4   model   =   mModelMatrix;
         //CELL::matrix4   vp = camera.getProject() * camera.getView();
         //CELL::matrix4   mvp = (vp * model);
-        glUniformMatrix4fv(sprogram._projection, 1, GL_FALSE, spaceProjectionMatrix.data());
-        glUniformMatrix4fv(sprogram._view, 1, GL_FALSE, spaceViewMatrix.data());
+        glUniformMatrix4fv(sprogram._projection, 1, GL_FALSE, currentProjectionMatrix.data());
+        glUniformMatrix4fv(sprogram._view, 1, GL_FALSE, currentViewMatrix.data());
         glUniformMatrix4fv(sprogram._model, 1, GL_FALSE, mModelMatrix.data());
 
         glActiveTexture(GL_TEXTURE0);
