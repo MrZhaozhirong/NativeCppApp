@@ -45,7 +45,7 @@ public:
         _position   =   glGetAttribLocation(programId,  "_position");
         _uv         =   glGetAttribLocation(programId,  "_uv");
         _texture    =   glGetUniformLocation(programId, "_texture");
-        _color =   glGetUniformLocation(programId, "_color");
+        _color      =   glGetUniformLocation(programId, "_color");
     }
 
 
