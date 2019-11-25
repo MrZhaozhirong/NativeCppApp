@@ -99,5 +99,5 @@ void GLThread::setGLRender(GLRender * render) {
 void GLThread::release() {
     void* reval;
     pthread_join(mThreadImpl, &reval);
-    LOGD("GLThread release %d",(int)reval);
+    LOGD("GLThread release %p",reval);
 }

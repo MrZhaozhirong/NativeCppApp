@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "org.zzrblog.nativecpp"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -30,15 +30,21 @@ android {
     }
     externalNativeBuild {
         cmake {
+            // 出现Error configuring  (Cause ...)
+            // 百度说官方说增加 version "3.10.2"
+            // 然后就出现这个奇葩问题，Unable to find CMake with version: 3.10.2 within folder [PATH]
+            // SDK Manager下载了CMake-3.10.2，并且添加了路径到系统PATH，但是提示找不到CMake-3.10.2
+            // 尝试 version "3.6.4" 一样是Unable to find CMake
+            // 最终解决->手动到SDK Manager卸载CMake3.10.2 使用默认的。
+            // 猜测是Gradle4.6版本不支持，以后再留意这个问题。
             path "CMakeLists.txt"
         }
     }
-
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     //testImplementation 'junit:junit:4.12'
     //androidTestImplementation 'com.android.support.test:runner:1.0.2'
     //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

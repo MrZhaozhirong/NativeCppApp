@@ -1,9 +1,9 @@
 package org.zzrblog.nativecpp;
 
+import android.app.Activity;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,7 +14,7 @@ import android.view.WindowManager;
 /**
  * Created by zzr on 2019/3/12.
  */
-public class NativeGLActivity extends AppCompatActivity {
+public class NativeGLActivity extends Activity {
 
     private NativeEGL nativeEGL;
 

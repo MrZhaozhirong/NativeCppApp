@@ -24,6 +24,8 @@
 
         <activity android:name="org.zzrblog.nativecpp.NativeGLActivity"
                   android:screenOrientation="landscape"/>
+        <activity android:name="org.zzrblog.gpuimage.GpuCameraEncodeActivity"
+                  android:screenOrientation="landscape"/>
 
     </application>
 
