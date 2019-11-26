@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -14,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="org.zzrblog.nativecpp.PermissionActivity">
+        <activity android:name="org.zzrblog.PermissionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,8 +25,8 @@
 
         <activity android:name="org.zzrblog.nativecpp.NativeGLActivity"
                   android:screenOrientation="landscape"/>
-        <activity android:name="org.zzrblog.gpuimage.GpuCameraEncodeActivity"
-                  android:screenOrientation="landscape"/>
+        <activity android:name="org.zzrblog.gpuimage.CameraFilterEncodeActivity"
+                  android:screenOrientation="portrait"/>
 
     </application>
 

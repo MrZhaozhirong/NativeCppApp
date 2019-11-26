@@ -1,4 +1,4 @@
-package org.zzrblog.nativecpp;
+package org.zzrblog;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +11,10 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Toast;
 
+import org.zzrblog.gpuimage.CameraFilterEncodeActivity;
+import org.zzrblog.nativecpp.NativeGLActivity;
+import org.zzrblog.nativecpp.R;
+
 /**
  * Created by zzr on 2019/3/26.
  */
@@ -21,7 +25,8 @@ public class PermissionActivity extends Activity {
     private static final String[] NEEDED_PERMISSIONS = new String[]{
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.READ_PHONE_STATE
+            android.Manifest.permission.READ_PHONE_STATE,
+            android.Manifest.permission.CAMERA,
     };
 
     @Override
@@ -35,6 +40,11 @@ public class PermissionActivity extends Activity {
     public void clickOnNativeEGL(View view) {
         startActivity(new Intent(PermissionActivity.this, NativeGLActivity.class));
     }
+
+    public void clickOnCameraFilterEncode(View view) {
+        startActivity(new Intent(PermissionActivity.this, CameraFilterEncodeActivity.class));
+    }
+
 
 
     @Override
@@ -70,6 +80,5 @@ public class PermissionActivity extends Activity {
             }
         }
     }
-
 
 }

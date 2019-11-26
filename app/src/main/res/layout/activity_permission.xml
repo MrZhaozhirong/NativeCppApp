@@ -9,4 +9,10 @@
         android:text="NativeEGL"
         android:textAllCaps="false"
         android:onClick="clickOnNativeEGL"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CameraFilterEncode"
+        android:textAllCaps="false"
+        android:onClick="clickOnCameraFilterEncode"/>
 </LinearLayout>
