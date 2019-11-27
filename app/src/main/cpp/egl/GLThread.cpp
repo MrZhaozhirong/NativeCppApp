@@ -63,7 +63,10 @@ void *glThreadImpl(void *context)
         if(glThread->isStart)
         {
             //LOGD("GLThread onDraw.");
-            glThread->mRender->renderOnDraw(second);
+            if(glThread->mRender!=NULL)
+            {
+                glThread->mRender->renderOnDraw(second);
+            }
         }
         //tm.update();
         // 不update就是就算整个应用的运行时长
@@ -89,6 +92,7 @@ void GLThread::onSurfaceChange(int w, int h)
 }
 
 void GLThread::onSurfaceDestroy() {
+    this->isStart = false;
     this->isExit = true;
 }
 

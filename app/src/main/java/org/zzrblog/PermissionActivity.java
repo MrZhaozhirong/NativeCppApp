@@ -27,6 +27,7 @@ public class PermissionActivity extends Activity {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_PHONE_STATE,
             android.Manifest.permission.CAMERA,
+            android.Manifest.permission.RECORD_AUDIO
     };
 
     @Override
