@@ -5,6 +5,7 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include "../egl/GLThread.h"
+#include "components/NV21BufferPool.hpp"
 
 GLThread* glThread = NULL;
 
@@ -36,4 +37,30 @@ Java_org_zzrblog_gpuimage_GpuFilterEncoder_onSurfaceDestroy(JNIEnv *env, jobject
     glThread->onSurfaceDestroy();
     glThread->release();
     glThread = NULL;
+}
+
+
+NV21BufferPool  nv21_pool;
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_zzrblog_gpuimage_GpuFilterEncoder_feedVideoData(JNIEnv *env, jobject instance, jbyteArray array)
+{
+    jbyte* nv21_buffer = env->GetByteArrayElements(array, NULL);
+    jsize array_len = env->GetArrayLength(array);
+
+    //int size = this->mWidth * this->mHeight;
+    //int y_len = size;   // mWidth*mHeight
+    //int u_len = size / 4;   // mWidth*mHeight / 4
+    //int v_len = size / 4;   // mWidth*mHeight / 4
+    //// nv21数据中 y占1个width*mHeight，uv各占1/4个width*mHeight 共 3/2个width*mHeight
+    //if(array_len < y_len+u_len+v_len)
+    //    return;
+    //ByteBuffer* p = new ByteBuffer(array_len);
+    //p->param1 = y_len;
+    //p->param2 = u_len;
+    //p->param3 = v_len;
+    //p->wrap(nv21_buffer, array_len);
+    //nv21_pool.put(p);
+
+    env->ReleaseByteArrayElements(array, nv21_buffer, 0);
 }
