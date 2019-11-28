@@ -50,7 +50,9 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-
+        if(mGpuFilterEncoder!=null){
+            mGpuFilterEncoder.feedVideoData(data.clone());
+        }
     }
 
     @Override

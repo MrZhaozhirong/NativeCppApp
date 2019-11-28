@@ -27,7 +27,7 @@ class GpuFilterEncoder {
      * 发送视频数据
      * @param data nv21数据
      */
-    public native void feedVideoData(byte[] data);
+    public native void feedVideoData(byte[] data,int width,int height);
     /**
      * 发送音频数据
      * @param data pcm数据

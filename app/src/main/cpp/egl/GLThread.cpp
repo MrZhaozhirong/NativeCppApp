@@ -104,4 +104,5 @@ void GLThread::release() {
     void* reval;
     pthread_join(mThreadImpl, &reval);
     LOGD("GLThread release %p",reval);
+    window = NULL;
 }
