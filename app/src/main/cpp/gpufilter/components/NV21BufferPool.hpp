@@ -13,7 +13,7 @@ class NV21BufferPool {
 
 public:
     NV21BufferPool() {
-        this->pool_capacity = 3;
+        this->pool_capacity = 2;
         current_pos = 0;
     }
     NV21BufferPool(size_t pool_size) {

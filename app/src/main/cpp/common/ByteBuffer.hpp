@@ -18,18 +18,27 @@ public:
         pbuffer = (int8_t *) malloc(500 * 500);
         capacity = 500 * 500;
         limit = 0;
+        param1 = 0;
+        param2 = 0;
+        param3 = 0;
     }
     ByteBuffer(size_t size)
     {
         pbuffer = (int8_t *) malloc(size);
         capacity = size;
         limit = 0;
+        param1 = 0;
+        param2 = 0;
+        param3 = 0;
     }
     ~ByteBuffer()
     {
         if(pbuffer!=NULL)
             free(pbuffer);
         capacity = limit = 0;
+        param1 = -1;
+        param2 = -1;
+        param3 = -1;
     }
 
     int     getCapacity()

@@ -50,9 +50,12 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if(mGpuFilterRender!=null){
+        if( mGpuFilterRender!=null){
             final Camera.Size previewSize = camera.getParameters().getPreviewSize();
             mGpuFilterRender.feedVideoData(data.clone(), previewSize.width, previewSize.height);
+        }
+        if( mCameraTexture!=null){
+            mCameraTexture.updateTexImage();
         }
     }
 

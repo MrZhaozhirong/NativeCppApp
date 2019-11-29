@@ -9,6 +9,12 @@
 #include "../../egl/GLRender.hpp"
 #include "../../egl/EglCore.h"
 #include "../../egl/WindowSurface.h"
+#include "../components/NV21BufferPool.hpp"
+
+#define ROTATION_0      0
+#define ROTATION_90     90
+#define ROTATION_180    180
+#define ROTATION_270    270
 
 class GpuFilterRender : public GLRender{
 public:
@@ -19,17 +25,29 @@ public:
     void surfaceChanged(int width, int height) ;
     void renderOnDraw(double elpasedInMilliSec) ;
     void surfaceDestroyed(void) ;
-    void setRotationCamera(int rotation, bool flipHorizontal, bool flipVertical) ;
 
+    void setRotationCamera(int rotation, bool flipHorizontal, bool flipVertical) ;
+    void feedVideoData(int8_t* data, int data_len, int previewWidth, int previewHeight);
 private:
     EglCore*        mEglCore;
     WindowSurface*  mWindowSurface;
-
+    // 帧图缓存池
+    NV21BufferPool  mNV21Pool;
+    // surface宽高
     int             mViewWidth;
     int             mViewHeight;
+    // 预览帧宽高
+    int             mFrameWidth;
+    int             mFrameHeight;
+    // 是否水平垂直翻转
+    bool            mFlipHorizontal;
+    bool            mFlipVertical;
+    int             mRotation; // 0,90,180,270
 
 private:
     DISALLOW_EVIL_CONSTRUCTORS(GpuFilterRender);
+
+    void adjustImageScaling();
 };
 
 

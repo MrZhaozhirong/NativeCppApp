@@ -5,7 +5,6 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include "../egl/GLThread.h"
-#include "components/NV21BufferPool.hpp"
 #include "render/GpuFilterRender.h"
 
 GLThread* glThread = NULL;
@@ -55,10 +54,12 @@ JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_setRotationCamera(JNIEnv *env, jobject instance,
                                                             jint rotation, jboolean flipHorizontal, jboolean flipVertical)
 {
-    render->setRotationCamera(rotation, flipHorizontal, flipVertical);
+    // 注意这里flipVertical对应render->setRotationCamera.flipHorizontal
+    // 注意这里flipHorizontal对应render->setRotationCamera.flipVertical
+    // 因为Android的预览帧数据是横着的，仿照GPUImage的处理方式。
+    render->setRotationCamera(rotation, flipVertical, flipHorizontal);
 }
 
-NV21BufferPool nv21_pool; // test
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_feedVideoData(JNIEnv *env, jobject instance,
@@ -66,20 +67,6 @@ Java_org_zzrblog_gpufilter_GpuFilterRender_feedVideoData(JNIEnv *env, jobject in
 {
     jbyte* nv21_buffer = env->GetByteArrayElements(array, NULL);
     jsize array_len = env->GetArrayLength(array);
-
-    int size = width * height;
-    int y_len = size;   // mWidth*mHeight
-    int u_len = size / 4;   // mWidth*mHeight / 4
-    int v_len = size / 4;   // mWidth*mHeight / 4
-    // nv21数据中 y占1个width*mHeight，uv各占1/4个width*mHeight 共 3/2个width*mHeight
-    if(array_len < y_len+u_len+v_len)
-        return;
-    ByteBuffer* p = new ByteBuffer(static_cast<size_t>(array_len));
-    p->param1 = y_len;
-    p->param2 = u_len;
-    p->param3 = v_len;
-    p->wrap(nv21_buffer, static_cast<size_t>(array_len));
-    nv21_pool.put(p);
-
+    render->feedVideoData(nv21_buffer, array_len, width, height);
     env->ReleaseByteArrayElements(array, nv21_buffer, 0);
 }
