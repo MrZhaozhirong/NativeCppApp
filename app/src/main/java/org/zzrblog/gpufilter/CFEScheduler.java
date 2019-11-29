@@ -1,4 +1,4 @@
-package org.zzrblog.gpuimage;
+package org.zzrblog.gpufilter;
 
 import android.app.Activity;
 import android.graphics.PixelFormat;
@@ -21,13 +21,13 @@ import java.lang.ref.WeakReference;
 public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callback {
     private static final String TAG = "CFEScheduler";
     private WeakReference<Activity> mActivityWeakRef;
-    private GpuFilterEncoder mGpuFilterEncoder;
-    private SurfaceView surfaceView;
+    private GpuFilterRender mGpuFilterRender;
+
 
     CFEScheduler(Activity activity, SurfaceView view) {
         mActivityWeakRef = new WeakReference<>(activity);
-        mGpuFilterEncoder = new GpuFilterEncoder(activity);
-        surfaceView = view;
+        mGpuFilterRender = new GpuFilterRender(activity);
+
         view.getHolder().setFormat(PixelFormat.RGBA_8888);
         view.getHolder().addCallback(this);
     }
@@ -50,37 +50,28 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if(mGpuFilterEncoder!=null){
-            mGpuFilterEncoder.feedVideoData(data.clone());
+        if(mGpuFilterRender!=null){
+            final Camera.Size previewSize = camera.getParameters().getPreviewSize();
+            mGpuFilterRender.feedVideoData(data.clone(), previewSize.width, previewSize.height);
         }
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated ... ");
-        try {
-            int[] textures = new int[1];
-            GLES20.glGenTextures(1, textures, 0);
-            mCameraTexture = new SurfaceTexture(textures[0]);
-            mCameraInstance.setPreviewTexture(mCameraTexture);
-            mCameraInstance.setPreviewCallback(this);
-            mCameraInstance.startPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        mGpuFilterEncoder.onSurfaceCreate(holder.getSurface());
+        mGpuFilterRender.onSurfaceCreate(holder.getSurface());
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(TAG, "surfaceChanged ... ");
-        mGpuFilterEncoder.onSurfaceChange(holder.getSurface(), width, height);
+        mGpuFilterRender.onSurfaceChange(holder.getSurface(), width, height);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "surfaceDestroyed ... ");
-        mGpuFilterEncoder.onSurfaceDestroy(holder.getSurface());
+        mGpuFilterRender.onSurfaceDestroy(holder.getSurface());
     }
 
 
@@ -107,7 +98,18 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         Activity activity = mActivityWeakRef.get();
         int orientation = getCameraDisplayOrientation(activity, cameraInfo);
         boolean flipHorizontal = cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
-        //mGPUImage.setUpCamera(mCameraInstance, orientation, flipHorizontal, false);
+        mGpuFilterRender.setRotationCamera(orientation, flipHorizontal, false);
+
+        try {
+            int[] textures = new int[1];
+            GLES20.glGenTextures(1, textures, 0);
+            mCameraTexture = new SurfaceTexture(textures[0]);
+            mCameraInstance.setPreviewTexture(mCameraTexture);
+            mCameraInstance.setPreviewCallback(this);
+            mCameraInstance.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private int getCameraDisplayOrientation(final Activity activity,

@@ -24,7 +24,6 @@ find_library( # Sets the name of the path variable.
         # Specifies the name of the NDK library that you want CMake to locate.
         log)
 
-
 # 引入外部so libzip 供源文件编译
 add_library(zip
             SHARED
@@ -58,6 +57,8 @@ target_link_libraries(
 
 
 aux_source_directory(./src/main/cpp/gpufilter GPU_FILTER_SRC )
+aux_source_directory(./src/main/cpp/gpufilter/components GPU_FILTER_COM_SRC )
+aux_source_directory(./src/main/cpp/gpufilter/render GPU_FILTER_RENDER_SRC )
 
 add_library(
         gpu-filter
@@ -65,6 +66,8 @@ add_library(
         ${COMMON_SRC}
         ${EGL_SRC}
         ${GPU_FILTER_SRC}
+        ${GPU_FILTER_COM_SRC}
+        ${GPU_FILTER_RENDER_SRC}
         )
 target_link_libraries(
         gpu-filter

@@ -1,4 +1,4 @@
-package org.zzrblog.gpuimage;
+package org.zzrblog.gpufilter;
 
 import android.content.Context;
 import android.view.Surface;
@@ -6,13 +6,13 @@ import android.view.Surface;
 /**
  * Created by zzr on 2019/11/27.
  */
-class GpuFilterEncoder {
+class GpuFilterRender {
     static {
         System.loadLibrary("gpu-filter");
     }
 
     private Context ctx;
-    GpuFilterEncoder(Context context) {
+    GpuFilterRender(Context context) {
         ctx = context;
     }
 
@@ -34,4 +34,15 @@ class GpuFilterEncoder {
      * @param len 数据长度
      */
     // public native void feedAudioData(byte[] data, int len);
+
+
+    /**
+     * 设置摄像头角度和方向
+     * 注意
+     * @param rotation 角度
+     * @param flipHorizontal 是否水平翻转
+     * @param flipVertical 是否垂直翻转
+     */
+    public native void setRotationCamera(final int rotation, final boolean flipHorizontal,
+                                         final boolean flipVertical);
 }

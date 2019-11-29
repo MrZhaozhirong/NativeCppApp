@@ -19,7 +19,7 @@ public:
     void surfaceChanged(int width, int height) ;
     void renderOnDraw(double elpasedInMilliSec) ;
     void surfaceDestroyed(void) ;
-
+    void setRotationCamera(int rotation, bool flipHorizontal, bool flipVertical) ;
 
 private:
     EglCore*        mEglCore;

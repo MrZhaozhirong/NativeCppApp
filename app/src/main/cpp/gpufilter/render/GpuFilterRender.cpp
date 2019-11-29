@@ -49,6 +49,11 @@ void GpuFilterRender::surfaceDestroyed()
     }
 }
 
+void GpuFilterRender::setRotationCamera(int rotation, bool flipHorizontal, bool flipVertical)
+{
+
+}
+
 void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 {
 

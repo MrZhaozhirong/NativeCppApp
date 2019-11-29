@@ -11,7 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Toast;
 
-import org.zzrblog.gpuimage.CameraFilterEncodeActivity;
+import org.zzrblog.gpufilter.CameraFilterEncodeActivity;
 import org.zzrblog.nativecpp.NativeGLActivity;
 import org.zzrblog.nativecpp.R;
 
