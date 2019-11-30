@@ -5,7 +5,6 @@
 #include <assert.h>
 #include "GpuFilterRender.h"
 #include "../../common/zzr_common.h"
-#include "../components/ByteBuffer.hpp"
 #include "../../common/ByteBuffer.hpp"
 
 GpuFilterRender::GpuFilterRender()
