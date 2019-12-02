@@ -11,11 +11,16 @@ GpuFilterRender::GpuFilterRender()
 {
     mEglCore = NULL;
     mWindowSurface = NULL;
+    positionCords = new float[8]{0};
+    textureCords = new float[8]{0};
 }
 
 GpuFilterRender::~GpuFilterRender()
 {
-
+    delete positionCords;
+    positionCords = NULL;
+    delete textureCords;
+    textureCords = NULL;
 }
 
 void GpuFilterRender::surfaceCreated(ANativeWindow *window)
@@ -76,9 +81,9 @@ void GpuFilterRender::setRotationCamera(int rotation, bool flipHorizontal, bool 
     this->mRotation = rotation;
     this->mFlipHorizontal = flipHorizontal;
     this->mFlipVertical = flipVertical;
-    adjustImageScaling();
+    adjustFrameScaling();
 }
-void GpuFilterRender::adjustImageScaling()
+void GpuFilterRender::adjustFrameScaling()
 {
     float outputWidth = mViewWidth;
     float outputHeight = mViewHeight;
@@ -89,14 +94,114 @@ void GpuFilterRender::adjustImageScaling()
 
     float ratio1 = outputWidth / mFrameWidth;
     float ratio2 = outputHeight / mFrameHeight;
-    // float ratioMax = Math.max(ratio1, ratio2);
+    float ratioMax = std::max(ratio1, ratio2);
+
+    int imageWidthNew = static_cast<int>(mFrameWidth * ratioMax);
+    int imageHeightNew = static_cast<int>(mFrameHeight * ratioMax);
+
+    float ratioWidth = imageWidthNew / outputWidth;
+    float ratioHeight = imageHeightNew / outputHeight;
+
+    //if (GPUImage.ScaleType.CENTER_CROP)
+    {
+        float distHorizontal = (1 - 1 / ratioWidth) / 2;
+        float distVertical = (1 - 1 / ratioHeight) / 2;
+        generateFrameTextureCords(mRotation, mFlipHorizontal, mFlipVertical);
+        textureCords[0] = addDistance(textureCords[0], distHorizontal);
+        textureCords[2] = addDistance(textureCords[2], distHorizontal);
+        textureCords[4] = addDistance(textureCords[4], distHorizontal);
+        textureCords[6] = addDistance(textureCords[6], distHorizontal);
+
+        textureCords[1] = addDistance(textureCords[1], distVertical);
+        textureCords[3] = addDistance(textureCords[3], distVertical);
+        textureCords[5] = addDistance(textureCords[5], distVertical);
+        textureCords[7] = addDistance(textureCords[7], distVertical);
+    }
+    //if (GPUImage.ScaleType.CENTER_INSIDE)
+    {
+        float cube[8] = {
+                // position   x, y
+                -1.0f, -1.0f,   //左下
+                1.0f, -1.0f,    //右下
+                -1.0f, 1.0f,    //左上
+                1.0f, 1.0f,     //右上
+        };
+        positionCords[0] = cube[0] / ratioHeight;
+        positionCords[2] = cube[2] / ratioHeight;
+        positionCords[4] = cube[4] / ratioHeight;
+        positionCords[6] = cube[6] / ratioHeight;
+
+        positionCords[1] = cube[1] / ratioWidth;
+        positionCords[3] = cube[3] / ratioWidth;
+        positionCords[5] = cube[5] / ratioWidth;
+        positionCords[7] = cube[7] / ratioWidth;
+    }
 }
+
+void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical)
+{
+    float tempTex[8]={0};
+    switch (rotation)
+    {
+        case ROTATION_90:{
+            float rotatedTex[8] = {
+                    1.0f, 1.0f,
+                    1.0f, 0.0f,
+                    0.0f, 1.0f,
+                    0.0f, 0.0f,
+            };
+            memcpy(tempTex, rotatedTex, sizeof(rotatedTex));
+        }break;
+        case ROTATION_180:{
+            float rotatedTex[8] = {
+                    1.0f, 0.0f,
+                    0.0f, 0.0f,
+                    1.0f, 1.0f,
+                    0.0f, 1.0f,
+            };
+            memcpy(tempTex, rotatedTex, sizeof(rotatedTex));
+        }break;
+        case ROTATION_270:{
+            float rotatedTex[8] = {
+                    0.0f, 0.0f,
+                    0.0f, 1.0f,
+                    1.0f, 0.0f,
+                    1.0f, 1.0f,
+            };
+            memcpy(tempTex, rotatedTex, sizeof(rotatedTex));
+        }break;
+        default:
+        case ROTATION_0:{
+            float rotatedTex[8] = {
+                    0.0f, 1.0f,
+                    1.0f, 1.0f,
+                    0.0f, 0.0f,
+                    1.0f, 0.0f,
+            };
+            memcpy(tempTex, rotatedTex, sizeof(rotatedTex));
+        }break;
+    }
+    if (flipHorizontal) {
+        tempTex[0] = flip(tempTex[0]);
+        tempTex[2] = flip(tempTex[2]);
+        tempTex[4] = flip(tempTex[4]);
+        tempTex[6] = flip(tempTex[6]);
+    }
+    if (flipVertical) {
+        tempTex[1] = flip(tempTex[1]);
+        tempTex[3] = flip(tempTex[3]);
+        tempTex[5] = flip(tempTex[5]);
+        tempTex[7] = flip(tempTex[7]);
+    }
+    memset(textureCords, 0, sizeof(textureCords));
+    memcpy(textureCords, tempTex, sizeof(tempTex));
+}
+
 
 void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 {
 
 }
-
 
 
 

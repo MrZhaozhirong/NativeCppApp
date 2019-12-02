@@ -100,6 +100,7 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
 
         Activity activity = mActivityWeakRef.get();
         int orientation = getCameraDisplayOrientation(activity, cameraInfo);
+        Log.i(TAG, "getCameraDisplayOrientation : "+orientation);
         boolean flipHorizontal = cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
         mGpuFilterRender.setRotationCamera(orientation, flipHorizontal, false);
 

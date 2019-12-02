@@ -44,10 +44,25 @@ private:
     bool            mFlipVertical;
     int             mRotation; // 0,90,180,270
 
+    float*          positionCords;
+    float*          textureCords;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(GpuFilterRender);
 
-    void adjustImageScaling();
+    void    adjustFrameScaling();
+    void    generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical);
+
+    float   flip(float value)
+    {
+        if(value ==0.0f)
+            return 1.0f;
+        else // == 1.0f
+            return 0.0f;
+    };
+    float   addDistance(float coordinate, float distance)
+    {
+        return coordinate == 0.0f ? distance : 1 - distance;
+    }
 };
 
 
