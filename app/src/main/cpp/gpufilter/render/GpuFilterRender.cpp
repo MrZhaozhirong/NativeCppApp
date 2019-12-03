@@ -57,9 +57,11 @@ void GpuFilterRender::surfaceDestroyed()
 
 void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth, int previewHeight)
 {
-    mFrameWidth = previewWidth;
-    mFrameHeight = previewHeight;
-
+    if( mFrameWidth != previewWidth){
+        mFrameWidth  = previewWidth;
+        mFrameHeight = previewHeight;
+        adjustFrameScaling();
+    }
     int size = previewWidth * previewHeight;
     int y_len = size;   // mWidth*mHeight
     int u_len = size / 4;   // mWidth*mHeight / 4
@@ -102,42 +104,48 @@ void GpuFilterRender::adjustFrameScaling()
     float ratioWidth = imageWidthNew / outputWidth;
     float ratioHeight = imageHeightNew / outputHeight;
 
+    generateFramePositionCords();
+    generateFrameTextureCords(mRotation, mFlipHorizontal, mFlipVertical);
+    // 根据效果调整位置坐标or纹理坐标
     //if (GPUImage.ScaleType.CENTER_CROP)
     {
         float distHorizontal = (1 - 1 / ratioWidth) / 2;
         float distVertical = (1 - 1 / ratioHeight) / 2;
-        generateFrameTextureCords(mRotation, mFlipHorizontal, mFlipVertical);
         textureCords[0] = addDistance(textureCords[0], distHorizontal);
-        textureCords[2] = addDistance(textureCords[2], distHorizontal);
-        textureCords[4] = addDistance(textureCords[4], distHorizontal);
-        textureCords[6] = addDistance(textureCords[6], distHorizontal);
-
         textureCords[1] = addDistance(textureCords[1], distVertical);
+        textureCords[2] = addDistance(textureCords[2], distHorizontal);
         textureCords[3] = addDistance(textureCords[3], distVertical);
+        textureCords[4] = addDistance(textureCords[4], distHorizontal);
         textureCords[5] = addDistance(textureCords[5], distVertical);
+        textureCords[6] = addDistance(textureCords[6], distHorizontal);
         textureCords[7] = addDistance(textureCords[7], distVertical);
     }
     //if (GPUImage.ScaleType.CENTER_INSIDE)
-    {
-        float cube[8] = {
-                // position   x, y
-                -1.0f, -1.0f,   //左下
-                1.0f, -1.0f,    //右下
-                -1.0f, 1.0f,    //左上
-                1.0f, 1.0f,     //右上
-        };
-        positionCords[0] = cube[0] / ratioHeight;
-        positionCords[2] = cube[2] / ratioHeight;
-        positionCords[4] = cube[4] / ratioHeight;
-        positionCords[6] = cube[6] / ratioHeight;
+    //{
+    //    positionCords[0] = positionCords[0] / ratioHeight;
+    //    positionCords[1] = positionCords[1] / ratioWidth;
+    //    positionCords[2] = positionCords[2] / ratioHeight;
+    //    positionCords[3] = positionCords[3] / ratioWidth;
+    //    positionCords[4] = positionCords[4] / ratioHeight;
+    //    positionCords[5] = positionCords[5] / ratioWidth;
+    //    positionCords[6] = positionCords[6] / ratioHeight;
+    //    positionCords[7] = positionCords[7] / ratioWidth;
+    //}
 
-        positionCords[1] = cube[1] / ratioWidth;
-        positionCords[3] = cube[3] / ratioWidth;
-        positionCords[5] = cube[5] / ratioWidth;
-        positionCords[7] = cube[7] / ratioWidth;
-    }
 }
 
+void GpuFilterRender::generateFramePositionCords()
+{
+    float cube[8] = {
+            // position   x, y
+            -1.0f, -1.0f,   //左下
+            1.0f, -1.0f,    //右下
+            -1.0f, 1.0f,    //左上
+            1.0f, 1.0f,     //右上
+    };
+    memset(positionCords, 0, sizeof(positionCords));
+    memcpy(positionCords, cube, sizeof(cube));
+}
 void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical)
 {
     float tempTex[8]={0};
@@ -202,6 +210,7 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 {
 
 }
+
 
 
 

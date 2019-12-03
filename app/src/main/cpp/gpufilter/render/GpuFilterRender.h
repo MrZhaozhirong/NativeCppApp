@@ -51,6 +51,7 @@ private:
 
     void    adjustFrameScaling();
     void    generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical);
+    void    generateFramePositionCords();
 
     float   flip(float value)
     {
