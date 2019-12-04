@@ -5,8 +5,8 @@
 #ifndef NV21_BUFFER_POOL_HPP
 #define NV21_BUFFER_POOL_HPP
 
-#include "ByteBuffer.hpp"
 #include <queue>
+#include "../../common/ByteBuffer.hpp"
 
 
 class NV21BufferPool {

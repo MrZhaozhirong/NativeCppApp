@@ -32,6 +32,7 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
+    mWindowSurface->swapBuffers();
 }
 
 void GpuFilterRender::surfaceChanged(int width, int height)
@@ -39,6 +40,7 @@ void GpuFilterRender::surfaceChanged(int width, int height)
     this->mViewHeight = height;
     this->mViewWidth = width;
     mWindowSurface->makeCurrent();
+    mWindowSurface->swapBuffers();
 }
 
 void GpuFilterRender::surfaceDestroyed()

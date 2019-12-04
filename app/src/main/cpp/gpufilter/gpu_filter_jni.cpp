@@ -16,10 +16,10 @@ JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_onSurfaceCreate(JNIEnv *env, jobject instance, jobject surface)
 {
     ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
-    if(render==NULL) {
+    if( render==NULL) {
         render = new GpuFilterRender();
     }
-    if(glThread==NULL) {
+    if( glThread==NULL) {
         glThread = new GLThread();
     }
     glThread->setGLRender(render);
@@ -57,6 +57,9 @@ Java_org_zzrblog_gpufilter_GpuFilterRender_setRotationCamera(JNIEnv *env, jobjec
     // 注意这里flipVertical对应render->setRotationCamera.flipHorizontal
     // 注意这里flipHorizontal对应render->setRotationCamera.flipVertical
     // 因为Android的预览帧数据是横着的，仿照GPUImage的处理方式。
+    if( render==NULL) {
+        render = new GpuFilterRender();
+    }
     render->setRotationCamera(rotation, flipVertical, flipHorizontal);
 }
 
@@ -67,6 +70,6 @@ Java_org_zzrblog_gpufilter_GpuFilterRender_feedVideoData(JNIEnv *env, jobject in
 {
     jbyte* nv21_buffer = env->GetByteArrayElements(array, NULL);
     jsize array_len = env->GetArrayLength(array);
-    render->feedVideoData(nv21_buffer, array_len, width, height);
+    // render->feedVideoData(nv21_buffer, array_len, width, height);
     env->ReleaseByteArrayElements(array, nv21_buffer, 0);
 }

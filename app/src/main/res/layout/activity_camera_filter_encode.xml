@@ -23,8 +23,7 @@
         android:id="@+id/filter_spinner"
         android:layout_width="240dp"
         android:layout_height="35dp"
-        android:padding="10dp"
-        android:background="#22000000"/>
+        android:padding="10dp"/>
 
     <LinearLayout
         android:id="@+id/seek_bar_layout"

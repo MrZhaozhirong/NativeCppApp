@@ -48,20 +48,32 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         setUpCamera(mCurrentCameraId);
     }
 
+    SurfaceTexture mCameraTexture = null;
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
+        Log.d(TAG, "onPreviewFrame ... ");
+        //if(mCameraTexture!=null){
+        //    mCameraTexture.updateTexImage();
+        //}
         if( mGpuFilterRender!=null){
             final Camera.Size previewSize = camera.getParameters().getPreviewSize();
             mGpuFilterRender.feedVideoData(data.clone(), previewSize.width, previewSize.height);
-        }
-        if( mCameraTexture!=null){
-            mCameraTexture.updateTexImage();
         }
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated ... ");
+        try {
+            int[] textures = new int[1];
+            GLES20.glGenTextures(1, textures, 0);
+            mCameraTexture = new SurfaceTexture(textures[0]);
+            mCameraInstance.setPreviewTexture(mCameraTexture);
+            mCameraInstance.setPreviewCallback(this);
+            mCameraInstance.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mGpuFilterRender.onSurfaceCreate(holder.getSurface());
     }
 
@@ -80,8 +92,6 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     private int mCurrentCameraId = 0;
     private Camera mCameraInstance;
-    private SurfaceTexture mCameraTexture = null;
-
 
     private void setUpCamera(final int id) {
         mCameraInstance = getCameraInstance(id);
@@ -103,17 +113,6 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         Log.i(TAG, "getCameraDisplayOrientation : "+orientation);
         boolean flipHorizontal = cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
         mGpuFilterRender.setRotationCamera(orientation, flipHorizontal, false);
-
-        try {
-            int[] textures = new int[1];
-            GLES20.glGenTextures(1, textures, 0);
-            mCameraTexture = new SurfaceTexture(textures[0]);
-            mCameraInstance.setPreviewTexture(mCameraTexture);
-            mCameraInstance.setPreviewCallback(this);
-            mCameraInstance.startPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private int getCameraDisplayOrientation(final Activity activity,
