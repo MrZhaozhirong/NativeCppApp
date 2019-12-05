@@ -23,6 +23,10 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     private WeakReference<Activity> mActivityWeakRef;
     private GpuFilterRender mGpuFilterRender;
 
+    public String[] getSupportedFilter() {
+        return null;
+    }
+
 
     CFEScheduler(Activity activity, SurfaceView view) {
         mActivityWeakRef = new WeakReference<>(activity);
@@ -52,9 +56,9 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         Log.d(TAG, "onPreviewFrame ... ");
-        //if(mCameraTexture!=null){
-        //    mCameraTexture.updateTexImage();
-        //}
+        // if(mCameraTexture!=null){
+        //     mCameraTexture.updateTexImage();
+        // }
         if( mGpuFilterRender!=null){
             final Camera.Size previewSize = camera.getParameters().getPreviewSize();
             mGpuFilterRender.feedVideoData(data.clone(), previewSize.width, previewSize.height);
@@ -87,6 +91,9 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "surfaceDestroyed ... ");
         mGpuFilterRender.onSurfaceDestroy(holder.getSurface());
+        if( mCameraTexture!=null){
+            mCameraTexture.release();
+        }
     }
 
 
@@ -160,5 +167,4 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         mCameraInstance.release();
         mCameraInstance = null;
     }
-
 }

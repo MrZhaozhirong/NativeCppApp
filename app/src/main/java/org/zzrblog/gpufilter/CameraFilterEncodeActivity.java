@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import org.zzrblog.nativecpp.R;
 
@@ -15,6 +18,7 @@ import org.zzrblog.nativecpp.R;
 public class CameraFilterEncodeActivity extends Activity {
 
     private CFEScheduler cfeScheduler;
+    private Spinner filterSpinner;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,6 +36,21 @@ public class CameraFilterEncodeActivity extends Activity {
 
         if( cfeScheduler==null)
             cfeScheduler = new CFEScheduler(this, surfaceView);
+
+        initFilterSpinner();
+    }
+
+    private void initFilterSpinner() {
+        String[] mItems = cfeScheduler.getSupportedFilter();
+        filterSpinner = findViewById(R.id.filter_spinner);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems);
+        filterSpinner.setAdapter(adapter);
+        filterSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
     }
 
     @Override
