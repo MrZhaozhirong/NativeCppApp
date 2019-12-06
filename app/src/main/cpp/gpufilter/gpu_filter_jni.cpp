@@ -68,8 +68,8 @@ JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_feedVideoData(JNIEnv *env, jobject instance,
                                                          jbyteArray array,jint width, jint height)
 {
-    jbyte* nv21_buffer = env->GetByteArrayElements(array, NULL);
+    jbyte* nv21_buffer = env->GetByteArrayElements(array, NULL );
     jsize array_len = env->GetArrayLength(array);
-    // render->feedVideoData(nv21_buffer, array_len, width, height);
+    render->feedVideoData(nv21_buffer, array_len, width, height);
     env->ReleaseByteArrayElements(array, nv21_buffer, 0);
 }

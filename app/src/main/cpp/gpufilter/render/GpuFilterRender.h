@@ -6,6 +6,7 @@
 #define GPU_FILTER_RENDER_H
 
 
+#include <GLES3/gl3.h>
 #include "../../egl/GLRender.hpp"
 #include "../../egl/EglCore.h"
 #include "../../egl/WindowSurface.h"
@@ -33,6 +34,13 @@ private:
     WindowSurface*  mWindowSurface;
     // 帧图缓存池
     NV21BufferPool  mNV21Pool;
+    pthread_mutex_t mutex;
+    ByteBuffer*     i420BufferY;
+    ByteBuffer*     i420BufferU;
+    ByteBuffer*     i420BufferV;
+    int             textureY_id;
+    int             textureU_id;
+    int             textureV_id;
     // surface宽高
     int             mViewWidth;
     int             mViewHeight;
@@ -52,6 +60,8 @@ private:
     void    adjustFrameScaling();
     void    generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical);
     void    generateFramePositionCords();
+    void    updateRenderTextures();
+    GLuint  updateTexture(int8_t* src, GLuint texId);
 
     float   flip(float value)
     {
