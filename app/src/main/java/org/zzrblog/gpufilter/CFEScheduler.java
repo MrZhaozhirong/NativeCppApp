@@ -24,6 +24,7 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     private GpuFilterRender mGpuFilterRender;
 
     public String[] getSupportedFilter() {
+        Activity activity = mActivityWeakRef.get();
         return null;
     }
 
@@ -55,7 +56,6 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     SurfaceTexture mCameraTexture = null;
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        Log.d(TAG, "onPreviewFrame ... ");
         // if(mCameraTexture!=null){
         //     mCameraTexture.updateTexImage();
         // }

@@ -48,7 +48,7 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
-
+    mFilter.init();
     mWindowSurface->swapBuffers();
 }
 
@@ -57,6 +57,7 @@ void GpuFilterRender::surfaceChanged(int width, int height)
     this->mViewHeight = height;
     this->mViewWidth = width;
     mWindowSurface->makeCurrent();
+    mFilter.onOutputSizeChanged(width, height);
     mWindowSurface->swapBuffers();
 }
 
@@ -88,20 +89,21 @@ void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth
     // nv21数据中 y占1个width*mHeight，uv各占1/4个width*mHeight 共 3/2个width*mHeight
     if(data_len < y_len+u_len+v_len)
         return;
+
     pthread_mutex_lock(&mutex);
-    ByteBuffer* p = new ByteBuffer(static_cast<size_t>(data_len));
+    ByteBuffer* p = new ByteBuffer(data_len);
     p->param1 = y_len;
     p->param2 = u_len;
     p->param3 = v_len;
-    p->wrap(data, static_cast<size_t>(data_len));
+    p->wrap(data, data_len);
     mNV21Pool.put(p);
 
     // nv21->i420的数据容器，用于renderOnDraw的渲染
     if( i420BufferY== NULL)
     {
-        i420BufferY = new ByteBuffer(static_cast<size_t>(y_len));
-        i420BufferU = new ByteBuffer(static_cast<size_t>(u_len));
-        i420BufferV = new ByteBuffer(static_cast<size_t>(v_len));
+        i420BufferY = new ByteBuffer(y_len*sizeof(int8_t));
+        i420BufferU = new ByteBuffer(u_len*sizeof(int8_t));
+        i420BufferV = new ByteBuffer(v_len*sizeof(int8_t));
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -140,8 +142,8 @@ void GpuFilterRender::adjustFrameScaling()
     {
         float distHorizontal = (1 - 1 / ratioWidth) / 2;
         float distVertical = (1 - 1 / ratioHeight) / 2;
-        textureCords[0] = addDistance(textureCords[0], distHorizontal);
-        textureCords[1] = addDistance(textureCords[1], distVertical);
+        textureCords[0] = addDistance(textureCords[0], distHorizontal); // x
+        textureCords[1] = addDistance(textureCords[1], distVertical);   // y
         textureCords[2] = addDistance(textureCords[2], distHorizontal);
         textureCords[3] = addDistance(textureCords[3], distVertical);
         textureCords[4] = addDistance(textureCords[4], distHorizontal);
@@ -237,11 +239,12 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
 
 void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 {
-    updateRenderTextures();
-}
+    if (mEglCore == NULL || mWindowSurface == NULL) {
+        LOGW("Skipping drawFrame after shutdown");
+        return;
+    }
+    mWindowSurface->makeCurrent();
 
-void GpuFilterRender::updateRenderTextures()
-{
     pthread_mutex_lock(&mutex);
     ByteBuffer* item = mNV21Pool.get();
     if(item == NULL) {
@@ -250,33 +253,37 @@ void GpuFilterRender::updateRenderTextures()
     } else { // item!=NULL，i420BufferY也!=NULL
         int8_t * nv21_buffer = item->data();
         int            y_len = item->param1;
-        int            u_len = item->param1;
-        int            v_len = item->param1;
+        int            u_len = item->param2;
+        int            v_len = item->param3;
         // 装填y u v数据。
-        int8_t * src_y = i420BufferY->data();
-        int8_t * src_u = i420BufferU->data();
-        int8_t * src_v = i420BufferV->data();
-        memcpy(src_y, nv21_buffer, (size_t) y_len);
+        int8_t * dst_y = i420BufferY->data();
+        int8_t * dst_u = i420BufferU->data();
+        int8_t * dst_v = i420BufferV->data();
+        memcpy(dst_y, nv21_buffer, (size_t) y_len);
         for (int i = 0; i < u_len; i++) {
             //NV21 先v后u
-            *(src_v + i) = (uint8_t) *(nv21_buffer + y_len + i * 2);
-            *(src_u + i) = (uint8_t) *(nv21_buffer + y_len + i * 2 + 1);
+            *(dst_v + i) = (uint8_t) *(nv21_buffer + y_len + i * 2);
+            *(dst_u + i) = (uint8_t) *(nv21_buffer + y_len + i * 2 + 1);
         }
         // 删除BufferPool当中的引用。
         delete item;
         pthread_mutex_unlock(&mutex);
 
-        textureY_id = updateTexture(src_y, static_cast<GLuint>(textureY_id));
-        textureU_id = updateTexture(src_u, static_cast<GLuint>(textureU_id));
-        textureV_id = updateTexture(src_v, static_cast<GLuint>(textureV_id));
+        textureY_id = updateTexture(dst_y, static_cast<GLuint>(textureY_id));
+        textureU_id = updateTexture(dst_u, static_cast<GLuint>(textureU_id));
+        textureV_id = updateTexture(dst_v, static_cast<GLuint>(textureV_id));
     }
+
+    mFilter.onDraw(textureY_id, textureU_id, textureV_id, positionCords, textureCords);
+    mWindowSurface->swapBuffers();
 }
+
 GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId)
 {
     GLuint mTextureID;
     if( texId == -1) {
         glGenTextures(1, &mTextureID);
-        glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(textureY_id));
+        glBindTexture(GL_TEXTURE_2D, mTextureID);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -289,6 +296,7 @@ GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId)
                         GL_LUMINANCE, GL_UNSIGNED_BYTE, src);
         mTextureID = texId;
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
     return mTextureID;
 }
 

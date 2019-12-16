@@ -70,6 +70,7 @@ add_library(
         SHARED
         ${COMMON_SRC}
         ${EGL_SRC}
+        ${PROGRAM_SRC}
         ${GPU_FILTER_SRC}
         ${GPU_FILTER_COM_SRC}
         ${GPU_FILTER_RENDER_SRC}

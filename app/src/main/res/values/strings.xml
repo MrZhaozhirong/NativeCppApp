@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">NativeCppApp</string>
+
+
+    <string-array name="filter_name">
+        <item>Contrast</item>
+        <item>Invert</item>
+        <item>Pixelation</item>
+    </string-array>
 </resources>

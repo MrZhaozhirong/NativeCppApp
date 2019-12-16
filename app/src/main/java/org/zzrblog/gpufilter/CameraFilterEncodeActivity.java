@@ -41,15 +41,17 @@ public class CameraFilterEncodeActivity extends Activity {
     }
 
     private void initFilterSpinner() {
-        String[] mItems = cfeScheduler.getSupportedFilter();
+        //String[] mItems = cfeScheduler.getSupportedFilter();
+        String[] mItems = this.getResources().getStringArray(R.array.filter_name);
         filterSpinner = findViewById(R.id.filter_spinner);
         ArrayAdapter<String> adapter=new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems);
         filterSpinner.setAdapter(adapter);
-        filterSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { }
 
-            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
     }
 
