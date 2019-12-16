@@ -243,7 +243,6 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         LOGW("Skipping drawFrame after shutdown");
         return;
     }
-    mWindowSurface->makeCurrent();
 
     pthread_mutex_lock(&mutex);
     ByteBuffer* item = mNV21Pool.get();
@@ -269,13 +268,13 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         delete item;
         pthread_mutex_unlock(&mutex);
 
+        mWindowSurface->makeCurrent();
         yTextureId = updateTexture(dst_y, static_cast<GLuint>(yTextureId));
         uTextureId = updateTexture(dst_u, static_cast<GLuint>(uTextureId));
         vTextureId = updateTexture(dst_v, static_cast<GLuint>(vTextureId));
+        mFilter.onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
+        mWindowSurface->swapBuffers();
     }
-
-    mFilter.onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
-    mWindowSurface->swapBuffers();
 }
 
 GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId)
