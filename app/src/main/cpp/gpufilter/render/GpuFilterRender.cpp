@@ -18,9 +18,9 @@ GpuFilterRender::GpuFilterRender()
     i420BufferY = NULL;
     i420BufferU = NULL;
     i420BufferV = NULL;
-    textureY_id = -1;
-    textureU_id = -1;
-    textureV_id = -1;
+    yTextureId = -1;
+    uTextureId = -1;
+    vTextureId = -1;
 }
 
 GpuFilterRender::~GpuFilterRender()
@@ -101,9 +101,9 @@ void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth
     // nv21->i420的数据容器，用于renderOnDraw的渲染
     if( i420BufferY== NULL)
     {
-        i420BufferY = new ByteBuffer(y_len*sizeof(int8_t));
-        i420BufferU = new ByteBuffer(u_len*sizeof(int8_t));
-        i420BufferV = new ByteBuffer(v_len*sizeof(int8_t));
+        i420BufferY = new ByteBuffer(y_len);
+        i420BufferU = new ByteBuffer(u_len);
+        i420BufferV = new ByteBuffer(v_len);
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -269,12 +269,12 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         delete item;
         pthread_mutex_unlock(&mutex);
 
-        textureY_id = updateTexture(dst_y, static_cast<GLuint>(textureY_id));
-        textureU_id = updateTexture(dst_u, static_cast<GLuint>(textureU_id));
-        textureV_id = updateTexture(dst_v, static_cast<GLuint>(textureV_id));
+        yTextureId = updateTexture(dst_y, static_cast<GLuint>(yTextureId));
+        uTextureId = updateTexture(dst_u, static_cast<GLuint>(uTextureId));
+        vTextureId = updateTexture(dst_v, static_cast<GLuint>(vTextureId));
     }
 
-    mFilter.onDraw(textureY_id, textureU_id, textureV_id, positionCords, textureCords);
+    mFilter.onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
     mWindowSurface->swapBuffers();
 }
 

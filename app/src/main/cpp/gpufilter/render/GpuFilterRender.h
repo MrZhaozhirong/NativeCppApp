@@ -39,9 +39,9 @@ private:
     ByteBuffer*     i420BufferY;
     ByteBuffer*     i420BufferU;
     ByteBuffer*     i420BufferV;
-    int             textureY_id;
-    int             textureU_id;
-    int             textureV_id;
+    int             yTextureId;
+    int             uTextureId;
+    int             vTextureId;
     // test
     GpuNormalFilter mFilter;
     // surface宽高

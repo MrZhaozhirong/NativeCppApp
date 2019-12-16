@@ -15,17 +15,17 @@ class ByteBuffer {
 public:
     ByteBuffer()
     {
-        pbuffer = (int8_t *) malloc(500 * 500);
-        capacity = 500 * 500;
+        pbuffer = (int8_t *) malloc(sizeof(int8_t)*1024);
+        capacity = 1024;
         limit = 0;
         param1 = 0;
         param2 = 0;
         param3 = 0;
     }
-    ByteBuffer(size_t size)
+    ByteBuffer(size_t length)
     {
-        pbuffer = (int8_t *) malloc(size);
-        capacity = size;
+        pbuffer = (int8_t *) malloc(sizeof(int8_t)*length);
+        capacity = length;
         limit = 0;
         param1 = 0;
         param2 = 0;
