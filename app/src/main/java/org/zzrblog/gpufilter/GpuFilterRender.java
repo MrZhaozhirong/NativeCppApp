@@ -16,33 +16,26 @@ class GpuFilterRender {
         ctx = context;
     }
 
-
     public native void onSurfaceCreate(Surface surface);
 
     public native void onSurfaceChange(Surface surface, int width, int height);
 
     public native void onSurfaceDestroy(Surface surface);
 
-    /**
-     * 发送视频数据
-     * @param data nv21数据
-     */
+    // 发送视频nv21数据
     public native void feedVideoData(byte[] data,int width,int height);
-    /**
-     * 发送音频数据
-     * @param data pcm数据
-     * @param len 数据长度
-     */
-    // public native void feedAudioData(byte[] data, int len);
-
+    // 发送音频 pcm数据
+    //public native void feedAudioData(byte[] data);
 
     /**
      * 设置摄像头角度和方向
-     * 注意
      * @param rotation 角度
      * @param flipHorizontal 是否水平翻转
      * @param flipVertical 是否垂直翻转
      */
     public native void setRotationCamera(final int rotation, final boolean flipHorizontal,
                                          final boolean flipVertical);
+
+
+    public native void setFilterType(int typeId);
 }

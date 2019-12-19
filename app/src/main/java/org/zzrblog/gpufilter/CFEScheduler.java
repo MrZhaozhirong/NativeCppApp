@@ -23,10 +23,29 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     private WeakReference<Activity> mActivityWeakRef;
     private GpuFilterRender mGpuFilterRender;
 
-    public String[] getSupportedFilter() {
-        Activity activity = mActivityWeakRef.get();
-        return null;
+    private FilterType supportFilters;
+    public String[] getSupportedFilterNamelist() {
+        if( supportFilters ==null ) {
+            supportFilters = new FilterType();
+            supportFilters.addFilter("Normal", FilterType.FILTER_TYPE_NORMAL);
+            supportFilters.addFilter("Contrast", FilterType.FILTER_TYPE_CONTRAST);
+            supportFilters.addFilter("Invert", FilterType.FILTER_TYPE_INVERT);
+        }
+        return supportFilters.names.toArray(new String[supportFilters.names.size()]);
     }
+    public int getSupportedFilterTypeID(int position) {
+        if(supportFilters!=null) {
+            try{
+                return supportFilters.filters.get(position);
+            }catch (Exception e){
+                e.printStackTrace();
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+
 
 
     CFEScheduler(Activity activity, SurfaceView view) {
@@ -53,7 +72,6 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         setUpCamera(mCurrentCameraId);
     }
 
-    SurfaceTexture mCameraTexture = null;
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         // if(mCameraTexture!=null){
@@ -65,6 +83,7 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         }
     }
 
+    private SurfaceTexture mCameraTexture = null;
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated ... ");
@@ -95,7 +114,6 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
             mCameraTexture.release();
         }
     }
-
 
     private int mCurrentCameraId = 0;
     private Camera mCameraInstance;
@@ -167,4 +185,5 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         mCameraInstance.release();
         mCameraInstance = null;
     }
+
 }

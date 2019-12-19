@@ -10,26 +10,31 @@
 
 class GpuNormalFilter  {
 public:
+    // 用于上层获取滤镜列表对应的Filter类型
+    virtual int getTypeId() { return 0; }
+
     GpuNormalFilter()
     {
+        //LOGI("---GpuNormalFilter构造, %p",this);
         NO_FILTER_VERTEX_SHADER   = "attribute vec4 position;\n\
                                      attribute vec4 inputTextureCoordinate;\n\
                                      varying vec2 textureCoordinate;\n\
                                      void main()\n\
                                      {\n\
-                                         gl_Position = position;\n\
-                                         textureCoordinate = inputTextureCoordinate.xy;\n\
+                                        gl_Position = position;\n\
+                                        textureCoordinate = inputTextureCoordinate.xy;\n\
                                      }";
 
-        NO_FILTER_FRAGMENT_SHADER = "varying highp vec2 textureCoordinate;\n\
-                                     uniform sampler2D inputImageTexture;\n\
+        NO_FILTER_FRAGMENT_SHADER = "precision mediump float;\n\
+                                     varying highp vec2 textureCoordinate;\n\
+                                     uniform sampler2D SamplerRGB;\n\
                                      uniform sampler2D SamplerY;\n\
                                      uniform sampler2D SamplerU;\n\
                                      uniform sampler2D SamplerV;\n\
                                      mat3 colorConversionMatrix = mat3(\n\
-                                                        1.0f, 1.0f, 1.0f,\n\
-                                                        0.0f, -0.39465f, 2.03211f,\n\
-                                                        1.13983f, -0.58060f, 0.0f);\n\
+                                                        1.0, 1.0, 1.0,\n\
+                                                        0.0, -0.39465, 2.03211,\n\
+                                                        1.13983, -0.58060, 0.0);\n\
                                      vec3 yuv2rgb(vec2 pos)\n\
                                      {\n\
                                         vec3 yuv;\n\
@@ -40,22 +45,33 @@ public:
                                      }\n\
                                      void main()\n\
                                      {\n\
-                                        //gl_FragColor = vec4(yuv2rgb(textureCoordinate),1.0);\n\
-                                        gl_FragColor = texture2D(SamplerY, textureCoordinate);\n\
+                                        gl_FragColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
+                                        //gl_FragColor = texture2D(SamplerY/U/V, textureCoordinate);\n\
                                      }";
     }
     virtual ~GpuNormalFilter()
     {
+        //LOGI("---GpuNormalFilter析构, %p",this);
         if(!NO_FILTER_VERTEX_SHADER.empty()) NO_FILTER_VERTEX_SHADER.clear();
         if(!NO_FILTER_FRAGMENT_SHADER.empty()) NO_FILTER_FRAGMENT_SHADER.clear();
         mIsInitialized = false;
     }
 
-    void init() {
-        GpuNormalFilter();
+    virtual void init() {
         mGLProgId = ShaderHelper::buildProgram(NO_FILTER_VERTEX_SHADER.c_str(), NO_FILTER_FRAGMENT_SHADER.c_str());
         mGLAttribPosition = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "position"));
-        mGLUniformTexture = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "inputImageTexture"));
+        mGLUniformSampleRGB = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerRGB"));
+        mGLUniformSampleY = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerY"));
+        mGLUniformSampleU = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerU"));
+        mGLUniformSampleV = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerV"));
+        mGLAttribTextureCoordinate = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "inputTextureCoordinate"));
+        mIsInitialized = true;
+    }
+
+    void init(const char *vertexShaderSource, const char *fragmentShaderSource) {
+        mGLProgId = ShaderHelper::buildProgram(vertexShaderSource, fragmentShaderSource);
+        mGLAttribPosition = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "position"));
+        mGLUniformSampleRGB = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerRGB"));
         mGLUniformSampleY = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerY"));
         mGLUniformSampleU = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerU"));
         mGLUniformSampleV = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerV"));
@@ -73,7 +89,7 @@ public:
         mOutputHeight = height;
     }
 
-    void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
+    virtual void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
                 void* positionCords, void* textureCords)
     {
         if (!mIsInitialized)
@@ -115,7 +131,7 @@ public:
         if (textureId != -1) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, textureId);
-            glUniform1i(mGLUniformTexture, 0);
+            glUniform1i(mGLUniformSampleRGB, 0);
         }
         // onDrawArraysPre();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -124,19 +140,23 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-public:
+
+
+
+
+protected:
     std::string NO_FILTER_VERTEX_SHADER;
     std::string NO_FILTER_FRAGMENT_SHADER;
-protected:
+
     GLuint  mGLProgId;
     GLuint  mGLAttribPosition;
-    GLuint  mGLUniformTexture;
+    GLuint  mGLUniformSampleRGB;
     GLuint  mGLAttribTextureCoordinate;
 
     GLuint  mGLUniformSampleY;
     GLuint  mGLUniformSampleU;
     GLuint  mGLUniformSampleV;
-private:
+
     int     mOutputWidth;
     int     mOutputHeight;
     bool    mIsInitialized;

@@ -16,7 +16,7 @@ import org.zzrblog.nativecpp.R;
  * Created by zzr on 2019/11/19.
  */
 public class CameraFilterEncodeActivity extends Activity {
-
+    private static final String TAG = "CFEScheduler";
     private CFEScheduler cfeScheduler;
     private Spinner filterSpinner;
 
@@ -41,14 +41,16 @@ public class CameraFilterEncodeActivity extends Activity {
     }
 
     private void initFilterSpinner() {
-        //String[] mItems = cfeScheduler.getSupportedFilter();
-        String[] mItems = this.getResources().getStringArray(R.array.filter_name);
+        String[] mItems = cfeScheduler.getSupportedFilterNamelist();
+        //String[] mItems = this.getResources().getStringArray(R.array.filter_name);
         filterSpinner = findViewById(R.id.filter_spinner);
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, mItems);
         filterSpinner.setAdapter(adapter);
         filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { }
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                cfeScheduler.getSupportedFilterTypeID(position);
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }

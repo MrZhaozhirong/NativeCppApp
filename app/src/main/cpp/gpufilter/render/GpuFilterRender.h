@@ -12,6 +12,7 @@
 #include "../../egl/WindowSurface.h"
 #include "../components/NV21BufferPool.hpp"
 #include "../filter/GpuNormalFilter.hpp"
+#include "../filter/GpuContrastFilter.hpp"
 
 #define ROTATION_0      0
 #define ROTATION_90     90
@@ -44,6 +45,7 @@ private:
     int             vTextureId;
     // test
     GpuNormalFilter mFilter;
+    //GpuContrastFilter mFilter;
     // surface宽高
     int             mViewWidth;
     int             mViewHeight;
@@ -64,19 +66,19 @@ private:
     void    generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical);
     void    generateFramePositionCords();
 
-    GLuint  updateTexture(int8_t* src, GLuint texId);
+    GLuint  updateTexture(int8_t* src, GLuint texId, int width, int height);
 
-    float   flip(float value)
+    __inline float flip(float value)
     {
         if(value ==0.0f)
             return 1.0f;
         else // == 1.0f
             return 0.0f;
     };
-    float   addDistance(float coordinate, float distance)
+    __inline float addDistance(float coordinate, float distance)
     {
         return coordinate == 0.0f ? distance : 1 - distance;
-    }
+    };
 };
 
 

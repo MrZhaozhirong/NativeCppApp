@@ -164,7 +164,6 @@ void GpuFilterRender::adjustFrameScaling()
     //}
 
 }
-
 void GpuFilterRender::generateFramePositionCords()
 {
     float cube[8] = {
@@ -269,15 +268,15 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         pthread_mutex_unlock(&mutex);
 
         mWindowSurface->makeCurrent();
-        yTextureId = updateTexture(dst_y, static_cast<GLuint>(yTextureId));
-        uTextureId = updateTexture(dst_u, static_cast<GLuint>(uTextureId));
-        vTextureId = updateTexture(dst_v, static_cast<GLuint>(vTextureId));
-        mFilter.onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
-        mWindowSurface->swapBuffers();
+        yTextureId = updateTexture(dst_y, static_cast<GLuint>(yTextureId), mFrameWidth, mFrameHeight);
+        uTextureId = updateTexture(dst_u, static_cast<GLuint>(uTextureId), mFrameWidth/2, mFrameHeight/2);
+        vTextureId = updateTexture(dst_v, static_cast<GLuint>(vTextureId), mFrameWidth/2, mFrameHeight/2);
     }
+    mFilter.onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
+    mWindowSurface->swapBuffers();
 }
 
-GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId)
+GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId, int width, int height)
 {
     GLuint mTextureID;
     if( texId == -1) {
@@ -287,11 +286,11 @@ GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, mFrameWidth, mFrameHeight,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height,
                      0, GL_LUMINANCE, GL_UNSIGNED_BYTE, src);
     } else {
         glBindTexture(GL_TEXTURE_2D, texId);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mFrameWidth, mFrameHeight,
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
                         GL_LUMINANCE, GL_UNSIGNED_BYTE, src);
         mTextureID = texId;
     }

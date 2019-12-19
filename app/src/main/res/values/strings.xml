@@ -3,6 +3,7 @@
 
 
     <string-array name="filter_name">
+        <item>Normal</item>
         <item>Contrast</item>
         <item>Invert</item>
         <item>Pixelation</item>
