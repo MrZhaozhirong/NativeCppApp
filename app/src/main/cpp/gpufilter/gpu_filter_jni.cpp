@@ -69,8 +69,18 @@ Java_org_zzrblog_gpufilter_GpuFilterRender_setFilterType(JNIEnv *env, jobject in
 {
     if( render==NULL)
         render = new GpuFilterRender();
-
+    render->setFilter(typeId);
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_zzrblog_gpufilter_GpuFilterRender_adjustFilterValue(JNIEnv *env, jobject instance, jint value, jint max)
+{
+    if( render==NULL)
+        render = new GpuFilterRender();
+    render->adjustFilterValue(value, max);
+}
+
+
 
 extern "C"
 JNIEXPORT void JNICALL

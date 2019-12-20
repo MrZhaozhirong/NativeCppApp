@@ -5,11 +5,11 @@
 #ifndef GPU_CONTRAST_FILTER_HPP
 #define GPU_CONTRAST_FILTER_HPP
 
-#include "GpuNormalFilter.hpp"
+#include "GpuBaseFilter.hpp"
 
-class GpuContrastFilter : public GpuNormalFilter {
+class GpuContrastFilter : public GpuBaseFilter {
 public:
-    int getTypeId() { return 1; }
+    int getTypeId() { return FILTER_TYPE_CONTRAST; }
 
     GpuContrastFilter()
     {
@@ -44,13 +44,14 @@ public:
     }
 
     void init() {
-        GpuNormalFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), CONTRAST_FRAGMENT_SHADER.c_str());
+        GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), CONTRAST_FRAGMENT_SHADER.c_str());
         mContrastLocation = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "contrast"));
         mContrastValue = 1.0f;
     }
 
-    void setContrast(float contrast) {
-        mContrastValue = contrast;
+    void setAdjustEffect(float percent) {
+        // 0.0~1
+        mContrastValue = percent * 1.0f + 1.0f;
     }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,

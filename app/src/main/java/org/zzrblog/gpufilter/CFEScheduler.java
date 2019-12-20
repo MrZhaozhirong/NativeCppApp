@@ -23,8 +23,13 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     private WeakReference<Activity> mActivityWeakRef;
     private GpuFilterRender mGpuFilterRender;
 
+    /*Filter相关*/
+    public void setFilterType(int typeId) {
+        if(mGpuFilterRender!=null)
+            mGpuFilterRender.setFilterType(typeId);
+    }
     private FilterType supportFilters;
-    public String[] getSupportedFilterNamelist() {
+    public String[] getSupportedFiltersName() {
         if( supportFilters ==null ) {
             supportFilters = new FilterType();
             supportFilters.addFilter("Normal", FilterType.FILTER_TYPE_NORMAL);
@@ -33,21 +38,34 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         }
         return supportFilters.names.toArray(new String[supportFilters.names.size()]);
     }
-    public int getSupportedFilterTypeID(int position) {
+    public int getSupportedFilterTypeID(String name) {
         if(supportFilters!=null) {
-            try{
+            try{// 防止空指针|越界|查询失败
+                int position = supportFilters.names.indexOf(name);
                 return supportFilters.filters.get(position);
             }catch (Exception e){
-                e.printStackTrace();
                 return 0;
             }
         }
         return 0;
     }
+    public int getSupportedFilterTypeID(int index) {
+        if(supportFilters!=null) {
+            try{// 防止空指针|越界|查询失败
+                return supportFilters.filters.get(index);
+            }catch (Exception e){
+                return 0;
+            }
+        }
+        return 0;
+    }
+    public void adjustFilterValue(int value, int max) {
+        if(mGpuFilterRender!=null)
+            mGpuFilterRender.adjustFilterValue(value, max);
+    }
 
 
-
-
+    /*Camera SurfaceView相关*/
     CFEScheduler(Activity activity, SurfaceView view) {
         mActivityWeakRef = new WeakReference<>(activity);
         mGpuFilterRender = new GpuFilterRender(activity);

@@ -38,4 +38,5 @@ class GpuFilterRender {
 
 
     public native void setFilterType(int typeId);
+    public native void adjustFilterValue(int value,int max);
 }

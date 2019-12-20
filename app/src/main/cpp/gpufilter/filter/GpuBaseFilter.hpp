@@ -7,13 +7,18 @@
 
 #include <string>
 #include "../../program/ShaderHelper.h"
+// 和 java/org.zzrblog.gpufilter.FilterType对应
+// 而且对应的衍生类的getTypeId也要返回正确的值
+#define FILTER_TYPE_NORMAL      0x1010
+#define FILTER_TYPE_CONTRAST    0x1011
+#define FILTER_TYPE_INVERT      0x1012
 
-class GpuNormalFilter  {
+class GpuBaseFilter  {
 public:
     // 用于上层获取滤镜列表对应的Filter类型
-    virtual int getTypeId() { return 0; }
+    virtual int getTypeId() { return FILTER_TYPE_NORMAL; }
 
-    GpuNormalFilter()
+    GpuBaseFilter()
     {
         //LOGI("---GpuNormalFilter构造, %p",this);
         NO_FILTER_VERTEX_SHADER   = "attribute vec4 position;\n\
@@ -49,7 +54,7 @@ public:
                                         //gl_FragColor = texture2D(SamplerY/U/V, textureCoordinate);\n\
                                      }";
     }
-    virtual ~GpuNormalFilter()
+    virtual ~GpuBaseFilter()
     {
         //LOGI("---GpuNormalFilter析构, %p",this);
         if(!NO_FILTER_VERTEX_SHADER.empty()) NO_FILTER_VERTEX_SHADER.clear();
@@ -58,14 +63,7 @@ public:
     }
 
     virtual void init() {
-        mGLProgId = ShaderHelper::buildProgram(NO_FILTER_VERTEX_SHADER.c_str(), NO_FILTER_FRAGMENT_SHADER.c_str());
-        mGLAttribPosition = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "position"));
-        mGLUniformSampleRGB = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerRGB"));
-        mGLUniformSampleY = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerY"));
-        mGLUniformSampleU = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerU"));
-        mGLUniformSampleV = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerV"));
-        mGLAttribTextureCoordinate = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "inputTextureCoordinate"));
-        mIsInitialized = true;
+        init(NO_FILTER_VERTEX_SHADER.c_str(), NO_FILTER_FRAGMENT_SHADER.c_str());
     }
 
     void init(const char *vertexShaderSource, const char *fragmentShaderSource) {
@@ -117,33 +115,36 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void onDraw(GLuint textureId, void* positionCords, void* textureCords)
-    {
-        if (!mIsInitialized)
-            return;
+    //### GLUniformSampleRGB对应的draw
+    //void onDraw(GLuint textureId, void* positionCords, void* textureCords)
+    //{
+    //    if (!mIsInitialized)
+    //        return;
+    //    glUseProgram(mGLProgId);
+    //    // runPendingOnDrawTasks();
+    //    glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
+    //    glEnableVertexAttribArray(mGLAttribPosition);
+    //    glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
+    //    glEnableVertexAttribArray(mGLAttribTextureCoordinate);
+    //    if (textureId != -1) {
+    //        glActiveTexture(GL_TEXTURE0);
+    //        glBindTexture(GL_TEXTURE_2D, textureId);
+    //        glUniform1i(mGLUniformSampleRGB, 0);
+    //    }
+    //    // onDrawArraysPre();
+    //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    //    glDisableVertexAttribArray(mGLAttribPosition);
+    //    glDisableVertexAttribArray(mGLAttribTextureCoordinate);
+    //    glBindTexture(GL_TEXTURE_2D, 0);
+    //}
 
-        glUseProgram(mGLProgId);
-        // runPendingOnDrawTasks();
-        glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
-        glEnableVertexAttribArray(mGLAttribPosition);
-        glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
-        glEnableVertexAttribArray(mGLAttribTextureCoordinate);
-        if (textureId != -1) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, textureId);
-            glUniform1i(mGLUniformSampleRGB, 0);
-        }
-        // onDrawArraysPre();
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glDisableVertexAttribArray(mGLAttribPosition);
-        glDisableVertexAttribArray(mGLAttribTextureCoordinate);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    // 相关滤镜对应的可调整参数，通过此借口进行操作
+    virtual void setAdjustEffect(float percent) {
+        // subclass override
     }
 
-
-
-
-
+    bool isInitialized(){ return mIsInitialized;}
+    GLuint getProgram(){ return mGLProgId;}
 protected:
     std::string NO_FILTER_VERTEX_SHADER;
     std::string NO_FILTER_FRAGMENT_SHADER;

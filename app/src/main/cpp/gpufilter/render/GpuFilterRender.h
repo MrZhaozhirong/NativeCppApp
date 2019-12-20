@@ -11,7 +11,7 @@
 #include "../../egl/EglCore.h"
 #include "../../egl/WindowSurface.h"
 #include "../components/NV21BufferPool.hpp"
-#include "../filter/GpuNormalFilter.hpp"
+#include "../filter/GpuBaseFilter.hpp"
 #include "../filter/GpuContrastFilter.hpp"
 
 #define ROTATION_0      0
@@ -31,10 +31,17 @@ public:
 
     void setRotationCamera(int rotation, bool flipHorizontal, bool flipVertical) ;
     void feedVideoData(int8_t* data, int data_len, int previewWidth, int previewHeight);
+    void setFilter(int filter_type_id);
+    void adjustFilterValue(int value, int max);
 private:
     EglCore*        mEglCore;
     WindowSurface*  mWindowSurface;
-    // 帧图缓存池
+    // Filter滤镜
+    GpuBaseFilter*  mFilter;
+    int             mRequestTypeId;
+    int             mFilterTypeId;
+    float           mFilterEffectPercent;
+    // 帧图缓存
     NV21BufferPool  mNV21Pool;
     pthread_mutex_t mutex;
     ByteBuffer*     i420BufferY;
@@ -43,18 +50,16 @@ private:
     int             yTextureId;
     int             uTextureId;
     int             vTextureId;
-    // test
-    GpuNormalFilter mFilter;
-    //GpuContrastFilter mFilter;
     // surface宽高
     int             mViewWidth;
     int             mViewHeight;
-    // 预览帧宽高
+    // 预览帧图宽高
     int             mFrameWidth;
     int             mFrameHeight;
-    // 是否水平垂直翻转
+    // 相机：是否水平垂直翻转，
     bool            mFlipHorizontal;
     bool            mFlipVertical;
+    // 相机：初始旋转角
     int             mRotation; // 0,90,180,270
 
     float*          positionCords;
@@ -67,6 +72,7 @@ private:
     void    generateFramePositionCords();
 
     GLuint  updateTexture(int8_t* src, GLuint texId, int width, int height);
+    void    checkFilterChange();
 
     __inline float flip(float value)
     {

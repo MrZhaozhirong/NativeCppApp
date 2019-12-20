@@ -9,9 +9,9 @@ import java.util.List;
 public class FilterType {
     // NOTE：这里的ID值要 与
     // cpp/gpufilter/filter/Gpu*****Filter.hpp的getTypeId一一对应
-    static final int FILTER_TYPE_NORMAL = 0;
-    static final int FILTER_TYPE_CONTRAST = 1;
-    static final int FILTER_TYPE_INVERT = 2;
+    static final int FILTER_TYPE_NORMAL = 0x1010;
+    static final int FILTER_TYPE_CONTRAST = 0x1011;
+    static final int FILTER_TYPE_INVERT = 0x1012;
 
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();

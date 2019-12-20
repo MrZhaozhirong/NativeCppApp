@@ -21,6 +21,10 @@ GpuFilterRender::GpuFilterRender()
     yTextureId = -1;
     uTextureId = -1;
     vTextureId = -1;
+    mFilter = NULL;
+    mFilterTypeId = 0;
+    mRequestTypeId = 0;
+    mFilterEffectPercent = 0.0f;
 }
 
 GpuFilterRender::~GpuFilterRender()
@@ -37,6 +41,7 @@ GpuFilterRender::~GpuFilterRender()
     delete i420BufferY; i420BufferY=NULL;
     delete i420BufferU; i420BufferU=NULL;
     delete i420BufferV; i420BufferV=NULL;
+    delete mFilter; mFilter = NULL;
 }
 
 void GpuFilterRender::surfaceCreated(ANativeWindow *window)
@@ -48,7 +53,15 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
-    mFilter.init();
+
+    if( mFilter==NULL) {
+        mFilter = new GpuBaseFilter();
+    } else {
+        mFilter->destroy();
+    }
+    mFilter->init();
+    mRequestTypeId = mFilterTypeId = mFilter->getTypeId();
+
     mWindowSurface->swapBuffers();
 }
 
@@ -57,7 +70,7 @@ void GpuFilterRender::surfaceChanged(int width, int height)
     this->mViewHeight = height;
     this->mViewWidth = width;
     mWindowSurface->makeCurrent();
-    mFilter.onOutputSizeChanged(width, height);
+    mFilter->onOutputSizeChanged(width, height);
     mWindowSurface->swapBuffers();
 }
 
@@ -236,19 +249,49 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
 }
 
 
+void GpuFilterRender::setFilter(int filter_type_id) {
+    mRequestTypeId = filter_type_id;
+    // 在checkFilterChange方法更新mFilterTypeId
+    if(mFilterTypeId!=mRequestTypeId) {
+        delete mFilter;
+        mFilter = NULL;
+        switch (mRequestTypeId)
+        {
+            case FILTER_TYPE_CONTRAST:{
+                mFilter = new GpuContrastFilter();
+            }break;
+            case FILTER_TYPE_NORMAL:
+            default:
+                mFilter = new GpuBaseFilter();
+                break;
+        }
+    }
+}
+void GpuFilterRender::adjustFilterValue(int value, int max) {
+    mFilterEffectPercent = (float)value / (float)max;
+    LOGD("GpuFilterRender adjust %f", mFilterEffectPercent);
+}
+void GpuFilterRender::checkFilterChange() {
+    if(mFilterTypeId!=mRequestTypeId) {
+        if( mFilter!=NULL) {
+            mFilter->init();
+            mFilter->onOutputSizeChanged(mViewWidth, mViewHeight);
+            mFilterTypeId = mRequestTypeId;
+        }
+    }
+}
 void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 {
     if (mEglCore == NULL || mWindowSurface == NULL) {
         LOGW("Skipping drawFrame after shutdown");
         return;
     }
-
     pthread_mutex_lock(&mutex);
     ByteBuffer* item = mNV21Pool.get();
     if(item == NULL) {
         pthread_mutex_unlock(&mutex);
         return;
-    } else { // item!=NULL，i420BufferY也!=NULL
+    } else { // item!=NULL，i420BufferY/U/V也!=NULL
         int8_t * nv21_buffer = item->data();
         int            y_len = item->param1;
         int            u_len = item->param2;
@@ -265,17 +308,20 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         }
         // 删除BufferPool当中的引用。
         delete item;
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex);//#赶紧解锁
 
         mWindowSurface->makeCurrent();
         yTextureId = updateTexture(dst_y, static_cast<GLuint>(yTextureId), mFrameWidth, mFrameHeight);
         uTextureId = updateTexture(dst_u, static_cast<GLuint>(uTextureId), mFrameWidth/2, mFrameHeight/2);
         vTextureId = updateTexture(dst_v, static_cast<GLuint>(vTextureId), mFrameWidth/2, mFrameHeight/2);
+        checkFilterChange();
+        if( mFilter!=NULL) {
+            mFilter->setAdjustEffect(mFilterEffectPercent);
+            mFilter->onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
+        }
+        mWindowSurface->swapBuffers();
     }
-    mFilter.onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
-    mWindowSurface->swapBuffers();
 }
-
 GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId, int width, int height)
 {
     GLuint mTextureID;
