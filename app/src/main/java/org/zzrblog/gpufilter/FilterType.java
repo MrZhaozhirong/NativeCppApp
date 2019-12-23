@@ -11,7 +11,8 @@ public class FilterType {
     // cpp/gpufilter/filter/Gpu*****Filter.hpp的getTypeId一一对应
     static final int FILTER_TYPE_NORMAL = 0x1010;
     static final int FILTER_TYPE_CONTRAST = 0x1011;
-    static final int FILTER_TYPE_INVERT = 0x1012;
+    static final int FILTER_TYPE_COLOR_INVERT = 0x1012;
+    static final int FILTER_TYPE_PIXELATION = 0x1013;
 
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();

@@ -7,6 +7,8 @@
 #include "GpuFilterRender.h"
 #include "../../common/zzr_common.h"
 #include "../../common/ByteBuffer.hpp"
+#include "../filter/GpuColorInvertFilter.hpp"
+#include "../filter/GpuPixelationFilter.hpp"
 
 GpuFilterRender::GpuFilterRender()
 {
@@ -253,14 +255,23 @@ void GpuFilterRender::setFilter(int filter_type_id) {
     mRequestTypeId = filter_type_id;
     // 在checkFilterChange方法更新mFilterTypeId
     if(mFilterTypeId!=mRequestTypeId) {
+        // mFilter->destroy(); 非GL线程，不执行GL语句
         delete mFilter;
         mFilter = NULL;
         switch (mRequestTypeId)
         {
+            case FILTER_TYPE_NORMAL: {
+                mFilter = new GpuBaseFilter();
+            }break;
             case FILTER_TYPE_CONTRAST:{
                 mFilter = new GpuContrastFilter();
             }break;
-            case FILTER_TYPE_NORMAL:
+            case FILTER_TYPE_COLOR_INVERT:{
+                mFilter = new GpuColorInvertFilter();
+            }break;
+            case FILTER_TYPE_PIXELATION:{
+                mFilter = new GpuPixelationFilter();
+            }break;
             default:
                 mFilter = new GpuBaseFilter();
                 break;
@@ -269,7 +280,7 @@ void GpuFilterRender::setFilter(int filter_type_id) {
 }
 void GpuFilterRender::adjustFilterValue(int value, int max) {
     mFilterEffectPercent = (float)value / (float)max;
-    LOGD("GpuFilterRender adjust %f", mFilterEffectPercent);
+    //LOGD("GpuFilterRender adjust %f", mFilterEffectPercent);
 }
 void GpuFilterRender::checkFilterChange() {
     if(mFilterTypeId!=mRequestTypeId) {

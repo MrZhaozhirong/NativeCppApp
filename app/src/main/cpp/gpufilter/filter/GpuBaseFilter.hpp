@@ -9,10 +9,13 @@
 #include "../../program/ShaderHelper.h"
 // 和 java/org.zzrblog.gpufilter.FilterType对应
 // 而且对应的衍生类的getTypeId也要返回正确的值
-#define FILTER_TYPE_NORMAL      0x1010
-#define FILTER_TYPE_CONTRAST    0x1011
-#define FILTER_TYPE_INVERT      0x1012
-
+#define FILTER_TYPE_NORMAL          0x1010
+#define FILTER_TYPE_CONTRAST        0x1011
+#define FILTER_TYPE_COLOR_INVERT    0x1012
+#define FILTER_TYPE_PIXELATION      0x1013
+/**
+ * Filter基础类，支持YUV / RGB渲染模式。
+ */
 class GpuBaseFilter  {
 public:
     // 用于上层获取滤镜列表对应的Filter类型
@@ -77,12 +80,12 @@ public:
         mIsInitialized = true;
     }
 
-    void destroy() {
+    virtual void destroy() {
         mIsInitialized = false;
         glDeleteProgram(mGLProgId);
     }
 
-    void onOutputSizeChanged(int width, int height) {
+    virtual void onOutputSizeChanged(int width, int height) {
         mOutputWidth = width;
         mOutputHeight = height;
     }
@@ -115,8 +118,8 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    //### GLUniformSampleRGB对应的draw
-    //void onDraw(GLuint textureId, void* positionCords, void* textureCords)
+    // GLUniformSampleRGB对应的draw，我这里没用rgb模式.
+    //virtual void onDraw2(GLuint textureId, void* positionCords, void* textureCords)
     //{
     //    if (!mIsInitialized)
     //        return;
@@ -142,6 +145,7 @@ public:
     virtual void setAdjustEffect(float percent) {
         // subclass override
     }
+
 
     bool isInitialized(){ return mIsInitialized;}
     GLuint getProgram(){ return mGLProgId;}

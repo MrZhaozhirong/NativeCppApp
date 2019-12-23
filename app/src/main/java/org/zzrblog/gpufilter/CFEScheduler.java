@@ -34,7 +34,8 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
             supportFilters = new FilterType();
             supportFilters.addFilter("Normal", FilterType.FILTER_TYPE_NORMAL);
             supportFilters.addFilter("Contrast", FilterType.FILTER_TYPE_CONTRAST);
-            supportFilters.addFilter("Invert", FilterType.FILTER_TYPE_INVERT);
+            supportFilters.addFilter("Color-Invert", FilterType.FILTER_TYPE_COLOR_INVERT);
+            supportFilters.addFilter("Pixelation", FilterType.FILTER_TYPE_PIXELATION);
         }
         return supportFilters.names.toArray(new String[supportFilters.names.size()]);
     }

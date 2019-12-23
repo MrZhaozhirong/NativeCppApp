@@ -6,14 +6,16 @@
 #define GPU_CONTRAST_FILTER_HPP
 
 #include "GpuBaseFilter.hpp"
-
+/**
+ * 更改图像的对比度。
+ * 对比度值在0.0到4.0之间，正常值为1.0
+ */
 class GpuContrastFilter : public GpuBaseFilter {
 public:
     int getTypeId() { return FILTER_TYPE_CONTRAST; }
 
     GpuContrastFilter()
     {
-        //LOGI("---GpuContrastFilter构造, %p",this);
         CONTRAST_FRAGMENT_SHADER  ="precision mediump float;\n\
                                     varying highp vec2 textureCoordinate;\n\
                                     uniform sampler2D SamplerRGB;\n\
@@ -40,18 +42,17 @@ public:
                                     }";
     }
     ~GpuContrastFilter() {
-        //LOGI("---GpuContrastFilter析构, %p",this);
+        if(!CONTRAST_FRAGMENT_SHADER.empty()) CONTRAST_FRAGMENT_SHADER.clear();
     }
 
     void init() {
         GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), CONTRAST_FRAGMENT_SHADER.c_str());
-        mContrastLocation = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "contrast"));
+        mContrastLocation = glGetUniformLocation(mGLProgId, "contrast");
         mContrastValue = 1.0f;
     }
 
     void setAdjustEffect(float percent) {
-        // 0.0~1
-        mContrastValue = percent * 1.0f + 1.0f;
+        mContrastValue = percent * 4.0f;
     }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
@@ -88,7 +89,7 @@ public:
 private:
     std::string CONTRAST_FRAGMENT_SHADER;
 
-    int     mContrastLocation;
+    GLint   mContrastLocation;
     float   mContrastValue;
 };
 #endif //GPU_CONTRAST_FILTER_HPP
