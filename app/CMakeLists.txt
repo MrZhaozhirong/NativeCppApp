@@ -60,11 +60,6 @@ aux_source_directory(./src/main/cpp/gpufilter GPU_FILTER_SRC )
 aux_source_directory(./src/main/cpp/gpufilter/components GPU_FILTER_COM_SRC )
 aux_source_directory(./src/main/cpp/gpufilter/render GPU_FILTER_RENDER_SRC )
 
-
-# 在系统找出预编译的android库，指定在CMake脚本下的别名为android-lib
-# android参数 for native windows
-find_library( android-lib android )
-
 add_library(
         gpu-filter
         SHARED
@@ -83,3 +78,6 @@ target_link_libraries(
         android
         log)
 
+# mediandk参数 for native codec
+# OpenMAXAL
+# android参数 for native windows
