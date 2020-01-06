@@ -13,7 +13,9 @@ android {
             cmake {
                 //cppFlags "-frtti -fexceptions -Wc++11-extensions"
                 cppFlags '-fexceptions', '-frtti'
-                abiFilters 'armeabi', 'armeabi-v7a'
+                //abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
+                // 升级ndk之后，不再支持armeabi的形式，然后我的libzip.so没找到对应的arm64-v8a，很尴尬...
+                abiFilters 'armeabi-v7a'
                 arguments "-DANDROID_STL=c++_static"
             }
         }
