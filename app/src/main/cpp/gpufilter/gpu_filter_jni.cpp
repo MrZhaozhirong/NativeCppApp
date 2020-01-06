@@ -10,86 +10,79 @@
 GLThread* glThread = NULL;
 GpuFilterRender* render = NULL;
 
+extern "C" {
 
-extern "C"
 JNIEXPORT void JNICALL
-Java_org_zzrblog_gpufilter_GpuFilterRender_onSurfaceCreate(JNIEnv *env, jobject instance, jobject surface)
-{
-    ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
-    if( render==NULL) {
+Java_org_zzrblog_gpufilter_GpuFilterRender_onSurfaceCreate(JNIEnv *env, jobject instance, jobject surface) {
+    ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
+    if (render == NULL) {
         render = new GpuFilterRender();
     }
-    if( glThread==NULL) {
+    if (glThread == NULL) {
         glThread = new GLThread();
     }
     glThread->setGLRender(render);
     glThread->onSurfaceCreate(nativeWindow);
 }
 
-extern "C"
+
 JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_onSurfaceChange(JNIEnv *env, jobject instance, jobject surface,
-                                                           jint width, jint height)
-{
+                                                           jint width, jint height) {
     glThread->onSurfaceChange(width, height);
 }
 
-extern "C"
+
 JNIEXPORT void JNICALL
-Java_org_zzrblog_gpufilter_GpuFilterRender_onSurfaceDestroy(JNIEnv *env, jobject instance, jobject surface)
-{
+Java_org_zzrblog_gpufilter_GpuFilterRender_onSurfaceDestroy(JNIEnv *env, jobject instance, jobject surface) {
     glThread->onSurfaceDestroy();
     glThread->release();
     delete glThread;
     glThread = NULL;
 
-    if( render==NULL) {
+    if (render == NULL) {
         delete render;
         render = NULL;
     }
 }
 
-extern "C"
+
 JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_setRotationCamera(JNIEnv *env, jobject instance,
-                                                            jint rotation, jboolean flipHorizontal, jboolean flipVertical)
-{
+                                                             jint rotation, jboolean flipHorizontal,
+                                                             jboolean flipVertical) {
     // 注意这里flipVertical对应render->setRotationCamera.flipHorizontal
     // 注意这里flipHorizontal对应render->setRotationCamera.flipVertical
     // 因为Android的预览帧数据是横着的，仿照GPUImage的处理方式。
-    if( render==NULL) {
+    if (render == NULL) {
         render = new GpuFilterRender();
     }
     render->setRotationCamera(rotation, flipVertical, flipHorizontal);
 }
 
-extern "C"
+
 JNIEXPORT void JNICALL
-Java_org_zzrblog_gpufilter_GpuFilterRender_setFilterType(JNIEnv *env, jobject instance, jint typeId)
-{
-    if( render==NULL)
+Java_org_zzrblog_gpufilter_GpuFilterRender_setFilterType(JNIEnv *env, jobject instance, jint typeId) {
+    if (render == NULL)
         render = new GpuFilterRender();
     render->setFilter(typeId);
 }
-extern "C"
 JNIEXPORT void JNICALL
-Java_org_zzrblog_gpufilter_GpuFilterRender_adjustFilterValue(JNIEnv *env, jobject instance, jint value, jint max)
-{
-    if( render==NULL)
+Java_org_zzrblog_gpufilter_GpuFilterRender_adjustFilterValue(JNIEnv *env, jobject instance, jint value, jint max) {
+    if (render == NULL)
         render = new GpuFilterRender();
     render->adjustFilterValue(value, max);
 }
 
 
-
-extern "C"
 JNIEXPORT void JNICALL
 Java_org_zzrblog_gpufilter_GpuFilterRender_feedVideoData(JNIEnv *env, jobject instance,
-                                                         jbyteArray array,jint width, jint height)
-{
-    if(render==NULL) return;
-    jbyte* nv21_buffer = env->GetByteArrayElements(array, NULL );
+                                                         jbyteArray array, jint width, jint height) {
+    if (render == NULL) return;
+    jbyte *nv21_buffer = env->GetByteArrayElements(array, NULL);
     jsize array_len = env->GetArrayLength(array);
     render->feedVideoData(nv21_buffer, array_len, width, height);
     env->ReleaseByteArrayElements(array, nv21_buffer, 0);
 }
+
+} // extern "C"

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "org.zzrblog.nativecpp"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -17,6 +17,7 @@ android {
                 // 升级ndk之后，不再支持armeabi的形式，然后我的libzip.so没找到对应的arm64-v8a，很尴尬...
                 abiFilters 'armeabi-v7a'
                 arguments "-DANDROID_STL=c++_static"
+                arguments "-DANDROID_ARM_NEON=ON"
             }
         }
     }

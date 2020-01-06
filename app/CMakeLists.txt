@@ -76,8 +76,9 @@ target_link_libraries(
         GLESv2
         GLESv3
         android
+        OpenMAXAL
         log)
 
 # mediandk参数 for native codec
-# OpenMAXAL
+# OpenMAXAL for 开放多媒体应用加速层
 # android参数 for native windows
