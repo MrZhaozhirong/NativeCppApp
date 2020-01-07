@@ -13,6 +13,7 @@
 #include "../components/NV21BufferPool.hpp"
 #include "../filter/GpuBaseFilter.hpp"
 #include "../filter/GpuContrastFilter.hpp"
+#include "../codec/CodecEncoder.h"
 
 #define ROTATION_0      0
 #define ROTATION_90     90
@@ -50,6 +51,9 @@ private:
     int             yTextureId;
     int             uTextureId;
     int             vTextureId;
+    // 位置/纹理的坐标数组
+    float*          positionCords;
+    float*          textureCords;
     // surface宽高
     int             mViewWidth;
     int             mViewHeight;
@@ -62,8 +66,7 @@ private:
     // 相机：初始旋转角
     int             mRotation; // 0,90,180,270
 
-    float*          positionCords;
-    float*          textureCords;
+    CodecEncoder    mEncoder;
 private:
     DISALLOW_EVIL_CONSTRUCTORS(GpuFilterRender);
 
@@ -71,7 +74,7 @@ private:
     void    generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical);
     void    generateFramePositionCords();
 
-    GLuint  updateTexture(int8_t* src, GLuint texId, int width, int height);
+    GLuint  updateTexture(int8_t* src, int texId, int width, int height);
     void    checkFilterChange();
 
     __inline float flip(float value)

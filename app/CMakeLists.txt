@@ -59,6 +59,7 @@ target_link_libraries(
 aux_source_directory(./src/main/cpp/gpufilter GPU_FILTER_SRC )
 aux_source_directory(./src/main/cpp/gpufilter/components GPU_FILTER_COM_SRC )
 aux_source_directory(./src/main/cpp/gpufilter/render GPU_FILTER_RENDER_SRC )
+aux_source_directory(./src/main/cpp/gpufilter/codec GPU_FILTER_CODEC_SRC )
 
 add_library(
         gpu-filter
@@ -69,16 +70,14 @@ add_library(
         ${GPU_FILTER_SRC}
         ${GPU_FILTER_COM_SRC}
         ${GPU_FILTER_RENDER_SRC}
+        ${GPU_FILTER_CODEC_SRC}
         )
 target_link_libraries(
         gpu-filter
-        EGL
-        GLESv2
-        GLESv3
-        android
-        OpenMAXAL
+        EGL GLESv2 GLESv3
+        android mediandk OpenMAXAL
         log)
 
 # mediandk参数 for native codec
-# OpenMAXAL for 开放多媒体应用加速层
+# OpenMAXAL参数 for 开放多媒体应用加速层
 # android参数 for native windows

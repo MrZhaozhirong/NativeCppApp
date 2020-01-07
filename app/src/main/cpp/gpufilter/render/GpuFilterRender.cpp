@@ -55,7 +55,6 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     assert(mWindowSurface != NULL && mEglCore != NULL);
     LOGD("render surface create ... ");
     mWindowSurface->makeCurrent();
-
     if( mFilter==NULL) {
         mFilter = new GpuBaseFilter();
     } else {
@@ -63,7 +62,6 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     }
     mFilter->init();
     mRequestTypeId = mFilterTypeId = mFilter->getTypeId();
-
     mWindowSurface->swapBuffers();
 }
 
@@ -74,6 +72,7 @@ void GpuFilterRender::surfaceChanged(int width, int height)
     mWindowSurface->makeCurrent();
     mFilter->onOutputSizeChanged(width, height);
     mWindowSurface->swapBuffers();
+
 }
 
 void GpuFilterRender::surfaceDestroyed()
@@ -320,20 +319,21 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         // 删除BufferPool当中的引用。
         delete item;
         pthread_mutex_unlock(&mutex);//#赶紧解锁
-
+        // 画面渲染
         mWindowSurface->makeCurrent();
-        yTextureId = updateTexture(dst_y, static_cast<GLuint>(yTextureId), mFrameWidth, mFrameHeight);
-        uTextureId = updateTexture(dst_u, static_cast<GLuint>(uTextureId), mFrameWidth/2, mFrameHeight/2);
-        vTextureId = updateTexture(dst_v, static_cast<GLuint>(vTextureId), mFrameWidth/2, mFrameHeight/2);
+        yTextureId = updateTexture(dst_y, yTextureId, mFrameWidth, mFrameHeight);
+        uTextureId = updateTexture(dst_u, uTextureId, mFrameWidth/2, mFrameHeight/2);
+        vTextureId = updateTexture(dst_v, vTextureId, mFrameWidth/2, mFrameHeight/2);
         checkFilterChange();
         if( mFilter!=NULL) {
             mFilter->setAdjustEffect(mFilterEffectPercent);
             mFilter->onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
         }
         mWindowSurface->swapBuffers();
+        // 视频录制
     }
 }
-GLuint GpuFilterRender::updateTexture(int8_t *src, GLuint texId, int width, int height)
+GLuint GpuFilterRender::updateTexture(int8_t *src, int texId, int width, int height)
 {
     GLuint mTextureID;
     if( texId == -1) {
