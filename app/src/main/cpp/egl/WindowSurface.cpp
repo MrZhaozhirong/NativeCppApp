@@ -10,7 +10,6 @@
 WindowSurface::WindowSurface(EglCore *eglCore, ANativeWindow *window, bool releaseSurface)
         : EglSurfaceBase(eglCore) {
     createWindowSurface(window);
-    ANativeWindow_acquire(mSurface);
     mSurface = window;
     mReleaseSurface = releaseSurface;
 }
@@ -19,7 +18,6 @@ WindowSurface::WindowSurface(EglCore *eglCore, ANativeWindow *window, bool relea
 WindowSurface::WindowSurface(EglCore *eglCore, ANativeWindow *window)
         : EglSurfaceBase(eglCore) {
     createWindowSurface(window);
-    ANativeWindow_acquire(mSurface);
 }
 
 //释放当前EGL上下文 关联 的 surface
@@ -39,5 +37,4 @@ void WindowSurface::recreate(EglCore *eglCore) {
     }
     mEglCore = eglCore;
     createWindowSurface(mSurface);
-    ANativeWindow_acquire(mSurface);
 }
