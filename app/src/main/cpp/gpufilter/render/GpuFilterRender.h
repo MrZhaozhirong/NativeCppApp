@@ -40,7 +40,7 @@ private:
     // Filter滤镜
     GpuBaseFilter*  mFilter;
     int             mRequestTypeId;
-    int             mFilterTypeId;
+    int             mCurrentTypeId;
     float           mFilterEffectPercent;
     // 帧图缓存
     NV21BufferPool  mNV21Pool;

@@ -1,7 +1,6 @@
 //
 // Created by nicky on 2020/1/6.
 //
-
 #include <pthread.h>
 #include <string>
 #include "CodecEncoder.h"
@@ -14,6 +13,7 @@ CodecEncoder::CodecEncoder() {
     mCodecRef = NULL;
     mWindowSurface = NULL;
     mEglCore = NULL;
+    mimeType = MIME_TYPE_H264;
 }
 
 CodecEncoder::~CodecEncoder() {
@@ -21,9 +21,7 @@ CodecEncoder::~CodecEncoder() {
     releaseMediaCodec();
 }
 
-void CodecEncoder::setMetaData(int width, int height, int mimeType) {
-    this->mWidth = width;
-    this->mHeight = height;
+void CodecEncoder::setMetaConfig(int mimeType) {
     this->mimeType = mimeType;
 }
 
@@ -44,7 +42,7 @@ bool CodecEncoder::initMediaCodec() {
     AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME,   mime.c_str());
     AMediaFormat_setInt32( format, AMEDIAFORMAT_KEY_WIDTH,  mWidth);
     AMediaFormat_setInt32( format, AMEDIAFORMAT_KEY_HEIGHT, mHeight);
-    // 这些参数以后可以扩展到上层设置
+    // 这些参数以后可以扩展到上层MetaData设置
     int32_t iFrameInterval = 5; // I帧间隔(单位秒)
     int32_t frameRate = 15; // 帧率
     int32_t bitRate = 8*1*1024*25; //码率bit per second(25Kb)
@@ -84,7 +82,6 @@ bool CodecEncoder::initMediaCodec() {
     return true;
 #endif
 }
-
 void CodecEncoder::releaseMediaCodec() {
     stopEncode();
     try{
@@ -102,6 +99,9 @@ void CodecEncoder::releaseMediaCodec() {
 }
 
 bool CodecEncoder::initEglWindow() {
+    if( isPrepareWindow ){
+        return isPrepareWindow;
+    }
     if (mWindowRef == NULL) {
         LOGW("SurfaceWindow is null, Call initMediaCodec before initEglWindow. ");
         return false;
@@ -132,6 +132,29 @@ void CodecEncoder::releaseEglWindow() {
     }
     isPrepareWindow = false;
 }
+
+
+void CodecEncoder::renderCreated(int width, int height) {
+
+}
+void CodecEncoder::renderChanged(int width, int height) {
+
+}
+void CodecEncoder::renderOnDraw() {
+
+}
+void CodecEncoder::renderDestroyed() {
+
+}
+
+void CodecEncoder::setFilter(int filter_type_id) {
+
+}
+void CodecEncoder::adjustFilterValue(int value, int max) {
+
+}
+
+
 
 void CodecEncoder::startEncode() {
     if( encoder_thread_t == 0) {

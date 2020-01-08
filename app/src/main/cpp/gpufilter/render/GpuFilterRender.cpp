@@ -10,8 +10,7 @@
 #include "../filter/GpuColorInvertFilter.hpp"
 #include "../filter/GpuPixelationFilter.hpp"
 
-GpuFilterRender::GpuFilterRender()
-{
+GpuFilterRender::GpuFilterRender() {
     pthread_mutex_init(&mutex, NULL);
     mEglCore = NULL;
     mWindowSurface = NULL;
@@ -24,13 +23,11 @@ GpuFilterRender::GpuFilterRender()
     uTextureId = -1;
     vTextureId = -1;
     mFilter = NULL;
-    mFilterTypeId = 0;
+    mCurrentTypeId = 0;
     mRequestTypeId = 0;
     mFilterEffectPercent = 0.0f;
 }
-
-GpuFilterRender::~GpuFilterRender()
-{
+GpuFilterRender::~GpuFilterRender() {
     pthread_mutex_destroy(&mutex);
     delete mEglCore;
     mEglCore = NULL;
@@ -61,18 +58,20 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
         mFilter->destroy();
     }
     mFilter->init();
-    mRequestTypeId = mFilterTypeId = mFilter->getTypeId();
+    mRequestTypeId = mCurrentTypeId = mFilter->getTypeId();
     mWindowSurface->swapBuffers();
+
+    mEncoder.renderCreated();
 }
 
 void GpuFilterRender::surfaceChanged(int width, int height)
 {
-    this->mViewHeight = height;
     this->mViewWidth = width;
+    this->mViewHeight = height;
     mWindowSurface->makeCurrent();
     mFilter->onOutputSizeChanged(width, height);
     mWindowSurface->swapBuffers();
-
+    mEncoder.renderChanged(width, height);
 }
 
 void GpuFilterRender::surfaceDestroyed()
@@ -87,6 +86,7 @@ void GpuFilterRender::surfaceDestroyed()
         delete mEglCore;
         mEglCore = NULL;
     }
+    mEncoder.renderDestroyed();
 }
 
 void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth, int previewHeight)
@@ -253,7 +253,7 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
 void GpuFilterRender::setFilter(int filter_type_id) {
     mRequestTypeId = filter_type_id;
     // 在checkFilterChange方法更新mFilterTypeId
-    if(mFilterTypeId!=mRequestTypeId) {
+    if(mCurrentTypeId!=mRequestTypeId) {
         // mFilter->destroy(); 非GL线程，不执行GL语句
         delete mFilter;
         mFilter = NULL;
@@ -276,17 +276,19 @@ void GpuFilterRender::setFilter(int filter_type_id) {
                 break;
         }
     }
+    mEncoder.setFilter(filter_type_id);
 }
 void GpuFilterRender::adjustFilterValue(int value, int max) {
     mFilterEffectPercent = (float)value / (float)max;
     //LOGD("GpuFilterRender adjust %f", mFilterEffectPercent);
+    mEncoder.adjustFilterValue(value, max);
 }
 void GpuFilterRender::checkFilterChange() {
-    if(mFilterTypeId!=mRequestTypeId) {
+    if(mCurrentTypeId!=mRequestTypeId) {
         if( mFilter!=NULL) {
             mFilter->init();
             mFilter->onOutputSizeChanged(mViewWidth, mViewHeight);
-            mFilterTypeId = mRequestTypeId;
+            mCurrentTypeId = mRequestTypeId;
         }
     }
 }

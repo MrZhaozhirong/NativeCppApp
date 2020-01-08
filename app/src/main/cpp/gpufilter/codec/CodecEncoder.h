@@ -20,15 +20,29 @@ class CodecEncoder {
 public:
     CodecEncoder();
     ~CodecEncoder();
-
+    // Encoder core
+    void            setMetaConfig(int mimeType);
     bool            initEglWindow();
     void            releaseEglWindow();
     bool            initMediaCodec();
     void            releaseMediaCodec();
     void            startEncode();
     void            stopEncode();
+    // Encoder logic
+    void            renderCreated(int width, int height);
+    void            renderChanged(int width, int height);
+    void            renderOnDraw();
+    void            renderDestroyed() ;
+    void            setFilter(int filter_type_id);
+    void            adjustFilterValue(int value, int max);
+public:
+    EglCore*        mEglCore;
+    WindowSurface*  mWindowSurface;
 
-    void            setMetaData(int width, int height, int mimeType);
+private:
+    pthread_t       encoder_thread_t;
+    bool            requestStopEncoder;
+    pthread_mutex_t mutex;
     //encoder thread
     static void*    onEncoderThreadStub(void *p)
     {
@@ -37,19 +51,12 @@ public:
     }
     void            onEncoderThreadProc();
 
-public:
-    EglCore*        mEglCore;
-    WindowSurface*  mWindowSurface;
 
-private:
-    pthread_t       encoder_thread_t;
-    bool            requestStopEncoder;
-    //BufferPool      pool;
-    pthread_mutex_t mutex;
+
 
     int             mWidth;
     int             mHeight;
-    int             mimeType;
+    int             mimeType; // 默认H264
     AMediaCodec*    mCodecRef;
     ANativeWindow*  mWindowRef;
     bool            isPrepareWindow = false;
