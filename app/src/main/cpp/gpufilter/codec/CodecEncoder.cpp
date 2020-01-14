@@ -5,6 +5,9 @@
 #include <string>
 #include "CodecEncoder.h"
 #include "../../common/zzr_common.h"
+#include "../filter/GpuContrastFilter.hpp"
+#include "../filter/GpuColorInvertFilter.hpp"
+#include "../filter/GpuPixelationFilter.hpp"
 #include <media/NdkMediaCodec.h>
 
 CodecEncoder::CodecEncoder() {
@@ -13,12 +16,20 @@ CodecEncoder::CodecEncoder() {
     mCodecRef = NULL;
     mWindowSurface = NULL;
     mEglCore = NULL;
+    mFilter = NULL;
     mimeType = MIME_TYPE_H264;
+    mCurrentTypeId = 0;
+    mRequestTypeId = 0;
+    mFilterEffectPercent = 0.0f;
+    //初始化互斥锁与条件变量
+    pthread_mutex_init(&mutex, NULL);
 }
 
 CodecEncoder::~CodecEncoder() {
     releaseEglWindow();
     releaseMediaCodec();
+    delete mFilter; mFilter = NULL;
+    pthread_mutex_destroy(&mutex);
 }
 
 void CodecEncoder::setMetaConfig(int mimeType) {
@@ -57,6 +68,7 @@ bool CodecEncoder::initMediaCodec() {
     //AMediaFormat_setBuffer(videoFormat, "csd-1", pps, ppsSize); // h264填入pps
     //AMediaFormat_setBuffer(videoFormat, "csd-0", vps+sps+pps, total_size); // h265填入vps+sps+pps
     mCodecRef = AMediaCodec_createEncoderByType(mime.c_str());
+    LOGI("AMediaCodec_configure format : %s", AMediaFormat_toString(format));
     media_status_t rc = AMediaCodec_configure(mCodecRef, format, NULL, NULL, AMEDIACODEC_CONFIGURE_FLAG_ENCODE);
     AMediaFormat_delete(format);
     LOGW("CodecEncoder AMediaCodec_configure %d ", rc);
@@ -109,17 +121,13 @@ bool CodecEncoder::initEglWindow() {
     if (mEglCore == NULL)
         mEglCore = new EglCore(NULL, FLAG_TRY_GLES2);
     if (mWindowSurface == NULL)
-        mWindowSurface = new WindowSurface(mEglCore, mWindowRef, true);
+        mWindowSurface = new WindowSurface(mEglCore, mWindowRef, false);
 
     assert(mWindowSurface != NULL && mEglCore != NULL);
     isPrepareWindow = true;
     return true;
 }
 void CodecEncoder::releaseEglWindow() {
-    if( mWindowRef) {
-        ANativeWindow_release(mWindowRef);
-        mWindowRef = NULL;
-    }
     if (mWindowSurface) {
         mWindowSurface->release();
         delete mWindowSurface;
@@ -135,31 +143,83 @@ void CodecEncoder::releaseEglWindow() {
 
 
 void CodecEncoder::renderCreated(int width, int height) {
-
+    this->mWidth = width;
+    this->mHeight = height;
+    initMediaCodec();
+    initEglWindow();
+    mWindowSurface->makeCurrent();
+    if( mFilter==NULL) {
+        mFilter = new GpuBaseFilter();
+    } else {
+        mFilter->destroy();
+    }
+    mFilter->init();
+    mRequestTypeId = mCurrentTypeId = mFilter->getTypeId();
+    mWindowSurface->swapBuffers();
+    startEncode();
 }
 void CodecEncoder::renderChanged(int width, int height) {
-
-}
-void CodecEncoder::renderOnDraw() {
-
+    this->mWidth = width;
+    this->mHeight = height;
 }
 void CodecEncoder::renderDestroyed() {
-
+    releaseMediaCodec();
+    releaseEglWindow();
+}
+void CodecEncoder::renderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint mVSamplerId,
+                                float* positionCords, float* textureCords) {
+    mWindowSurface->makeCurrent();
+    if(mCurrentTypeId!=mRequestTypeId) {
+        // 更新filter
+        if( mFilter!=NULL) {
+            mFilter->init();
+            mFilter->onOutputSizeChanged(mWidth, mHeight);
+            mCurrentTypeId = mRequestTypeId;
+        }
+    }
+    if( mFilter!=NULL) {
+        mFilter->setAdjustEffect(mFilterEffectPercent);
+        mFilter->onDraw(mYSamplerId, mUSamplerId, mVSamplerId, positionCords, textureCords);
+    }
+    //mWindowSurface->setPresentationTime();
+    mWindowSurface->swapBuffers();
 }
 
-void CodecEncoder::setFilter(int filter_type_id) {
 
-}
+
 void CodecEncoder::adjustFilterValue(int value, int max) {
-
+    mFilterEffectPercent = (float)value / (float)max;
 }
-
+void CodecEncoder::setFilter(int filter_type_id) {
+    mRequestTypeId = filter_type_id;
+    if(mCurrentTypeId!=mRequestTypeId) {
+        // mFilter->destroy(); 非GL线程，不执行GL语句
+        delete mFilter;
+        mFilter = NULL;
+        switch (mRequestTypeId)
+        {
+            case FILTER_TYPE_NORMAL: {
+                mFilter = new GpuBaseFilter();
+            }break;
+            case FILTER_TYPE_CONTRAST:{
+                mFilter = new GpuContrastFilter();
+            }break;
+            case FILTER_TYPE_COLOR_INVERT:{
+                mFilter = new GpuColorInvertFilter();
+            }break;
+            case FILTER_TYPE_PIXELATION:{
+                mFilter = new GpuPixelationFilter();
+            }break;
+            default:
+                mFilter = new GpuBaseFilter();
+                break;
+        }
+    }
+}
 
 
 void CodecEncoder::startEncode() {
     if( encoder_thread_t == 0) {
-        //初始化互斥锁与条件变量
-        pthread_mutex_init(&mutex, NULL);
         requestStopEncoder = false;
         pthread_create(&encoder_thread_t, NULL, onEncoderThreadStub, this);
     }
@@ -168,7 +228,6 @@ void CodecEncoder::stopEncode() {
     if( encoder_thread_t!= 0) {
         requestStopEncoder = true; // 请求退出解码线程
         //pthread_join(decoder_thread_t, NULL);
-        pthread_mutex_destroy(&mutex);
         encoder_thread_t = 0;
     }
 }
@@ -178,7 +237,7 @@ void CodecEncoder::onEncoderThreadProc() {
     bool finish = false;
     bool doRender = false;
 
-    long buff_idx;
+    int buff_idx;
     while ( !finish ){
         if( mCodecRef==NULL) {
             finish = true;
@@ -186,16 +245,15 @@ void CodecEncoder::onEncoderThreadProc() {
         }
         try {
             if( requestStopEncoder ){
-                if(isDebug) LOGI("Stop requested, send BUFFER_FLAG_END_OF_STREAM to AMediaCodec Encoder");
-                buff_idx = AMediaCodec_dequeueInputBuffer(mCodecRef, TIMEOUT_USEC);
-                if (buff_idx >= 0) {
-                    AMediaCodec_queueInputBuffer(mCodecRef, buff_idx, 0, 0, 0L,
-                                                 AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
-                }
-            } else {
-                // 等待输入 filter.draw到AMediaCodec->createInputSurface的mWindowRef
+                media_status_t rc = AMediaCodec_signalEndOfInputStream(mCodecRef);
+                if(isDebug) LOGI("Stop requested, send BUFFER_FLAG_END_OF_STREAM to AMediaCodec Encoder %d.", rc);
+                //buff_idx = AMediaCodec_dequeueInputBuffer(mCodecRef, TIMEOUT_USEC);
+                //### Error:dequeueInputBuffer can't be used with input surface
+                //if (buff_idx >= 0) {
+                //    AMediaCodec_queueInputBuffer(mCodecRef, buff_idx, 0, 0, 0L,
+                //                                 AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
+                //}
             }
-
             // 从编码output队列 获取解码结果 清空解码状态
             AMediaCodecBufferInfo info;
             auto status = AMediaCodec_dequeueOutputBuffer(mCodecRef, &info, TIMEOUT_USEC);

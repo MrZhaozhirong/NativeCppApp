@@ -8,10 +8,12 @@
 
 #include <cstdlib>
 #include <android/native_window.h>
+#include <GLES3/gl3.h>
 #include "media/NdkMediaCodec.h"
 #include "../../common/constructormagic.h"
 #include "../../egl/EglCore.h"
 #include "../../egl/WindowSurface.h"
+#include "../filter/GpuBaseFilter.hpp"
 
 #define MIME_TYPE_H264 0x1201
 #define MIME_TYPE_H265 0x1202
@@ -31,13 +33,18 @@ public:
     // Encoder logic
     void            renderCreated(int width, int height);
     void            renderChanged(int width, int height);
-    void            renderOnDraw();
+    void            renderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint mVSamplerId,
+                                 float* positionCords, float* textureCords);
     void            renderDestroyed() ;
     void            setFilter(int filter_type_id);
     void            adjustFilterValue(int value, int max);
-public:
+private:
     EglCore*        mEglCore;
     WindowSurface*  mWindowSurface;
+    GpuBaseFilter*  mFilter;
+    int             mRequestTypeId;
+    int             mCurrentTypeId;
+    float           mFilterEffectPercent;
 
 private:
     pthread_t       encoder_thread_t;
@@ -50,8 +57,6 @@ private:
         return NULL;
     }
     void            onEncoderThreadProc();
-
-
 
 
     int             mWidth;

@@ -61,7 +61,10 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     mRequestTypeId = mCurrentTypeId = mFilter->getTypeId();
     mWindowSurface->swapBuffers();
 
-    mEncoder.renderCreated();
+    int32_t windowWidth = ANativeWindow_getWidth(window);
+    int32_t windowHeight = ANativeWindow_getHeight(window);
+    // 和surfaceChanged传入的width和height是一样的，但是这里就可以提前激活AMediaCodec
+    mEncoder.renderCreated(windowWidth, windowHeight);
 }
 
 void GpuFilterRender::surfaceChanged(int width, int height)
@@ -252,7 +255,7 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
 
 void GpuFilterRender::setFilter(int filter_type_id) {
     mRequestTypeId = filter_type_id;
-    // 在checkFilterChange方法更新mFilterTypeId
+    // 在 checkFilterChange 方法更新mFilterTypeId
     if(mCurrentTypeId!=mRequestTypeId) {
         // mFilter->destroy(); 非GL线程，不执行GL语句
         delete mFilter;
@@ -333,6 +336,7 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         }
         mWindowSurface->swapBuffers();
         // 视频录制
+        mEncoder.renderOnDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
     }
 }
 GLuint GpuFilterRender::updateTexture(int8_t *src, int texId, int width, int height)
