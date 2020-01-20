@@ -95,7 +95,6 @@ bool CodecEncoder::initMediaCodec() {
 #endif
 }
 void CodecEncoder::releaseMediaCodec() {
-    stopEncode();
     try{
         if( mCodecRef ) {
             AMediaCodec_flush(mCodecRef);
@@ -163,8 +162,9 @@ void CodecEncoder::renderChanged(int width, int height) {
     this->mHeight = height;
 }
 void CodecEncoder::renderDestroyed() {
-    releaseMediaCodec();
-    releaseEglWindow();
+    //releaseMediaCodec();
+    //releaseEglWindow();
+    stopEncode();
 }
 void CodecEncoder::renderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint mVSamplerId,
                                 float* positionCords, float* textureCords) {
@@ -258,7 +258,7 @@ void CodecEncoder::onEncoderThreadProc() {
             AMediaCodecBufferInfo info;
             auto status = AMediaCodec_dequeueOutputBuffer(mCodecRef, &info, TIMEOUT_USEC);
             if (status == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-                //if (isDebug) LOGI("no output available yet");
+                if (isDebug) LOGI("no output available yet");
             } else if (status == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
                 // not important for us, since we're using Surface
                 if (isDebug) LOGI("encoder output buffers changed");
@@ -277,7 +277,7 @@ void CodecEncoder::onEncoderThreadProc() {
                 uint8_t* outputBuf = AMediaCodec_getOutputBuffer(mCodecRef, status, &BufferSize);
                 if (outputBuf != nullptr) {
                     //int64_t pts32_us = info.presentationTimeUs;
-                    LOGD("AMediaCodec_getOutputBuffer size : %d", info.size);
+                    if (isDebug) LOGD("AMediaCodec_getOutputBuffer size : %d", info.size);
                     //## memcpy(dst, outputBuf, outsize);
                     //AMediaCodec_releaseOutputBuffer(mCodecRef, status, info.size != 0);
                     AMediaCodec_releaseOutputBuffer(mCodecRef, status, doRender);
