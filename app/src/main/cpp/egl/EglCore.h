@@ -7,6 +7,8 @@
 
 #include <EGL/egl.h>
 #include "../common/constructormagic.h"
+#define EGL_EGLEXT_PROTOTYPES
+#include <EGL/eglext.h>
 
 #define FLAG_RECORDABLE 0x01
 #define FLAG_TRY_GLES2 0x02
@@ -59,12 +61,12 @@ public:
     // Note the EGLSurface won't actually be destroyed if it's still current in a context.
     void releaseSurface(EGLSurface eglSurface);
     // 设置pts
-    void setPresentationTime(EGLSurface eglSurface, long nsecs);
+    void setPresentationTime(EGLSurface eglSurface, EGLnsecsANDROID nsecs);
 
 
     static void logCurrentEglState();
     // 动态 设置pts方法
-    EGL_PRESENTATION_TIME_ANDROID_PROC eglPresentationTimeANDROID;
+    EGL_PRESENTATION_TIME_ANDROID_PROC eglPresentationTimeANDROID2;
 private:
     EGLConfig getConfig(int flags, int version);
     void checkEglError(const char *msg);

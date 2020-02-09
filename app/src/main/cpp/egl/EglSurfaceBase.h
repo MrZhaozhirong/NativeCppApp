@@ -34,7 +34,7 @@ public:
     // Calls eglSwapBuffers.  Use this to "publish" the current frame.
     bool swapBuffers();
     // Sends the presentation time stamp to EGL.
-    void setPresentationTime(long nsecs);
+    void setPresentationTime(EGLnsecsANDROID nsecs);
     // 原java版本是直接写文件，void saveFrame(File file)，
     // 然后经过思考glReadPixels是耗时操作，还是直接返回数据好了
     char * getFrame();

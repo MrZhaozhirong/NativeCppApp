@@ -113,7 +113,7 @@ bool EglSurfaceBase::swapBuffers() {
  * 设置当前时间戳
  * @param nsecs
  */
-void EglSurfaceBase::setPresentationTime(long nsecs) {
+void EglSurfaceBase::setPresentationTime(EGLnsecsANDROID nsecs) {
     mEglCore->setPresentationTime(mEglSurface, nsecs);
 }
 

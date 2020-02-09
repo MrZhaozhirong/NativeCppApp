@@ -24,7 +24,7 @@ EglCore::EglCore() {
     mEglDisplay = EGL_NO_DISPLAY;
     mEglContext = EGL_NO_CONTEXT;
     mEglConfig = NULL;
-    eglPresentationTimeANDROID = NULL;
+    eglPresentationTimeANDROID2 = NULL;
     mEglVersion = -1;
     initEgl(NULL, 0);
 }
@@ -105,10 +105,10 @@ int EglCore::initEgl(EGLContext sharedContext, int flags)
     }
 
     // 动态获取eglPresentationTimeANDROID方法的地址
-    eglPresentationTimeANDROID = (EGL_PRESENTATION_TIME_ANDROID_PROC)
+    eglPresentationTimeANDROID2 = (EGL_PRESENTATION_TIME_ANDROID_PROC)
             eglGetProcAddress("eglPresentationTimeANDROID");
-    if (!eglPresentationTimeANDROID) {
-        LOGE("eglPresentationTimeANDROID is not available!");
+    if (!eglPresentationTimeANDROID2) {
+        LOGE("eglPresentationTimeANDROID2 is not available!");
     }
     return 0;
 }
@@ -249,11 +249,17 @@ void EglCore::releaseSurface(EGLSurface eglSurface) {
 }
 
 // 设置显示时间戳 pts
-void EglCore::setPresentationTime(EGLSurface eglSurface, long nsecs) {
-    if(eglPresentationTimeANDROID)
+void EglCore::setPresentationTime(EGLSurface eglSurface, EGLnsecsANDROID nsecs) {
+    try{
         eglPresentationTimeANDROID(mEglDisplay, eglSurface, nsecs);
-    else
-        LOGE("eglPresentationTimeANDROID is not available!");
+        checkEglError("eglPresentationTimeANDROID");
+    }catch (char *str){
+        LOGE("native eglPresentationTimeANDROID err : %s", str);
+        if(eglPresentationTimeANDROID2)
+            eglPresentationTimeANDROID2(mEglDisplay, eglSurface, nsecs);
+        else
+            LOGE("eglPresentationTimeANDROID2 is not available!");
+    }
 }
 
 
