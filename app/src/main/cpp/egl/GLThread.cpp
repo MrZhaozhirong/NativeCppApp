@@ -36,6 +36,8 @@ void *glThreadImpl(void *context)
             }
             break;
         }
+        // 1s = 1000ms = 1000000us
+        // 此睡眠时间可以根据实际情况调整。
         usleep(16000);  // 1s/0.016s = 62.5 fps
         //onCreate
         if (glThread->isCreate)
