@@ -1,6 +1,7 @@
 package org.zzrblog.gpufilter;
 
 import android.app.Activity;
+import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -134,12 +135,13 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
         }
     }
 
-    private int mCurrentCameraId = 0;
+    private int mCurrentCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera mCameraInstance;
 
     private void setUpCamera(final int id) {
         mCameraInstance = getCameraInstance(id);
         Camera.Parameters parameters = mCameraInstance.getParameters();
+        parameters.setPreviewFormat(ImageFormat.NV21);
         // NOTE!!! TODO
         // adjust by getting supportedPreviewSizes and then choosing
         // the best one for screen size (best fill screen)

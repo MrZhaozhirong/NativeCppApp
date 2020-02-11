@@ -10,6 +10,8 @@
 #include "../filter/GpuColorInvertFilter.hpp"
 #include "../filter/GpuPixelationFilter.hpp"
 
+int GpuFilterRender::mStaticInputFps = 0;
+
 GpuFilterRender::GpuFilterRender() {
     pthread_mutex_init(&mutex, NULL);
     mEglCore = NULL;
@@ -64,7 +66,15 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     int32_t windowWidth = ANativeWindow_getWidth(window);
     int32_t windowHeight = ANativeWindow_getHeight(window);
     // 和surfaceChanged传入的width和height是一样的，但是这里就可以提前激活AMediaCodec
-    mEncoder.renderCreated(windowWidth, windowHeight);
+    // 推荐使用bitRate = Width*Height*FrameRate * Factor的公式结合产品的使用场景进行设置。
+    int mDesiredFps = 20;
+    int iFrameInterval = 2;
+    int bitRate = static_cast<int>(windowWidth * windowHeight * mDesiredFps * 0.22f);
+    mEncoder.setMetaConfig(MIME_TYPE_H264, windowWidth, windowHeight, iFrameInterval, mDesiredFps, bitRate);
+    mEncoder.encoderCreated();
+
+    mFpsTimer.setTimer(1,0,this);
+    mFpsTimer.startTimer();
 }
 
 void GpuFilterRender::surfaceChanged(int width, int height)
@@ -74,7 +84,8 @@ void GpuFilterRender::surfaceChanged(int width, int height)
     mWindowSurface->makeCurrent();
     mFilter->onOutputSizeChanged(width, height);
     mWindowSurface->swapBuffers();
-    mEncoder.renderChanged(width, height);
+    mEncoder.encoderChanged(width, height);
+    mEncoder.startEncode();
 }
 
 void GpuFilterRender::surfaceDestroyed()
@@ -90,6 +101,8 @@ void GpuFilterRender::surfaceDestroyed()
         mEglCore = NULL;
     }
     mEncoder.renderDestroyed();
+    mEncoder.stopEncode();
+    mFpsTimer.stopTimer();
 }
 
 void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth, int previewHeight)
@@ -103,7 +116,7 @@ void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth
     int y_len = size;   // mWidth*mHeight
     int u_len = size / 4;   // mWidth*mHeight / 4
     int v_len = size / 4;   // mWidth*mHeight / 4
-    // nv21数据中 y占1个width*mHeight，uv各占1/4个width*mHeight 共 3/2个width*mHeight
+    // nv21数据中 y占1个width*height，uv各占1/4个width*height 共 3/2个width*height
     if(data_len < y_len+u_len+v_len)
         return;
 
@@ -114,7 +127,7 @@ void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth
     p->param3 = v_len;
     p->wrap(data, data_len);
     mNV21Pool.put(p);
-
+    mCurrentInputFps++;
     // nv21->i420的数据容器，用于renderOnDraw的渲染
     if( i420BufferY== NULL)
     {
@@ -179,7 +192,6 @@ void GpuFilterRender::adjustFrameScaling()
     //    positionCords[6] = positionCords[6] / ratioHeight;
     //    positionCords[7] = positionCords[7] / ratioWidth;
     //}
-
 }
 void GpuFilterRender::generateFramePositionCords()
 {
@@ -256,10 +268,44 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
 void GpuFilterRender::setFilter(int filter_type_id) {
     mRequestTypeId = filter_type_id;
     // 在 checkFilterChange 方法更新mFilterTypeId
+    // if(mCurrentTypeId!=mRequestTypeId) {
+    //     /*mFilter->destroy(); 非GL线程，不执行GL语句，所以此部分代码移至checkFilterChange*/
+    //     delete mFilter;
+    //     mFilter = NULL;
+    //     switch (mRequestTypeId)
+    //     {
+    //         case FILTER_TYPE_NORMAL: {
+    //             mFilter = new GpuBaseFilter();
+    //         }break;
+    //         case FILTER_TYPE_CONTRAST:{
+    //             mFilter = new GpuContrastFilter();
+    //         }break;
+    //         case FILTER_TYPE_COLOR_INVERT:{
+    //             mFilter = new GpuColorInvertFilter();
+    //         }break;
+    //         case FILTER_TYPE_PIXELATION:{
+    //             mFilter = new GpuPixelationFilter();
+    //         }break;
+    //         default:
+    //             mFilter = new GpuBaseFilter();
+    //             break;
+    //     }
+    // }
+    mEncoder.setFilter(filter_type_id);
+}
+void GpuFilterRender::adjustFilterValue(int value, int max) {
+    mFilterEffectPercent = (float)value / (float)max;
+    //LOGD("GpuFilterRender adjust %f", mFilterEffectPercent);
+    mEncoder.adjustFilterValue(value, max);
+}
+void GpuFilterRender::checkFilterChange() {
     if(mCurrentTypeId!=mRequestTypeId) {
-        // mFilter->destroy(); 非GL线程，不执行GL语句
-        delete mFilter;
-        mFilter = NULL;
+        // 更新filter
+        if( mFilter!=NULL) {
+            mFilter->destroy();
+            delete mFilter;
+            mFilter = NULL;
+        }
         switch (mRequestTypeId)
         {
             case FILTER_TYPE_NORMAL: {
@@ -278,16 +324,6 @@ void GpuFilterRender::setFilter(int filter_type_id) {
                 mFilter = new GpuBaseFilter();
                 break;
         }
-    }
-    mEncoder.setFilter(filter_type_id);
-}
-void GpuFilterRender::adjustFilterValue(int value, int max) {
-    mFilterEffectPercent = (float)value / (float)max;
-    //LOGD("GpuFilterRender adjust %f", mFilterEffectPercent);
-    mEncoder.adjustFilterValue(value, max);
-}
-void GpuFilterRender::checkFilterChange() {
-    if(mCurrentTypeId!=mRequestTypeId) {
         if( mFilter!=NULL) {
             mFilter->init();
             mFilter->onOutputSizeChanged(mViewWidth, mViewHeight);
@@ -334,9 +370,18 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
             mFilter->setAdjustEffect(mFilterEffectPercent);
             mFilter->onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
         }
+        // 1s=1,000ms=1,000,000us=1,000,000,000ns
+        static int64_t count = 0;
+        if(mStaticInputFps!=0) {
+            count++;
+            long frame_interval = 1000000000L / mStaticInputFps;
+            //long long pts = system_time_base_ns + frame_interval * count;
+            //LOGI("setPresentationTime %lld", pts);
+            mWindowSurface->setPresentationTime(frame_interval);
+        }
         mWindowSurface->swapBuffers();
         // 视频录制
-        mEncoder.renderOnDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
+        mEncoder.encoderOnDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
     }
 }
 GLuint GpuFilterRender::updateTexture(int8_t *src, int texId, int width, int height)

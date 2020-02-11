@@ -15,15 +15,18 @@
 #include "../../egl/WindowSurface.h"
 #include "../filter/GpuBaseFilter.hpp"
 
+#define MIME_TYPE_NONE 0x1000
 #define MIME_TYPE_H264 0x1201
 #define MIME_TYPE_H265 0x1202
+#define NDK_MEDIACODEC_BUFFER_FLAG_KEY_FRAME 1
 
 class CodecEncoder {
 public:
     CodecEncoder();
     ~CodecEncoder();
     // Encoder core
-    void            setMetaConfig(int mimeType);
+    void            setMetaConfig(int mimeType, int width, int height,
+                                  int iFrameInterval, int frameRate, int bitRate);
     bool            initEglWindow();
     void            releaseEglWindow();
     bool            initMediaCodec();
@@ -31,9 +34,9 @@ public:
     void            startEncode();
     void            stopEncode();
     // Encoder logic
-    void            renderCreated(int width, int height);
-    void            renderChanged(int width, int height);
-    void            renderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint mVSamplerId,
+    void            encoderCreated();
+    void            encoderChanged(int width, int height);
+    void            encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint mVSamplerId,
                                  float* positionCords, float* textureCords);
     void            renderDestroyed() ;
     void            setFilter(int filter_type_id);
@@ -62,13 +65,21 @@ private:
     int             mWidth;
     int             mHeight;
     int             mimeType; // 默认H264
+    int             iFrameInterval; // I帧间隔(单位秒)
+    int             frameRate; // 帧率
+    int             bitRate; //码率bit per second(100Kb)
     AMediaCodec*    mCodecRef;
     ANativeWindow*  mWindowRef;
     bool            isPrepareWindow = false;
     bool            isPrepareCodec = false;
+
+    uint8_t*        pps_sps_header;
+    int             header_size;
+    void            saveConfigPPSandSPS(uint8_t* data, int32_t data_size);
 private:
     DISALLOW_EVIL_CONSTRUCTORS(CodecEncoder);
     bool            isDebug = true;
+    void            debugWriteOutputFile(uint8_t* data, int32_t data_size, bool bNeedPack_PPS_SPS);
 };
 
 

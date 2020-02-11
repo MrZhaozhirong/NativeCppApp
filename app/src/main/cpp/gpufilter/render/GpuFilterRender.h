@@ -10,6 +10,7 @@
 #include "../../egl/GLRender.hpp"
 #include "../../egl/EglCore.h"
 #include "../../egl/WindowSurface.h"
+#include "../../common/CELLTimer.h"
 #include "../components/NV21BufferPool.hpp"
 #include "../filter/GpuBaseFilter.hpp"
 #include "../filter/GpuContrastFilter.hpp"
@@ -20,7 +21,9 @@
 #define ROTATION_180    180
 #define ROTATION_270    270
 
-class GpuFilterRender : public GLRender{
+class GpuFilterRender : public GLRender,
+                        public CELL::CELLTimerHandler
+{
 public:
     GpuFilterRender();
     ~GpuFilterRender();
@@ -67,6 +70,17 @@ private:
     int             mRotation; // 0,90,180,270
 
     CodecEncoder    mEncoder;
+
+    CELL::CELLTimer mFpsTimer;
+    int             mCurrentInputFps;
+    int static      mStaticInputFps;
+    // CELLTimer定时器Callback，动态计算输入的NV21帧率
+    virtual void handlerCallback()
+    {
+        mStaticInputFps = mCurrentInputFps;
+        LOGI("mCurrentInputFps : %d",mCurrentInputFps);
+        mCurrentInputFps = 0;
+    }
 private:
     DISALLOW_EVIL_CONSTRUCTORS(GpuFilterRender);
 
