@@ -202,7 +202,7 @@ void GpuFilterRender::generateFramePositionCords()
             -1.0f, 1.0f,    //左上
             1.0f, 1.0f,     //右上
     };
-    memset(positionCords, 0, sizeof(positionCords));
+    memset(positionCords, 0, sizeof(*positionCords));
     memcpy(positionCords, cube, sizeof(cube));
 }
 void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizontal, bool flipVertical)
@@ -260,7 +260,7 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
         tempTex[5] = flip(tempTex[5]);
         tempTex[7] = flip(tempTex[7]);
     }
-    memset(textureCords, 0, sizeof(textureCords));
+    memset(textureCords, 0, sizeof(*textureCords));
     memcpy(textureCords, tempTex, sizeof(tempTex));
 }
 

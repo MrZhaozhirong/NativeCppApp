@@ -80,6 +80,7 @@ private:
     DISALLOW_EVIL_CONSTRUCTORS(CodecEncoder);
     bool            isDebug = true;
     void            debugWriteOutputFile(uint8_t* data, int32_t data_size, bool bNeedPack_PPS_SPS);
+    media_status_t  MY_AMediaCodec_createInputSurface(AMediaCodec *mData, ANativeWindow **surface);
 };
 
 

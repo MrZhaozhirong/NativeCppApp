@@ -15,7 +15,7 @@
 #define FLAG_TRY_GLES3 0x04
 
 // 参考android-26/android/opengl/EGLxt.java中的定义
-#define EGL_OPENGL_ES3_BIT_KHR 0x0040
+//#define EGL_OPENGL_ES3_BIT_KHR 0x0040 //#include <EGL/eglext.h>
 #define EGL_RECORDABLE_ANDROID 0x3142
 // 参考android-26/android/opengl/EGLxt.java中的定义
 // egl.h没有 eglPresentationTimeANDROID 的接口，

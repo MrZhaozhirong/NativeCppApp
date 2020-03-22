@@ -11,6 +11,8 @@ aux_source_directory(./src/main/cpp/program  PROGRAM_SRC )
 aux_source_directory(./src/main/cpp/utils    UTILS_SRC )
 aux_source_directory(./src/main/cpp/nativegl PROJECT_SRC )
 
+
+
 # 为log_common.h 指定平台
 IF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
     ADD_DEFINITIONS(-DWindows)
@@ -61,6 +63,13 @@ aux_source_directory(./src/main/cpp/gpufilter/components GPU_FILTER_COM_SRC )
 aux_source_directory(./src/main/cpp/gpufilter/render GPU_FILTER_RENDER_SRC )
 aux_source_directory(./src/main/cpp/gpufilter/codec GPU_FILTER_CODEC_SRC )
 
+include_directories(G:/android-sys-src/android-8.1.0_r8/av/media/libstagefright/include)
+#缺<utils/Errors.h>
+include_directories(G:/android-sys-src/android-8.1.0_r8/native/libs/gui/include)
+include_directories(G:/android-sys-src/android-8.1.0_r8/native/libs/ui/include)
+#缺<android-base/unique_fd.h>
+
+
 add_library(
         gpu-filter
         SHARED
@@ -75,6 +84,7 @@ add_library(
 target_link_libraries(
         gpu-filter
         EGL GLESv2 GLESv3
+        #GUI UI UTILS
         android mediandk OpenMAXAL
         log)
 

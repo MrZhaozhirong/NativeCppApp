@@ -11,6 +11,9 @@
 #include <media/NdkMediaCodec.h>
 #include <sys/stat.h>
 
+//#include "media/stagefright/MediaCodec.h"
+//#include "gui/Surface.h"
+
 CodecEncoder::CodecEncoder() {
     encoder_thread_t = 0;
     mWindowRef = NULL;
@@ -47,6 +50,17 @@ void CodecEncoder::setMetaConfig(int mimeType, int width, int height,
     this->frameRate = frameRate;
     this->bitRate = bitRate;
 }
+//media_status_t CodecEncoder::MY_AMediaCodec_createInputSurface(AMediaCodec *mData, ANativeWindow **surface) {
+//    if (surface == NULL || mData == NULL) {
+//        return AMEDIA_ERROR_INVALID_PARAMETER;
+//    }
+//    *surface = NULL;
+//    sp<IGraphicBufferProducer> igbp = NULL;
+//    status_t err = mData->mCodec->createInputSurface(&igbp);
+//    *surface = new Surface(igbp);
+//    ANativeWindow_acquire(*surface);
+//    return AMEDIA_OK;
+//}
 
 bool CodecEncoder::initMediaCodec() {
     if( isPrepareCodec ){
@@ -99,6 +113,10 @@ bool CodecEncoder::initMediaCodec() {
 #if __ANDROID_API__ >= 26
     // after {@link #configure} and before {@link #start}.
     media_status_t ret = AMediaCodec_createInputSurface(mCodecRef, &mWindowRef);
+#else
+    // native source create input surface
+    media_status_t ret = MY_AMediaCodec_createInputSurface(mCodecRef, &mWindowRef);
+#endif
     if(AMEDIA_OK == ret) {
         ret = AMediaCodec_start(mCodecRef);
         LOGI("CodecEncoder AMediaCodec_start %d ",ret);
@@ -110,12 +128,6 @@ bool CodecEncoder::initMediaCodec() {
         isPrepareCodec = false;
         return false;
     }
-#else
-    //TUDO native source create input surface
-    AMediaCodec_start(mCodecRef);
-    isPrepareCodec = true;
-    return true;
-#endif
 }
 void CodecEncoder::releaseMediaCodec() {
     try{
