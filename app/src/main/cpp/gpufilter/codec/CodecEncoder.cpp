@@ -114,7 +114,7 @@ bool CodecEncoder::initMediaCodec() {
     // after {@link #configure} and before {@link #start}.
     media_status_t ret = AMediaCodec_createInputSurface(mCodecRef, &mWindowRef);
 #else
-    // native source create input surface
+    // 参照源码，自编写AMediaCodec_createInputSurface
     media_status_t ret = MY_AMediaCodec_createInputSurface(mCodecRef, &mWindowRef);
 #endif
     if(AMEDIA_OK == ret) {
