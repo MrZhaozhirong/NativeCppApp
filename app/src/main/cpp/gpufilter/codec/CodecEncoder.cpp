@@ -85,11 +85,11 @@ bool CodecEncoder::initMediaCodec() {
     //int32_t iFrameInterval = 3; // I帧间隔(单位秒)
     //int32_t frameRate = 15; // 帧率
     //int32_t bitRate = 8*1*1024*100; //码率bit per second(100Kb)
-    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_BIT_RATE, bitRate);
-    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_FRAME_RATE, frameRate);
-    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_I_FRAME_INTERVAL, iFrameInterval);
+    AMediaFormat_setInt32( format, AMEDIAFORMAT_KEY_BIT_RATE, bitRate);
+    AMediaFormat_setInt32( format, AMEDIAFORMAT_KEY_FRAME_RATE, frameRate);
+    AMediaFormat_setInt32( format, AMEDIAFORMAT_KEY_I_FRAME_INTERVAL, iFrameInterval);
     // public static final int COLOR_FormatSurface = 0x7F000789;
-    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_COLOR_FORMAT, 0x7F000789);
+    AMediaFormat_setInt32( format, AMEDIAFORMAT_KEY_COLOR_FORMAT, 0x7F000789);
 #if __ANDROID_API__ >= 28
     // //Constant quality mode 忽略用户设置的码率，由编码器自己控制码率，并尽可能保证画面清晰度和码率的均衡
     // public static final int BITRATE_MODE_CQ = 0;
@@ -198,7 +198,7 @@ void CodecEncoder::encoderChanged(int width, int height) {
     this->mWidth = width;
     this->mHeight = height;
 }
-void CodecEncoder::renderDestroyed() {
+void CodecEncoder::encoderDestroyed() {
     // releaseMediaCodec();
     // releaseEglWindow();
     //在编码线程退出后调用。

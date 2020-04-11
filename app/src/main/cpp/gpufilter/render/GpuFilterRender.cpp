@@ -100,7 +100,7 @@ void GpuFilterRender::surfaceDestroyed()
         delete mEglCore;
         mEglCore = NULL;
     }
-    mEncoder.renderDestroyed();
+    mEncoder.encoderDestroyed();
     mEncoder.stopEncode();
     mFpsTimer.stopTimer();
 }

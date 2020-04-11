@@ -38,7 +38,7 @@ public:
     void            encoderChanged(int width, int height);
     void            encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint mVSamplerId,
                                  float* positionCords, float* textureCords);
-    void            renderDestroyed() ;
+    void            encoderDestroyed() ;
     void            setFilter(int filter_type_id);
     void            adjustFilterValue(int value, int max);
 private:
