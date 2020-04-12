@@ -325,7 +325,7 @@ void CodecEncoder::onEncoderThreadProc() {
                     if (isDebug) LOGI("capture Video BUFFER_FLAG_CODEC_CONFIG.");
                     saveConfigPPSandSPS(outputBuf, info.size);
                     debugWriteOutputFile(outputBuf, info.size, false);
-                } else if (info.flags & NDK_MEDIACODEC_BUFFER_FLAG_KEY_FRAME) {
+                } else if (info.flags & AMEDIACODEC_BUFFER_FLAG_KEY_FRAME) {
                     if (isDebug) LOGI("capture Video BUFFER_FLAG_KEY_FRAME.");
                     debugWriteOutputFile(outputBuf, info.size, false);
                 } else {
