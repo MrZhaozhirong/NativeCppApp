@@ -14,6 +14,7 @@
 #define FILTER_TYPE_COLOR_INVERT    0x1012
 #define FILTER_TYPE_PIXELATION      0x1013
 #define FILTER_TYPE_BRIGHTNESS      0x1014
+#define FILTER_TYPE_HUE             0x1015
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
  */
@@ -147,9 +148,14 @@ public:
         // subclass override
     }
 
-
     bool isInitialized(){ return mIsInitialized;}
+
     GLuint getProgram(){ return mGLProgId;}
+
+    float range(float percentage, float start, float end) {
+        return (end - start) * percentage / 100.0f + start;
+    }
+
 protected:
     std::string NO_FILTER_VERTEX_SHADER;
     std::string NO_FILTER_FRAGMENT_SHADER;

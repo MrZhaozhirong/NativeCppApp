@@ -52,7 +52,8 @@ public:
     }
 
     void setAdjustEffect(float percent) {
-        mContrastValue = percent * 4.0f;
+        mContrastValue = range(percent*100.0f, 0.0f, 4.0f);
+        //mContrastValue = percent * 4.0f;
     }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,

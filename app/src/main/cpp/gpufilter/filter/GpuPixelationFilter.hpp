@@ -60,7 +60,7 @@ public:
 
     void setAdjustEffect(float percent) {
         if(percent==0.0f) percent=0.01f;
-        mPixelValue = percent * 100.0f;
+        mPixelValue = percent * 100.0f * 1.0f;
     }
 
     void onOutputSizeChanged(int width, int height) {

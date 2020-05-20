@@ -7,7 +7,9 @@
 
 
 #include "GpuBaseFilter.hpp"
-
+/**
+ * 调整曝光度
+ */
 class GpuBrightnessFilter : public GpuBaseFilter {
 public:
     int getTypeId() { return FILTER_TYPE_BRIGHTNESS; }
@@ -41,8 +43,8 @@ public:
     }
 
     void setAdjustEffect(float percent) {
-        if(percent==0.0f) percent=0.01f;
         mBrightness = range(percent * 100.0f, -1.0f, 1.0f);
+        //mBrightness = percent * 100.0f * 2.0f;
     }
 
     void init() {
@@ -84,10 +86,6 @@ private:
     std::string BRIGHTNESS_FRAGMENT_SHADER;
     GLint mBrightnessLocation;
     float mBrightness;
-
-    float range(float percentage, float start, float end) {
-        return (end - start) * percentage / 100.0f + start;
-    }
 };
 
 
