@@ -9,6 +9,7 @@
 #include "../../common/ByteBuffer.hpp"
 #include "../filter/GpuColorInvertFilter.hpp"
 #include "../filter/GpuPixelationFilter.hpp"
+#include "../filter/GpuBrightnessFilter.hpp"
 
 int GpuFilterRender::mStaticInputFps = 0;
 
@@ -319,6 +320,9 @@ void GpuFilterRender::checkFilterChange() {
             }break;
             case FILTER_TYPE_PIXELATION:{
                 mFilter = new GpuPixelationFilter();
+            }break;
+            case FILTER_TYPE_BRIGHTNESS:{
+                mFilter = new GpuBrightnessFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

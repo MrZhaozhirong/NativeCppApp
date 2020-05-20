@@ -13,6 +13,7 @@
 #define FILTER_TYPE_CONTRAST        0x1011
 #define FILTER_TYPE_COLOR_INVERT    0x1012
 #define FILTER_TYPE_PIXELATION      0x1013
+#define FILTER_TYPE_BRIGHTNESS      0x1014
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
  */
@@ -54,7 +55,7 @@ public:
                                      void main()\n\
                                      {\n\
                                         gl_FragColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
-                                        //gl_FragColor = texture2D(SamplerY/U/V, textureCoordinate);\n\
+                                        //gl_FragColor = texture2D(SamplerRGB, textureCoordinate);\n\
                                      }";
     }
     virtual ~GpuBaseFilter()
@@ -72,11 +73,11 @@ public:
     void init(const char *vertexShaderSource, const char *fragmentShaderSource) {
         mGLProgId = ShaderHelper::buildProgram(vertexShaderSource, fragmentShaderSource);
         mGLAttribPosition = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "position"));
+        mGLAttribTextureCoordinate = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "inputTextureCoordinate"));
         mGLUniformSampleRGB = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerRGB"));
         mGLUniformSampleY = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerY"));
         mGLUniformSampleU = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerU"));
         mGLUniformSampleV = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerV"));
-        mGLAttribTextureCoordinate = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "inputTextureCoordinate"));
         mIsInitialized = true;
     }
 

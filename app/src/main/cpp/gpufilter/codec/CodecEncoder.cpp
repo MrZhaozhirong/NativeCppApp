@@ -8,6 +8,7 @@
 #include "../filter/GpuContrastFilter.hpp"
 #include "../filter/GpuColorInvertFilter.hpp"
 #include "../filter/GpuPixelationFilter.hpp"
+#include "../filter/GpuBrightnessFilter.hpp"
 #include <media/NdkMediaCodec.h>
 #include <sys/stat.h>
 
@@ -227,6 +228,9 @@ void CodecEncoder::encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint 
             }break;
             case FILTER_TYPE_PIXELATION:{
                 mFilter = new GpuPixelationFilter();
+            }break;
+            case FILTER_TYPE_BRIGHTNESS:{
+                mFilter = new GpuBrightnessFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

@@ -13,6 +13,7 @@ public class FilterType {
     static final int FILTER_TYPE_CONTRAST = 0x1011;
     static final int FILTER_TYPE_COLOR_INVERT = 0x1012;
     static final int FILTER_TYPE_PIXELATION = 0x1013;
+    static final int FILTER_TYPE_BRIGHTNESS = 0x1014;
 
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();
