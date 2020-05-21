@@ -10,6 +10,9 @@
 #include "../filter/GpuColorInvertFilter.hpp"
 #include "../filter/GpuPixelationFilter.hpp"
 #include "../filter/GpuBrightnessFilter.hpp"
+#include "../filter/GpuHueFilter.hpp"
+#include "../filter/GpuExposureFilter.hpp"
+#include "../filter/GpuSaturationFilter.hpp"
 
 int GpuFilterRender::mStaticInputFps = 0;
 
@@ -323,6 +326,15 @@ void GpuFilterRender::checkFilterChange() {
             }break;
             case FILTER_TYPE_BRIGHTNESS:{
                 mFilter = new GpuBrightnessFilter();
+            }break;
+            case FILTER_TYPE_HUE:{
+                mFilter = new GpuHueFilter();
+            }break;
+            case FILTER_TYPE_EXPOSURE:{
+                mFilter = new GpuExposureFilter();
+            }break;
+            case FILTER_TYPE_SATURATION:{
+                mFilter = new GpuSaturationFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

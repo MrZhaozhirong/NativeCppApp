@@ -1,22 +1,15 @@
-//
-// Created by nicky on 2020/5/20.
-//
-
-#ifndef GPU_BRIGHTNESS_FILTER_HPP
-#define GPU_BRIGHTNESS_FILTER_HPP
-
+#ifndef GPU_SATURATION_FILTER_HPP
+#define GPU_SATURATION_FILTER_HPP
 
 #include "GpuBaseFilter.hpp"
-/**
- * 调整亮度度
- */
-class GpuBrightnessFilter : public GpuBaseFilter {
-public:
-    int getTypeId() { return FILTER_TYPE_BRIGHTNESS; }
 
-    GpuBrightnessFilter()
+class GpuSaturationFilter : public GpuBaseFilter {
+public:
+    int getTypeId() { return FILTER_TYPE_SATURATION; }
+
+    GpuSaturationFilter()
     {
-        BRIGHTNESS_FRAGMENT_SHADER="precision mediump float;\n\
+        SATURATION_FRAGMENT_SHADER = "precision mediump float;\n\
                                     varying highp vec2 textureCoordinate;\n\
                                     uniform sampler2D SamplerRGB;\n\
                                     uniform sampler2D SamplerY;\n\
@@ -34,27 +27,27 @@ public:
                                        yuv.z = texture2D(SamplerV, pos).r - 0.5;\n\
                                        return colorConversionMatrix * yuv;\n\
                                     }\n\
-                                    uniform lowp float brightness;\n\
+                                    uniform float saturation;\n\
+                                    const mediump vec3 luminanceWeight = vec3(0.2125, 0.7154, 0.0721);\n\
                                     void main()\n\
                                     {\n\
                                         vec4 textureColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
-                                        gl_FragColor = vec4((textureColor.rgb + vec3(brightness)), textureColor.w);\n\
+                                        lowp float luminance = dot(textureColor.rgb, luminanceWeight);\n\
+                                        lowp vec3 greyScaleColor = vec3(luminance);\n\
+                                        gl_FragColor = vec4(mix(greyScaleColor, textureColor.rgb, saturation), textureColor.w);\n\
                                     }";
-
     }
-    ~GpuBrightnessFilter() {
-        if(!BRIGHTNESS_FRAGMENT_SHADER.empty()) BRIGHTNESS_FRAGMENT_SHADER.clear();
+    ~GpuSaturationFilter() {
+        if(!SATURATION_FRAGMENT_SHADER.empty()) SATURATION_FRAGMENT_SHADER.clear();
     }
 
     void setAdjustEffect(float percent) {
-        mBrightness = range(percent * 100.0f, -1.0f, 1.0f);
-        //mBrightness = percent * 100.0f * 2.0f;
+        mSaturation = range(percent * 100.0f, 0.0f, 2.0f);
     }
-
     void init() {
-        GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), BRIGHTNESS_FRAGMENT_SHADER.c_str());
-        mBrightnessLocation = glGetUniformLocation(mGLProgId, "brightness");
-        mBrightness = 0.0f;
+        GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), SATURATION_FRAGMENT_SHADER.c_str());
+        mSaturationLocation = glGetUniformLocation(mGLProgId, "saturation");
+        mSaturation = 0.0f;
     }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
@@ -64,7 +57,7 @@ public:
             return;
         glUseProgram(mGLProgId);
         // runPendingOnDrawTasks
-        glUniform1f(mBrightnessLocation, mBrightness);
+        glUniform1f(mSaturationLocation, mSaturation);
 
         glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
         glEnableVertexAttribArray(mGLAttribPosition);
@@ -87,10 +80,9 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 private:
-    std::string BRIGHTNESS_FRAGMENT_SHADER;
-    GLint mBrightnessLocation;
-    float mBrightness;
+    std::string SATURATION_FRAGMENT_SHADER;
+    GLint mSaturationLocation;
+    float mSaturation;
 };
 
-
-#endif //GPU_COLOR_INVERT_FILTER_HPP
+#endif // GPU_SATURATION_FILTER_HPP

@@ -2,21 +2,20 @@
 // Created by nicky on 2020/5/20.
 //
 
-#ifndef GPU_BRIGHTNESS_FILTER_HPP
-#define GPU_BRIGHTNESS_FILTER_HPP
-
+#ifndef GPU_EXPOSURE_FILTER_HPP
+#define GPU_EXPOSURE_FILTER_HPP
 
 #include "GpuBaseFilter.hpp"
 /**
- * 调整亮度度
+ * 调整曝光度
  */
-class GpuBrightnessFilter : public GpuBaseFilter {
+class GpuExposureFilter : public GpuBaseFilter {
 public:
-    int getTypeId() { return FILTER_TYPE_BRIGHTNESS; }
+    int getTypeId() { return FILTER_TYPE_EXPOSURE; }
 
-    GpuBrightnessFilter()
+    GpuExposureFilter()
     {
-        BRIGHTNESS_FRAGMENT_SHADER="precision mediump float;\n\
+        EXPOSURE_FRAGMENT_SHADER = "precision mediump float;\n\
                                     varying highp vec2 textureCoordinate;\n\
                                     uniform sampler2D SamplerRGB;\n\
                                     uniform sampler2D SamplerY;\n\
@@ -34,27 +33,26 @@ public:
                                        yuv.z = texture2D(SamplerV, pos).r - 0.5;\n\
                                        return colorConversionMatrix * yuv;\n\
                                     }\n\
-                                    uniform lowp float brightness;\n\
+                                    uniform float exposure;\n\
                                     void main()\n\
                                     {\n\
                                         vec4 textureColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
-                                        gl_FragColor = vec4((textureColor.rgb + vec3(brightness)), textureColor.w);\n\
+                                        gl_FragColor = vec4((textureColor.rgb * pow(2.0, exposure)), textureColor.w);\n\
                                     }";
-
     }
-    ~GpuBrightnessFilter() {
-        if(!BRIGHTNESS_FRAGMENT_SHADER.empty()) BRIGHTNESS_FRAGMENT_SHADER.clear();
+    ~GpuExposureFilter(){
+        if(!EXPOSURE_FRAGMENT_SHADER.empty()) EXPOSURE_FRAGMENT_SHADER.clear();
     }
 
     void setAdjustEffect(float percent) {
-        mBrightness = range(percent * 100.0f, -1.0f, 1.0f);
-        //mBrightness = percent * 100.0f * 2.0f;
+        // (0.0 as the default)
+        mExposure = range(percent * 100.0f, -5.0f, 5.0f);
     }
 
     void init() {
-        GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), BRIGHTNESS_FRAGMENT_SHADER.c_str());
-        mBrightnessLocation = glGetUniformLocation(mGLProgId, "brightness");
-        mBrightness = 0.0f;
+        GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), EXPOSURE_FRAGMENT_SHADER.c_str());
+        mExposureLocation = glGetUniformLocation(mGLProgId, "exposure");
+        mExposure = 0.0f;
     }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
@@ -64,7 +62,7 @@ public:
             return;
         glUseProgram(mGLProgId);
         // runPendingOnDrawTasks
-        glUniform1f(mBrightnessLocation, mBrightness);
+        glUniform1f(mExposureLocation, mExposure);
 
         glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
         glEnableVertexAttribArray(mGLAttribPosition);
@@ -87,10 +85,8 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 private:
-    std::string BRIGHTNESS_FRAGMENT_SHADER;
-    GLint mBrightnessLocation;
-    float mBrightness;
+    std::string EXPOSURE_FRAGMENT_SHADER;
+    GLint mExposureLocation;
+    float mExposure;
 };
-
-
-#endif //GPU_COLOR_INVERT_FILTER_HPP
+#endif // GPU_EXPOSURE_FILTER_HPP

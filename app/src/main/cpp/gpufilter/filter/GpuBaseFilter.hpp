@@ -10,11 +10,14 @@
 // 和 java/org.zzrblog.gpufilter.FilterType对应
 // 而且对应的衍生类的getTypeId也要返回正确的值
 #define FILTER_TYPE_NORMAL          0x1010
-#define FILTER_TYPE_CONTRAST        0x1011
-#define FILTER_TYPE_COLOR_INVERT    0x1012
-#define FILTER_TYPE_PIXELATION      0x1013
+#define FILTER_TYPE_COLOR_INVERT    0x1011
+#define FILTER_TYPE_PIXELATION      0x1012
+#define FILTER_TYPE_CONTRAST        0x1013
 #define FILTER_TYPE_BRIGHTNESS      0x1014
 #define FILTER_TYPE_HUE             0x1015
+#define FILTER_TYPE_EXPOSURE        0x1016
+#define FILTER_TYPE_SATURATION      0x1017
+
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
  */

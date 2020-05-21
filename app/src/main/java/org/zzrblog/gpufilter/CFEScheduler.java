@@ -33,11 +33,14 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
     public String[] getSupportedFiltersName() {
         if( supportFilters ==null ) {
             supportFilters = new FilterType();
-            supportFilters.addFilter("Normal", FilterType.FILTER_TYPE_NORMAL);
-            supportFilters.addFilter("Contrast", FilterType.FILTER_TYPE_CONTRAST);
-            supportFilters.addFilter("Color-Invert", FilterType.FILTER_TYPE_COLOR_INVERT);
-            supportFilters.addFilter("Pixelation", FilterType.FILTER_TYPE_PIXELATION);
-            supportFilters.addFilter("Brightness", FilterType.FILTER_TYPE_BRIGHTNESS);
+            supportFilters.addFilter("Normal(无特效)", FilterType.FILTER_TYPE_NORMAL);
+            supportFilters.addFilter("Color-Invert(黑白取反)", FilterType.FILTER_TYPE_COLOR_INVERT);
+            supportFilters.addFilter("Pixelation(马赛克)", FilterType.FILTER_TYPE_PIXELATION);
+            supportFilters.addFilter("Contrast(对比度)", FilterType.FILTER_TYPE_CONTRAST);
+            supportFilters.addFilter("Brightness(亮度)", FilterType.FILTER_TYPE_BRIGHTNESS);
+            supportFilters.addFilter("Hue(色调)", FilterType.FILTER_TYPE_HUE);
+            supportFilters.addFilter("Exposure(曝光度)", FilterType.FILTER_TYPE_EXPOSURE);
+            supportFilters.addFilter("Saturation(饱和度)", FilterType.FILTER_TYPE_SATURATION);
         }
         return supportFilters.names.toArray(new String[supportFilters.names.size()]);
     }

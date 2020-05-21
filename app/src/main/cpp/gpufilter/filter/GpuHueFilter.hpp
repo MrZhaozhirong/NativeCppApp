@@ -17,6 +17,10 @@ public:
     {
         HUE_FRAGMENT_SHADER =       "precision mediump float;\n\
                                     varying highp vec2 textureCoordinate;\n\
+                                    uniform sampler2D SamplerRGB;\n\
+                                    uniform sampler2D SamplerY;\n\
+                                    uniform sampler2D SamplerU;\n\
+                                    uniform sampler2D SamplerV;\n\
                                     mat3 colorConversionMatrix = mat3(\n\
                                                        1.0, 1.0, 1.0,\n\
                                                        0.0, -0.39465, 2.03211,\n\
@@ -39,11 +43,11 @@ public:
                                     void main()\n\
                                     {\n\
                                         // Sample the input pixel\n\
-                                        vec4 vec4 textureColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
+                                        vec4 textureColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
                                         // Convert to YIQ\n\
-                                        highp float YPrime = dot (color, kRGBToYPrime);\n\
-                                        highp float I = dot (color, kRGBToI);\n\
-                                        highp float Q = dot (color, kRGBToQ);\n\
+                                        highp float YPrime = dot(textureColor, kRGBToYPrime);\n\
+                                        highp float I = dot(textureColor, kRGBToI);\n\
+                                        highp float Q = dot(textureColor, kRGBToQ);\n\
                                         // Calculate the hue and chroma\n\
                                         highp float hue = atan(Q, I);\n\
                                         highp float chroma = sqrt(I * I + Q * Q);\n\
@@ -54,10 +58,10 @@ public:
                                         I = chroma * cos (hue);\n\
                                         // Convert back to RGB\n\
                                         highp vec4 yIQ = vec4 (YPrime, I, Q, 0.0);\n\
-                                        color.r = dot(yIQ, kYIQToR);\n\
-                                        color.g = dot(yIQ, kYIQToG);\n\
-                                        color.b = dot(yIQ, kYIQToB);\n\
-                                        gl_FragColor = color;\n\
+                                        textureColor.r = dot(yIQ, kYIQToR);\n\
+                                        textureColor.g = dot(yIQ, kYIQToG);\n\
+                                        textureColor.b = dot(yIQ, kYIQToB);\n\
+                                        gl_FragColor = textureColor;\n\
                                     }";
     }
     ~GpuHueFilter() {
@@ -66,7 +70,7 @@ public:
 
     void setAdjustEffect(float percent) {
         //mHue = (percent % 360.0f) * (float) PI / 180.0f;
-        mHue = range(percent * 100.0f, -1.0f, 1.0f);
+        mHue = range(percent * 100.0f, -1.5f, 1.5f);
     }
 
     void init() {
