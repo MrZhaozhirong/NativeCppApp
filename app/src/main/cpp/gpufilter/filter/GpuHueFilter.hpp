@@ -64,6 +64,7 @@ public:
                                         gl_FragColor = textureColor;\n\
                                     }";
     }
+
     ~GpuHueFilter() {
         if(!HUE_FRAGMENT_SHADER.empty()) HUE_FRAGMENT_SHADER.clear();
     }
