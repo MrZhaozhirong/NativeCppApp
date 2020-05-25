@@ -15,7 +15,7 @@ public:
 
     GpuHueFilter()
     {
-        HUE_FRAGMENT_SHADER =       "precision mediump float;\n\
+        HUE_FRAGMENT_SHADER =      "precision mediump float;\n\
                                     varying highp vec2 textureCoordinate;\n\
                                     uniform sampler2D SamplerRGB;\n\
                                     uniform sampler2D SamplerY;\n\

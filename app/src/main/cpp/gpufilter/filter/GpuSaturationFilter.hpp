@@ -42,7 +42,7 @@ public:
     }
 
     void setAdjustEffect(float percent) {
-        mSaturation = range(percent * 100.0f, 0.0f, 2.0f);
+        mSaturation = range(percent * 100.0f, 0.0f, 1.0f); // 2.0f
     }
     void init() {
         GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), SATURATION_FRAGMENT_SHADER.c_str());

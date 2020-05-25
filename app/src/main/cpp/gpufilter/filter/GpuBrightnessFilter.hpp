@@ -47,7 +47,7 @@ public:
     }
 
     void setAdjustEffect(float percent) {
-        mBrightness = range(percent * 100.0f, -1.0f, 1.0f);
+        mBrightness = range(percent * 100.0f, -0.5f, 0.5f);
         //mBrightness = percent * 100.0f * 2.0f;
     }
 
