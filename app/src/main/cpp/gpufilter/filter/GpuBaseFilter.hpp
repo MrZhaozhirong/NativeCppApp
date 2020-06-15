@@ -17,6 +17,7 @@
 #define FILTER_TYPE_HUE             0x1015
 #define FILTER_TYPE_EXPOSURE        0x1016
 #define FILTER_TYPE_SATURATION      0x1017
+#define FILTER_TYPE_SHARPEN         0x1018
 
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
