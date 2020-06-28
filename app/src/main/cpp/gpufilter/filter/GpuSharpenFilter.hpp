@@ -43,7 +43,7 @@ public:
                                         edgeMultiplier = sharpness;\n\
                                     }";
 
-        SHARPEN_FRAGMENT_SHADER   ="precision highp float;\n\
+        SHARPEN_FRAGMENT_SHADER   ="\n\
                                     varying highp vec2 textureCoordinate;\n\
                                     varying highp vec2 leftTextureCoordinate;\n\
                                     varying highp vec2 rightTextureCoordinate;\n\
