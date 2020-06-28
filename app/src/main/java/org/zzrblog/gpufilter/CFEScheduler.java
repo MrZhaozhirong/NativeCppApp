@@ -41,6 +41,7 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
             supportFilters.addFilter("Hue(色调)", FilterType.FILTER_TYPE_HUE);
             supportFilters.addFilter("Exposure(曝光度)", FilterType.FILTER_TYPE_EXPOSURE);
             supportFilters.addFilter("Saturation(饱和度)", FilterType.FILTER_TYPE_SATURATION);
+            supportFilters.addFilter("Sharpen(锐化)", FilterType.FILTER_TYPE_SHARPEN);
         }
         return supportFilters.names.toArray(new String[supportFilters.names.size()]);
     }

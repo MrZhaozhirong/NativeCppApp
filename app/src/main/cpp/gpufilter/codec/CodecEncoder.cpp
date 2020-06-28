@@ -12,6 +12,7 @@
 #include "../filter/GpuHueFilter.hpp"
 #include "../filter/GpuExposureFilter.hpp"
 #include "../filter/GpuSaturationFilter.hpp"
+#include "../filter/GpuSharpenFilter.hpp"
 #include <media/NdkMediaCodec.h>
 #include <sys/stat.h>
 
@@ -244,6 +245,9 @@ void CodecEncoder::encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint 
             case FILTER_TYPE_SATURATION:{
                 mFilter = new GpuSaturationFilter();
             }break;
+            case FILTER_TYPE_SHARPEN:{
+                mFilter = new GpuSharpenFilter();
+            }break;
             default:
                 mFilter = new GpuBaseFilter();
                 break;
@@ -343,10 +347,10 @@ void CodecEncoder::onEncoderThreadProc() {
                     debugWriteOutputFile(outputBuf, info.size, false);
                 } else if (info.flags & AMEDIACODEC_BUFFER_FLAG_KEY_FRAME) {
                     if (isDebug) LOGI("capture Video BUFFER_FLAG_KEY_FRAME.");
-                    debugWriteOutputFile(outputBuf, info.size, false);
+                    if (isDebug) debugWriteOutputFile(outputBuf, info.size, false);
                 } else {
                     //if (isDebug) LOGI("capture Frame AMediaCodecBufferInfo.flags %d.", info.flags);
-                    debugWriteOutputFile(outputBuf, info.size, false);
+                    if (isDebug) debugWriteOutputFile(outputBuf, info.size, false);
                 }
                 int64_t pts = info.presentationTimeUs;
                 //if (isDebug) LOGD("AMediaCodec_getOutputBuffer 容器空间BufferSize : %d", BufferSize);

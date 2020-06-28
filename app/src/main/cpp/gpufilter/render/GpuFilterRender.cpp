@@ -13,6 +13,7 @@
 #include "../filter/GpuHueFilter.hpp"
 #include "../filter/GpuExposureFilter.hpp"
 #include "../filter/GpuSaturationFilter.hpp"
+#include "../filter/GpuSharpenFilter.hpp"
 
 int GpuFilterRender::mStaticInputFps = 0;
 
@@ -77,8 +78,8 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     mEncoder.setMetaConfig(MIME_TYPE_H264, windowWidth, windowHeight, iFrameInterval, mDesiredFps, bitRate);
     mEncoder.encoderCreated();
 
-    mFpsTimer.setTimer(1,0,this);
-    mFpsTimer.startTimer();
+    //mFpsTimer.setTimer(1,0,this);
+    //mFpsTimer.startTimer();
 }
 
 void GpuFilterRender::surfaceChanged(int width, int height)
@@ -106,7 +107,7 @@ void GpuFilterRender::surfaceDestroyed()
     }
     mEncoder.encoderDestroyed();
     mEncoder.stopEncode();
-    mFpsTimer.stopTimer();
+    //mFpsTimer.stopTimer();
 }
 
 void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth, int previewHeight)
@@ -335,6 +336,9 @@ void GpuFilterRender::checkFilterChange() {
             }break;
             case FILTER_TYPE_SATURATION:{
                 mFilter = new GpuSaturationFilter();
+            }break;
+            case FILTER_TYPE_SHARPEN:{
+                mFilter = new GpuSharpenFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();
