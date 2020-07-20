@@ -106,6 +106,43 @@ public:
         mWidthFactorLocation = glGetUniformLocation(mGLProgId, "widthFactor");
         mHeightFactorLocation = glGetUniformLocation(mGLProgId, "heightFactor");
     }
+
+    void onOutputSizeChanged(int width, int height) {
+        GpuBaseFilter::onOutputSizeChanged(width, height);
+        glUniform1f(mWidthFactorLocation, 1.0f / width);
+        glUniform1f(mHeightFactorLocation, 1.0f / height);
+    }
+
+    void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
+                void* positionCords, void* textureCords)
+    {
+        if (!mIsInitialized)
+            return;
+        glUseProgram(mGLProgId);
+        // runPendingOnDrawTasks
+        glUniform1f(mWidthFactorLocation, 1.0f / mOutputWidth);
+        glUniform1f(mHeightFactorLocation, 1.0f / mOutputHeight);
+
+        glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
+        glEnableVertexAttribArray(mGLAttribPosition);
+        glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
+        glEnableVertexAttribArray(mGLAttribTextureCoordinate);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, SamplerY_texId);
+        glUniform1i(mGLUniformSampleY, 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, SamplerU_texId);
+        glUniform1i(mGLUniformSampleU, 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, SamplerV_texId);
+        glUniform1i(mGLUniformSampleV, 2);
+        // onDrawArraysPre
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDisableVertexAttribArray(mGLAttribPosition);
+        glDisableVertexAttribArray(mGLAttribTextureCoordinate);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 private:
     std::string BOXBLUR_VERTEX_SHADER;
     std::string BOXBLUR_FRAGMENT_SHADER;
