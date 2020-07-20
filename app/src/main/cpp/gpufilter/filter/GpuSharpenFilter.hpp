@@ -7,7 +7,16 @@
 #ifndef GPU_SHARPEN_FILTER_HPP
 #define GPU_SHARPEN_FILTER_HPP
 
-
+/**
+ * 经典laplacian算子1
+ * 0 1 0
+ * 1 5 1
+ * 0 1 0
+ * 经典laplacian算子2
+ * -1 -1 -1
+ * -1  9 -1
+ * -1 -1 -1
+ */
 class GpuSharpenFilter : public GpuBaseFilter {
 public:
     virtual int getTypeId() { return FILTER_TYPE_SHARPEN; }
