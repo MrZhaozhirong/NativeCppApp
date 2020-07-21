@@ -19,6 +19,7 @@
 #define FILTER_TYPE_SATURATION      0x1017
 #define FILTER_TYPE_SHARPEN         0x1018
 #define FILTER_TYPE_BOXBLUR         0x1019
+#define FILTER_TYPE_GAUSSIANBLUR    0x1020
 
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
