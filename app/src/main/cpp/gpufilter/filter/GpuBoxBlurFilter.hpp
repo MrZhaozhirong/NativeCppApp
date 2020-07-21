@@ -18,6 +18,7 @@ public:
                             attribute vec4 inputTextureCoordinate;\n\
                             uniform float widthFactor;\n\
                             uniform float heightFactor;\n\
+                            uniform float blurSize;\n\
                             \n\
                             varying vec2 textureCoordinate;\n\
                             varying vec2 leftTextureCoordinate;\n\
@@ -33,8 +34,9 @@ public:
                             void main()\n\
                             {\n\
                                 gl_Position = position;\n\
-                                vec2 widthStep = vec2(widthFactor, 0.0);\n\
-                                vec2 heightStep = vec2(0.0, heightFactor);\n\
+                                vec2 widthStep = vec2(blurSize*widthFactor, 0.0);\n\
+                                vec2 heightStep = vec2(0.0, blurSize*heightFactor);\n\
+                                \n\
                                 textureCoordinate = inputTextureCoordinate.xy;\n\
                                 leftTextureCoordinate = inputTextureCoordinate.xy - widthStep;\n\
                                 rightTextureCoordinate = inputTextureCoordinate.xy + widthStep;\n\
@@ -48,10 +50,9 @@ public:
                                 bottomRightTextureCoordinate = inputTextureCoordinate.xy + heightStep + widthStep;\n\
                              }";
 
-
+        // uniform mediump mat3 convolutionMatrix;
         BOXBLUR_FRAGMENT_SHADER   ="\n\
                             precision highp float;\n\
-                            uniform mediump mat3 convolutionMatrix;\n\
                             varying vec2 textureCoordinate;\n\
                             varying vec2 leftTextureCoordinate;\n\
                             varying vec2 rightTextureCoordinate;\n\
@@ -91,7 +92,7 @@ public:
                                 vec3 fragmentColor = (leftTextureColor + textureColor + rightTextureColor);\n\
                                 fragmentColor += (topLeftTextureColor + topTextureColor + topRightTextureColor);\n\
                                 fragmentColor += (bottomLeftTextureColor + bottomTextureColor + bottomRightTextureColor);\n\
-                                gl_FragColor = vec4(fragmentColor/9, 1.0);\n\
+                                gl_FragColor = vec4(fragmentColor/9.0, 1.0);\n\
                             }";
     }
 
@@ -100,17 +101,23 @@ public:
         if(!BOXBLUR_FRAGMENT_SHADER.empty()) BOXBLUR_FRAGMENT_SHADER.clear();
     }
 
-
     void init() {
         GpuBaseFilter::init(BOXBLUR_VERTEX_SHADER.c_str(), BOXBLUR_FRAGMENT_SHADER.c_str());
-        mWidthFactorLocation = glGetUniformLocation(mGLProgId, "widthFactor");
-        mHeightFactorLocation = glGetUniformLocation(mGLProgId, "heightFactor");
+        mWidthFactorLocation = glGetUniformLocation(getProgram(), "widthFactor");
+        mHeightFactorLocation = glGetUniformLocation(getProgram(), "heightFactor");
+        mBlurSizeLocation = glGetUniformLocation(getProgram(), "blurSize");
+        mBlurSize = 1.0f;
     }
 
     void onOutputSizeChanged(int width, int height) {
         GpuBaseFilter::onOutputSizeChanged(width, height);
         glUniform1f(mWidthFactorLocation, 1.0f / width);
         glUniform1f(mHeightFactorLocation, 1.0f / height);
+    }
+
+    void setAdjustEffect(float percent) {
+        mBlurSize = range(percent * 100.0f, 0.0f, 3.5f);
+        // from 0.0 to 3.5, with 0.0 as the normal level
     }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
@@ -120,6 +127,7 @@ public:
             return;
         glUseProgram(mGLProgId);
         // runPendingOnDrawTasks
+        glUniform1f(mBlurSizeLocation, mBlurSize);
         glUniform1f(mWidthFactorLocation, 1.0f / mOutputWidth);
         glUniform1f(mHeightFactorLocation, 1.0f / mOutputHeight);
 
@@ -149,5 +157,8 @@ private:
 
     GLint mWidthFactorLocation;
     GLint mHeightFactorLocation;
+
+    GLint mBlurSizeLocation;
+    float mBlurSize;
 };
 #endif //GPU_BOXBLUR_FILTER_HPP

@@ -14,6 +14,7 @@
 #include "../filter/GpuExposureFilter.hpp"
 #include "../filter/GpuSaturationFilter.hpp"
 #include "../filter/GpuSharpenFilter.hpp"
+#include "../filter/GpuBoxBlurFilter.hpp"
 
 int GpuFilterRender::mStaticInputFps = 0;
 
@@ -75,7 +76,7 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     int mDesiredFps = 20;
     int iFrameInterval = 2;
     int bitRate = static_cast<int>(windowWidth * windowHeight * mDesiredFps * 0.22f);
-    mEncoder.setMetaConfig(MIME_TYPE_H264, windowWidth, windowHeight, iFrameInterval, mDesiredFps, bitRate);
+    mEncoder.setMetaConfig(MIME_TYPE_H265, windowWidth, windowHeight, iFrameInterval, mDesiredFps, bitRate);
     mEncoder.encoderCreated();
 
     //mFpsTimer.setTimer(1,0,this);
@@ -339,6 +340,9 @@ void GpuFilterRender::checkFilterChange() {
             }break;
             case FILTER_TYPE_SHARPEN:{
                 mFilter = new GpuSharpenFilter();
+            }break;
+            case FILTER_TYPE_BOXBLUR:{
+                mFilter = new GpuBoxBlurFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

@@ -18,6 +18,7 @@ public class FilterType {
     static final int FILTER_TYPE_EXPOSURE = 0x1016;
     static final int FILTER_TYPE_SATURATION = 0x1017;
     static final int FILTER_TYPE_SHARPEN = 0x1018;
+    static final int FILTER_TYPE_BOXBLUR = 0x1019;
 
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();

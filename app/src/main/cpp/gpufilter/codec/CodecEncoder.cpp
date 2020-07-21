@@ -13,6 +13,7 @@
 #include "../filter/GpuExposureFilter.hpp"
 #include "../filter/GpuSaturationFilter.hpp"
 #include "../filter/GpuSharpenFilter.hpp"
+#include "../filter/GpuBoxBlurFilter.hpp"
 #include <media/NdkMediaCodec.h>
 #include <sys/stat.h>
 
@@ -248,6 +249,9 @@ void CodecEncoder::encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint 
             case FILTER_TYPE_SHARPEN:{
                 mFilter = new GpuSharpenFilter();
             }break;
+            case FILTER_TYPE_BOXBLUR:{
+                mFilter = new GpuBoxBlurFilter();
+            }break;
             default:
                 mFilter = new GpuBaseFilter();
                 break;
@@ -344,7 +348,7 @@ void CodecEncoder::onEncoderThreadProc() {
                     // 标记为BUFFER_FLAG_CODEC_CONFIG的缓冲区包含编码数据(PPS SPS)
                     if (isDebug) LOGI("capture Video BUFFER_FLAG_CODEC_CONFIG.");
                     saveConfigPPSandSPS(outputBuf, info.size);
-                    debugWriteOutputFile(outputBuf, info.size, false);
+                    if (isDebug) debugWriteOutputFile(outputBuf, info.size, false);
                 } else if (info.flags & AMEDIACODEC_BUFFER_FLAG_KEY_FRAME) {
                     if (isDebug) LOGI("capture Video BUFFER_FLAG_KEY_FRAME.");
                     if (isDebug) debugWriteOutputFile(outputBuf, info.size, false);
