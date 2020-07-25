@@ -14,6 +14,7 @@
 #include "../filter/GpuSaturationFilter.hpp"
 #include "../filter/GpuSharpenFilter.hpp"
 #include "../filter/GpuBoxBlurFilter.hpp"
+#include "../filter/GpuGaussianBlurFilter.hpp"
 #include <media/NdkMediaCodec.h>
 #include <sys/stat.h>
 
@@ -251,6 +252,9 @@ void CodecEncoder::encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint 
             }break;
             case FILTER_TYPE_BOXBLUR:{
                 mFilter = new GpuBoxBlurFilter();
+            }break;
+            case FILTER_TYPE_GAUSSIANBLUR:{
+                mFilter = new GpuGaussianBlurFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();
