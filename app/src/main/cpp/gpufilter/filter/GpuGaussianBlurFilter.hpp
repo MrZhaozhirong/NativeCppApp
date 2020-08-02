@@ -37,7 +37,7 @@ public:
                                 textureCoordinate[6] = inputTextureCoordinate.xy + heightStep - widthStep;\n\
                                 textureCoordinate[7] = inputTextureCoordinate.xy + heightStep;\n\
                                 textureCoordinate[8] = inputTextureCoordinate.xy + heightStep + widthStep;\n\
-                             }";
+                            }";
 
         GAUSSIAN_BLUR_FRAGMENT_SHADER ="\n\
                             precision highp float;\n\

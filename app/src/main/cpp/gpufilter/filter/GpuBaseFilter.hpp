@@ -126,28 +126,28 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    // GLUniformSampleRGB对应的draw，我这里没用rgb模式.
-    //virtual void onDraw2(GLuint textureId, void* positionCords, void* textureCords)
-    //{
-    //    if (!mIsInitialized)
-    //        return;
-    //    glUseProgram(mGLProgId);
-    //    // runPendingOnDrawTasks();
-    //    glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
-    //    glEnableVertexAttribArray(mGLAttribPosition);
-    //    glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
-    //    glEnableVertexAttribArray(mGLAttribTextureCoordinate);
-    //    if (textureId != -1) {
-    //        glActiveTexture(GL_TEXTURE0);
-    //        glBindTexture(GL_TEXTURE_2D, textureId);
-    //        glUniform1i(mGLUniformSampleRGB, 0);
-    //    }
-    //    // onDrawArraysPre();
-    //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    //    glDisableVertexAttribArray(mGLAttribPosition);
-    //    glDisableVertexAttribArray(mGLAttribTextureCoordinate);
-    //    glBindTexture(GL_TEXTURE_2D, 0);
-    //}
+    // GLUniformSampleRGB对应的draw
+    virtual void onDrawRGB(GLuint textureId, void* positionCords, void* textureCords)
+    {
+        if (!mIsInitialized)
+            return;
+        glUseProgram(mGLProgId);
+        // runPendingOnDrawTasks();
+        glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
+        glEnableVertexAttribArray(mGLAttribPosition);
+        glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
+        glEnableVertexAttribArray(mGLAttribTextureCoordinate);
+        if (textureId != -1) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, textureId);
+            glUniform1i(mGLUniformSampleRGB, 0);
+        }
+        // onDrawArraysPre();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDisableVertexAttribArray(mGLAttribPosition);
+        glDisableVertexAttribArray(mGLAttribTextureCoordinate);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     // 相关滤镜对应的可调整参数，通过此借口进行操作
     virtual void setAdjustEffect(float percent) {
