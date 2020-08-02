@@ -133,7 +133,7 @@ public:
             if (i == 0) {
                 filter.onDraw(SamplerY_texId, SamplerU_texId, SamplerV_texId, positionCords, textureCords);
             }else {
-                drawFBO(filter, previousTexture, mGLCubeBuffer, mGLTextureBuffer);
+                //drawFBO(filter, previousTexture, mGLCubeBuffer, mGLTextureBuffer);
             }
 
             if (isNotLast) {
