@@ -162,7 +162,7 @@ public:
         return (end - start) * percentage / 100.0f + start;
     }
 
-protected:
+public:
     std::string NO_FILTER_VERTEX_SHADER;
     std::string NO_FILTER_FRAGMENT_SHADER;
 

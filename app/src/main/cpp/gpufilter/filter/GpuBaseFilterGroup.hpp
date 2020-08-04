@@ -87,13 +87,13 @@ private:
 
 
 
-protected:
+public:
     std::vector<GpuBaseFilter> mFilterList;
     void addFilter(GpuBaseFilter filter) {
         mFilterList.push_back(filter);
     }
 
-    GLuint mFBO_IDs[];
-    GLuint mFBO_TextureIDs[];
+    GLuint* mFBO_IDs;
+    GLuint* mFBO_TextureIDs;
 };
 #endif // GPU_FILTER_GROUP_HPP

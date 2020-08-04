@@ -26,12 +26,13 @@ public:
                                     {\n\
                                         gl_Position = position;\n\
                                         \n\
-                                        vec2 singleStepOffset = vec2(texelHeightOffset, texelWidthOffset);\n\
+                                        vec2 singleStepOffset = vec2(offset*widthFactor, offset*heightFactor);\n\
                                         int multiplier = 0;\n\
                                         vec2 blurStep;\n\
                                         for (int i = 0; i < GAUSSIAN_SAMPLES; i++)\n\
                                         {\n\
                                             multiplier = (i - ((GAUSSIAN_SAMPLES - 1) / 2));\n\
+                                            //-4，-3，-2，-1，0，1，2，3，4\n\
                                             blurStep = float(multiplier) * singleStepOffset;\n\
                                             blurCoordinates[i] = inputTextureCoordinate.xy + blurStep;\n\
                                         }\n\
@@ -99,6 +100,7 @@ public:
         mWidthFactorLocation1  = glGetUniformLocation(filter1.getProgram(), "widthFactor");
         mHeightFactorLocation1 = glGetUniformLocation(filter1.getProgram(), "heightFactor");
         mSampleOffsetLocation1 = glGetUniformLocation(filter1.getProgram(), "offset");
+        mDrawModeLocation1     = glGetUniformLocation(filter1.getProgram(), "drawMode");
         addFilter(filter1);
 
         GpuBaseFilter filter2;
@@ -106,6 +108,7 @@ public:
         mWidthFactorLocation2  = glGetUniformLocation(filter2.getProgram(), "widthFactor");
         mHeightFactorLocation2 = glGetUniformLocation(filter2.getProgram(), "heightFactor");
         mSampleOffsetLocation2 = glGetUniformLocation(filter2.getProgram(), "offset");
+        mDrawModeLocation2     = glGetUniformLocation(filter2.getProgram(), "drawMode");
         addFilter(filter2);
     }
 
@@ -114,13 +117,15 @@ public:
         // glUniform1f(mWidthFactorLocation, 1.0f / width);
         // glUniform1f(mHeightFactorLocation, 1.0f / height);
     }
-
+    void setAdjustEffect(float percent) {
+        mSampleOffset = range(percent * 100.0f, 0.0f, 2.0f);
+    }
 
     void onDraw(GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
                 void* positionCords, void* textureCords)
     {
         if (mFilterList.size()==0) return;
-        int previousTexture = -100;
+        GLuint previousTexture = 0;
         int size = mFilterList.size();
         for (int i = 0; i < size; i++) {
             GpuBaseFilter filter = mFilterList[i];
@@ -131,9 +136,10 @@ public:
             }
 
             if (i == 0) {
-                filter.onDraw(SamplerY_texId, SamplerU_texId, SamplerV_texId, positionCords, textureCords);
-            }else {
-                //drawFBO(filter, previousTexture, mGLCubeBuffer, mGLTextureBuffer);
+                drawFilter1YUV(filter, SamplerY_texId, SamplerU_texId, SamplerV_texId, positionCords, textureCords);
+            }
+            if (i == 1) { //isNotLast=false, not bind FBO, draw on screen.
+                drawFilter2RGB(filter, previousTexture, positionCords, textureCords);
             }
 
             if (isNotLast) {
@@ -143,15 +149,90 @@ public:
         }
     }
 private:
+    void drawFilter1YUV(GpuBaseFilter filter,
+                 GLuint SamplerY_texId, GLuint SamplerU_texId, GLuint SamplerV_texId,
+                 void* positionCords, void* textureCords)
+    {
+        if (!filter.isInitialized())
+            return;
+        glUseProgram(filter.getProgram());
+        glUniform1f(mDrawModeLocation1, 0);
+        glUniform1f(mSampleOffsetLocation1, mSampleOffset);
+        glUniform1f(mWidthFactorLocation1, 1.0f / filter.mOutputWidth);
+        glUniform1f(mHeightFactorLocation1, 1.0f / filter.mOutputHeight);
+
+        glVertexAttribPointer(filter.mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
+        glEnableVertexAttribArray(filter.mGLAttribPosition);
+        glVertexAttribPointer(filter.mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
+        glEnableVertexAttribArray(filter.mGLAttribTextureCoordinate);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, SamplerY_texId);
+        glUniform1i(filter.mGLUniformSampleY, 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, SamplerU_texId);
+        glUniform1i(filter.mGLUniformSampleU, 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, SamplerV_texId);
+        glUniform1i(filter.mGLUniformSampleV, 2);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDisableVertexAttribArray(filter.mGLAttribPosition);
+        glDisableVertexAttribArray(filter.mGLAttribTextureCoordinate);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void drawFilter2RGB(GpuBaseFilter filter, GLuint _texId, void* positionCords, void* textureCords)
+    {
+        if (!filter.isInitialized())
+            return;
+        glUseProgram(filter.getProgram());
+        glUniform1f(mDrawModeLocation2, 1);
+        glUniform1f(mSampleOffsetLocation2, mSampleOffset);
+        glUniform1f(mWidthFactorLocation2, 1.0f / mOutputWidth);
+        glUniform1f(mHeightFactorLocation2, 1.0f / mOutputHeight);
+
+        glVertexAttribPointer(filter.mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
+        glEnableVertexAttribArray(filter.mGLAttribPosition);
+        float * temp = static_cast<float *>(textureCords);
+        for (int k = 0; k < 4; k ++) {
+            temp[2*k+1] = flip(temp[2*k+1]);
+        }
+        glVertexAttribPointer(filter.mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
+        glEnableVertexAttribArray(filter.mGLAttribTextureCoordinate);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, _texId);
+        glUniform1i(filter.mGLUniformSampleRGB, 0);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDisableVertexAttribArray(filter.mGLAttribPosition);
+        glDisableVertexAttribArray(filter.mGLAttribTextureCoordinate);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+
+    __inline float flip(float value)
+    {
+        if(value ==0.0f)
+            return 1.0f;
+        else // == 1.0f
+            return 0.0f;
+    };
+
     std::string GAUSSIAN_BLUR_VERTEX_SHADER;
     std::string GAUSSIAN_BLUR_FRAGMENT_SHADER;
 
     GLint mWidthFactorLocation1;
     GLint mHeightFactorLocation1;
     GLint mSampleOffsetLocation1;
+    GLint mDrawModeLocation1;
 
     GLint mWidthFactorLocation2;
     GLint mHeightFactorLocation2;
     GLint mSampleOffsetLocation2;
+    GLint mDrawModeLocation2;
+
+    float mSampleOffset;
 };
 #endif // GPU_GAUSSIANBLUR_2_FILTER_HPP
