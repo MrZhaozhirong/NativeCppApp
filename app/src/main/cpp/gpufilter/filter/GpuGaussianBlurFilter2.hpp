@@ -26,7 +26,7 @@ public:
                                     {\n\
                                         gl_Position = position;\n\
                                         \n\
-                                        vec2 singleStepOffset = vec2(offset*widthFactor, offset*heightFactor);\n\
+                                        vec2 singleStepOffset = vec2(widthFactor, heightFactor);\n\
                                         int multiplier = 0;\n\
                                         vec2 blurStep;\n\
                                         for (int i = 0; i < GAUSSIAN_SAMPLES; i++)\n\
@@ -57,10 +57,10 @@ public:
                             }\n\
                             uniform int drawMode; //0为YUV,1为RGB \n\
                             const int GAUSSIAN_SAMPLES = 9;\n\
-                            varying vec2 textureCoordinate[GAUSSIAN_SAMPLES];\n\
+                            varying vec2 blurCoordinates[GAUSSIAN_SAMPLES];\n\
                             void main()\n\
                             {\n\
-                                vec3 fragmentColor = vec(0,0); \n\
+                                vec3 fragmentColor = vec3(0.0); \n\
                                 if (drawMode==0) \n\
                                 {\n\
                                     fragmentColor += (yuv2rgb(blurCoordinates[0]) *0.05); \n\
@@ -72,20 +72,21 @@ public:
                                     fragmentColor += (yuv2rgb(blurCoordinates[6]) *0.12); \n\
                                     fragmentColor += (yuv2rgb(blurCoordinates[7]) *0.09); \n\
                                     fragmentColor += (yuv2rgb(blurCoordinates[8]) *0.05); \n\
+                                    gl_FragColor = vec4(fragmentColor, 1.0);\n\
                                 }\n\
                                 else \n\
                                 { \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[0]).rgb *0.05; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[1]).rgb *0.09; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[2]).rgb *0.12; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[3]).rgb *0.15; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[4]).rgb *0.18; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[5]).rgb *0.15; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[6]).rgb *0.12; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[7]).rgb *0.09; \n\
-                                    fragmentColor += texture2D(inputImageTexture, blurCoordinates[8]).rgb *0.05; \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[0]).rgb *0.05); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[1]).rgb *0.09); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[2]).rgb *0.12); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[3]).rgb *0.15); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[4]).rgb *0.18); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[5]).rgb *0.15); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[6]).rgb *0.12); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[7]).rgb *0.09); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[8]).rgb *0.05); \n\
+                                    gl_FragColor = vec4(fragmentColor, 1.0);\n\
                                 } \n\
-                                gl_FragColor = vec4(fragmentColor, 1.0);\n\
                             }";
     }
     ~GpuGaussianBlurFilter2()
@@ -96,7 +97,7 @@ public:
 
     void init() {
         GpuBaseFilter filter1;
-        filter1.init(GAUSSIAN_BLUR_VERTEX_SHADER.c_str(), GAUSSIAN_BLUR_VERTEX_SHADER.c_str());
+        filter1.init(GAUSSIAN_BLUR_VERTEX_SHADER.c_str(), GAUSSIAN_BLUR_FRAGMENT_SHADER.c_str());
         mWidthFactorLocation1  = glGetUniformLocation(filter1.getProgram(), "widthFactor");
         mHeightFactorLocation1 = glGetUniformLocation(filter1.getProgram(), "heightFactor");
         mSampleOffsetLocation1 = glGetUniformLocation(filter1.getProgram(), "offset");
@@ -104,7 +105,7 @@ public:
         addFilter(filter1);
 
         GpuBaseFilter filter2;
-        filter2.init(GAUSSIAN_BLUR_VERTEX_SHADER.c_str(), GAUSSIAN_BLUR_VERTEX_SHADER.c_str());
+        filter2.init(GAUSSIAN_BLUR_VERTEX_SHADER.c_str(), GAUSSIAN_BLUR_FRAGMENT_SHADER.c_str());
         mWidthFactorLocation2  = glGetUniformLocation(filter2.getProgram(), "widthFactor");
         mHeightFactorLocation2 = glGetUniformLocation(filter2.getProgram(), "heightFactor");
         mSampleOffsetLocation2 = glGetUniformLocation(filter2.getProgram(), "offset");
@@ -132,16 +133,14 @@ public:
             bool isNotLast = i < size - 1;
             if (isNotLast) {
                 glBindFramebuffer(GL_FRAMEBUFFER, mFBO_IDs[i]);
-                glClearColor(0, 0, 0, 0);
             }
-
+            glClearColor(0, 0, 0, 0);
             if (i == 0) {
                 drawFilter1YUV(filter, SamplerY_texId, SamplerU_texId, SamplerV_texId, positionCords, textureCords);
             }
             if (i == 1) { //isNotLast=false, not bind FBO, draw on screen.
-                drawFilter2RGB(filter, previousTexture, positionCords, textureCords);
+                drawFilter2RGB(filter, previousTexture, positionCords, mNormalTextureCords);
             }
-
             if (isNotLast) {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 previousTexture = mFBO_TextureIDs[i];
@@ -156,10 +155,10 @@ private:
         if (!filter.isInitialized())
             return;
         glUseProgram(filter.getProgram());
-        glUniform1f(mDrawModeLocation1, 0);
-        glUniform1f(mSampleOffsetLocation1, mSampleOffset);
-        glUniform1f(mWidthFactorLocation1, 1.0f / filter.mOutputWidth);
-        glUniform1f(mHeightFactorLocation1, 1.0f / filter.mOutputHeight);
+        glUniform1i(mDrawModeLocation1, 0);
+        //glUniform1f(mSampleOffsetLocation1, mSampleOffset);
+        glUniform1f(mWidthFactorLocation1, mSampleOffset / filter.mOutputWidth);
+        glUniform1f(mHeightFactorLocation1, 0);
 
         glVertexAttribPointer(filter.mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
         glEnableVertexAttribArray(filter.mGLAttribPosition);
@@ -187,23 +186,20 @@ private:
         if (!filter.isInitialized())
             return;
         glUseProgram(filter.getProgram());
-        glUniform1f(mDrawModeLocation2, 1);
-        glUniform1f(mSampleOffsetLocation2, mSampleOffset);
-        glUniform1f(mWidthFactorLocation2, 1.0f / mOutputWidth);
-        glUniform1f(mHeightFactorLocation2, 1.0f / mOutputHeight);
+        glUniform1i(mDrawModeLocation2, 1);
+        //glUniform1f(mSampleOffsetLocation2, mSampleOffset);
+        glUniform1f(mWidthFactorLocation2, 0);
+        glUniform1f(mHeightFactorLocation2, mSampleOffset / filter.mOutputHeight);
 
         glVertexAttribPointer(filter.mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
         glEnableVertexAttribArray(filter.mGLAttribPosition);
-        float * temp = static_cast<float *>(textureCords);
-        for (int k = 0; k < 4; k ++) {
-            temp[2*k+1] = flip(temp[2*k+1]);
-        }
+
         glVertexAttribPointer(filter.mGLAttribTextureCoordinate, 2, GL_FLOAT, GL_FALSE, 0, textureCords);
         glEnableVertexAttribArray(filter.mGLAttribTextureCoordinate);
 
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, _texId);
-        glUniform1i(filter.mGLUniformSampleRGB, 0);
+        glUniform1i(filter.mGLUniformSampleRGB, 3);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableVertexAttribArray(filter.mGLAttribPosition);

@@ -366,6 +366,7 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         LOGW("Skipping drawFrame after shutdown");
         return;
     }
+    glViewport(0,0, mViewWidth, mViewHeight);
     pthread_mutex_lock(&mutex);
     ByteBuffer* item = mNV21Pool.get();
     if(item == NULL) {

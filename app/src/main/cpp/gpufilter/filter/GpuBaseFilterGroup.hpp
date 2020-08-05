@@ -13,6 +13,21 @@
 class GpuBaseFilterGroup : public GpuBaseFilter {
     // GpuBaseFilter virtual method
 public:
+    GpuBaseFilterGroup()
+    {
+        mFBO_IDs = NULL;
+        mFBO_TextureIDs = NULL;
+        float cords[8] = {
+                // position   x, y
+                0.0f, 0.0f,   //左下
+                1.0f, 0.0f,    //右下
+                0.0f, 1.0f,    //左上
+                1.0f, 1.0f,     //右上
+        };
+        mNormalTextureCords = new float[8]{0};
+        memcpy(mNormalTextureCords, cords, sizeof(cords));
+    }
+
     virtual void onOutputSizeChanged(int width, int height) {
         if (mFilterList.empty()) return;
 
@@ -38,6 +53,8 @@ public:
             filter.destroy();
         }
         mFilterList.clear();
+        delete[] mNormalTextureCords;
+        mNormalTextureCords = NULL;
 
         GpuBaseFilter::destroy();
     }
@@ -57,7 +74,7 @@ private:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // GL_REPEAT
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // GL_REPEAT
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _width, _height, 0, GL_RGBA, GL_FLOAT, 0);
 
             glBindFramebuffer(GL_FRAMEBUFFER, mFBO_IDs[i]);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFBO_TextureIDs[i], 0);
@@ -95,5 +112,6 @@ public:
 
     GLuint* mFBO_IDs;
     GLuint* mFBO_TextureIDs;
+    float*  mNormalTextureCords;
 };
 #endif // GPU_FILTER_GROUP_HPP
