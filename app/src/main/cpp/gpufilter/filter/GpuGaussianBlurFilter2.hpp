@@ -208,14 +208,6 @@ private:
     }
 
 
-    __inline float flip(float value)
-    {
-        if(value ==0.0f)
-            return 1.0f;
-        else // == 1.0f
-            return 0.0f;
-    };
-
     std::string GAUSSIAN_BLUR_VERTEX_SHADER;
     std::string GAUSSIAN_BLUR_FRAGMENT_SHADER;
 
