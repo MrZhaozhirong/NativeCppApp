@@ -17,6 +17,7 @@
 #include "../filter/GpuBoxBlurFilter.hpp"
 #include "../filter/GpuGaussianBlurFilter.hpp"
 #include "../filter/GpuGaussianBlurFilter2.hpp"
+#include "../filter/GpuBilateralBlurFilter.hpp"
 
 int GpuFilterRender::mStaticInputFps = 0;
 
@@ -348,6 +349,9 @@ void GpuFilterRender::checkFilterChange() {
             }break;
             case FILTER_TYPE_GAUSSIANBLUR:{
                 mFilter = new GpuGaussianBlurFilter2();
+            }break;
+            case FILTER_TYPE_BilateralBLUR:{
+                mFilter = new GpuBilateralBlurFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

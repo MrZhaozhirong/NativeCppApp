@@ -20,6 +20,7 @@ public class FilterType {
     static final int FILTER_TYPE_SHARPEN = 0x1018;
     static final int FILTER_TYPE_BOXBLUR = 0x1019;
     static final int FILTER_TYPE_GAUSSIANBLUR = 0x1020;
+    static final int FILTER_TYPE_BilateralBLUR = 0x1021;
 
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();

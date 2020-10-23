@@ -76,15 +76,15 @@ public:
                                 }\n\
                                 else \n\
                                 { \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[0]).rgb *0.05); \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[1]).rgb *0.09); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[0]).rgb *0.03); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[1]).rgb *0.07); \n\
                                     fragmentColor += (texture2D(SamplerRGB, blurCoordinates[2]).rgb *0.12); \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[3]).rgb *0.15); \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[4]).rgb *0.18); \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[5]).rgb *0.15); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[3]).rgb *0.17); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[4]).rgb *0.22); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[5]).rgb *0.17); \n\
                                     fragmentColor += (texture2D(SamplerRGB, blurCoordinates[6]).rgb *0.12); \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[7]).rgb *0.09); \n\
-                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[8]).rgb *0.05); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[7]).rgb *0.07); \n\
+                                    fragmentColor += (texture2D(SamplerRGB, blurCoordinates[8]).rgb *0.03); \n\
                                     gl_FragColor = vec4(fragmentColor, 1.0);\n\
                                 } \n\
                             }";
