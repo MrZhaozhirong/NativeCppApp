@@ -81,7 +81,7 @@ public:
                                       gaussianWeight = 0.07 * (1.0 - distanceFromCentralColor);\n\
                                       gaussianWeightTotal += gaussianWeight;\n\
                                       sampleSum += sampleColor * gaussianWeight;\n\
-                                      \
+                                      \n\
                                       sampleColor = vec4(yuv2rgb(blurCoordinates[2]), 1.0);\n\
                                       distanceFromCentralColor = min(distance(centralColor, sampleColor) * distanceNormalizationFactor, 1.0);\n\
                                       gaussianWeight = 0.12 * (1.0 - distanceFromCentralColor);\n\
