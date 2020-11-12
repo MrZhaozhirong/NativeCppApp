@@ -44,6 +44,7 @@ public:
 
         NO_FILTER_FRAGMENT_SHADER = "precision mediump float;\n\
                                      varying highp vec2 textureCoordinate;\n\
+                                     uniform int drawMode; //0为YUV,1为RGB \n\
                                      uniform sampler2D SamplerRGB;\n\
                                      uniform sampler2D SamplerY;\n\
                                      uniform sampler2D SamplerU;\n\
@@ -62,8 +63,14 @@ public:
                                      }\n\
                                      void main()\n\
                                      {\n\
-                                        gl_FragColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
-                                        //gl_FragColor = texture2D(SamplerRGB, textureCoordinate);\n\
+                                        if (drawMode==0) \n\
+                                        {\n\
+                                            gl_FragColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
+                                        }\n\
+                                        else\n\
+                                        {\n\
+                                            gl_FragColor = texture2D(SamplerRGB, textureCoordinate);\n\
+                                        }\n\
                                      }";
     }
     virtual ~GpuBaseFilter()
