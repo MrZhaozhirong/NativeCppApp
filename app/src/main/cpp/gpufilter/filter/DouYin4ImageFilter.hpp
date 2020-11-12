@@ -61,6 +61,44 @@ private:
     GLuint mFboId = 9999;
     GLuint mFboTextureId = 9999;
 
+    float texCoordinates[8] = {
+            0.0f, 1.0f,     //左下
+            1.0f, 1.0f,     //右下
+            0.0f, 0.0f,     //左上
+            1.0f, 0.0f,     //右上
+    };
+
+    float positionCords_left_top[8] = {
+            //x, y          //position
+            -1.0f, -0.0f,   //左下
+            0.0f, -0.0f,    //右下
+            -1.0f, 1.0f,    //左上
+            0.0f, 1.0f,     //右上
+    };
+
+    float positionCords_right_top[8] = {
+            //x, y          //position
+            -0.0f, -0.0f,   //左下
+            1.0f, -0.0f,    //右下
+            -0.0f, 1.0f,    //左上
+            1.0f, 1.0f,     //右上
+    };
+
+    float positionCords_left_bottom[8] = {
+            //x, y          //position
+            -1.0f, -1.0f,   //左下
+            0.0f, -1.0f,    //右下
+            -1.0f, 0.0f,    //左上
+            0.0f, 0.0f,     //右上
+    };
+
+    float positionCords_right_bottom[8] = {
+            //x, y          //position
+            -0.0f, -1.0f,   //左下
+            1.0f, -1.0f,    //右下
+            -0.0f, 0.0f,    //左上
+            1.0f, 0.0f,     //右上
+    };
 };
 
 
