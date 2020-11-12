@@ -87,12 +87,13 @@ public:
 
     void init(const char *vertexShaderSource, const char *fragmentShaderSource) {
         mGLProgId = ShaderHelper::buildProgram(vertexShaderSource, fragmentShaderSource);
-        mGLAttribPosition = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "position"));
+        mGLAttribPosition   = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "position"));
         mGLAttribTextureCoordinate = static_cast<GLuint>(glGetAttribLocation(mGLProgId, "inputTextureCoordinate"));
+        mDrawModeLocation   = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "drawMode"));
         mGLUniformSampleRGB = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerRGB"));
-        mGLUniformSampleY = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerY"));
-        mGLUniformSampleU = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerU"));
-        mGLUniformSampleV = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerV"));
+        mGLUniformSampleY   = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerY"));
+        mGLUniformSampleU   = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerU"));
+        mGLUniformSampleV   = static_cast<GLuint>(glGetUniformLocation(mGLProgId, "SamplerV"));
         mIsInitialized = true;
     }
 
@@ -112,6 +113,7 @@ public:
         if (!mIsInitialized)
             return;
         glUseProgram(mGLProgId);
+        glUniform1i(mDrawModeLocation, 0);
         // runPendingOnDrawTasks();
         glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
         glEnableVertexAttribArray(mGLAttribPosition);
@@ -140,6 +142,7 @@ public:
         if (!mIsInitialized)
             return;
         glUseProgram(mGLProgId);
+        glUniform1i(mDrawModeLocation, 1);
         // runPendingOnDrawTasks();
         glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords);
         glEnableVertexAttribArray(mGLAttribPosition);
@@ -176,9 +179,10 @@ public:
 
     GLuint  mGLProgId;
     GLuint  mGLAttribPosition;
-    GLuint  mGLUniformSampleRGB;
     GLuint  mGLAttribTextureCoordinate;
 
+    GLuint  mDrawModeLocation;
+    GLuint  mGLUniformSampleRGB;
     GLuint  mGLUniformSampleY;
     GLuint  mGLUniformSampleU;
     GLuint  mGLUniformSampleV;
