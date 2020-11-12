@@ -131,7 +131,7 @@ public:
     }
 
     void setAdjustEffect(float percent) {
-        mThreshold_ColorDistanceNormalization = range(percent*100.0f, 10.0f, 1.0f);
+        mThreshold_ColorDistanceNormalization = range(percent*100.0f, 0.5f, 5.0f);
     }
 
     void init() {
