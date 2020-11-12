@@ -32,7 +32,7 @@ public:
 
     GpuBaseFilter()
     {
-        //LOGI("---GpuNormalFilter构造, %p",this);
+        LOGI("---GpuBaseFilter构造, %p",this);
         NO_FILTER_VERTEX_SHADER   = "attribute vec4 position;\n\
                                      attribute vec4 inputTextureCoordinate;\n\
                                      varying vec2 textureCoordinate;\n\
@@ -75,7 +75,7 @@ public:
     }
     virtual ~GpuBaseFilter()
     {
-        //LOGI("---GpuNormalFilter析构, %p",this);
+        LOGI("---GpuBaseFilter析构, %p",this);
         if(!NO_FILTER_VERTEX_SHADER.empty()) NO_FILTER_VERTEX_SHADER.clear();
         if(!NO_FILTER_FRAGMENT_SHADER.empty()) NO_FILTER_FRAGMENT_SHADER.clear();
         mIsInitialized = false;
