@@ -22,6 +22,9 @@ public class FilterType {
     static final int FILTER_TYPE_GAUSSIANBLUR = 0x1020;
     static final int FILTER_TYPE_BilateralBLUR = 0x1021;
 
+    static final int FILTER_TYPE_DOUYIN_4IMAGE = 0x2000;
+    static final int FILTER_TYPE_DOUYIN_SHOCK = 0x2001;
+
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();
 

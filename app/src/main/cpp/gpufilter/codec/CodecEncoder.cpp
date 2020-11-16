@@ -2,6 +2,8 @@
 // Created by nicky on 2020/1/6.
 //
 #include <pthread.h>
+#include <sys/stat.h>
+#include <media/NdkMediaCodec.h>
 #include <string>
 #include "CodecEncoder.h"
 #include "../../common/zzr_common.h"
@@ -17,8 +19,7 @@
 #include "../filter/GpuGaussianBlurFilter.hpp"
 #include "../filter/GpuGaussianBlurFilter2.hpp"
 #include "../filter/GpuBilateralBlurFilter.hpp"
-#include <media/NdkMediaCodec.h>
-#include <sys/stat.h>
+#include "../filter/DouYin4ImageFilter.hpp"
 
 //#include "media/stagefright/MediaCodec.h"
 //#include "gui/Surface.h"
@@ -260,6 +261,9 @@ void CodecEncoder::encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint 
             }break;
             case FILTER_TYPE_BilateralBLUR:{
                 mFilter = new GpuBilateralBlurFilter();
+            }break;
+            case FILTER_TYPE_DOUYIN_4IMAGE:{
+                mFilter = new DouYin4ImageFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

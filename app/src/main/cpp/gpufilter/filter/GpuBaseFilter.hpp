@@ -22,6 +22,9 @@
 #define FILTER_TYPE_GAUSSIANBLUR    0x1020
 #define FILTER_TYPE_BilateralBLUR   0x1021
 
+#define FILTER_TYPE_DOUYIN_4IMAGE   0x2000
+#define FILTER_TYPE_DOUYIN_SHOCK    0x2001
+
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
  */
@@ -32,7 +35,7 @@ public:
 
     GpuBaseFilter()
     {
-        LOGI("---GpuBaseFilter构造, %p",this);
+        //LOGI("---GpuBaseFilter构造, %p",this);
         NO_FILTER_VERTEX_SHADER   = "attribute vec4 position;\n\
                                      attribute vec4 inputTextureCoordinate;\n\
                                      varying vec2 textureCoordinate;\n\
@@ -75,7 +78,7 @@ public:
     }
     virtual ~GpuBaseFilter()
     {
-        LOGI("---GpuBaseFilter析构, %p",this);
+        //LOGI("---GpuBaseFilter析构, %p",this);
         if(!NO_FILTER_VERTEX_SHADER.empty()) NO_FILTER_VERTEX_SHADER.clear();
         if(!NO_FILTER_FRAGMENT_SHADER.empty()) NO_FILTER_FRAGMENT_SHADER.clear();
         mIsInitialized = false;

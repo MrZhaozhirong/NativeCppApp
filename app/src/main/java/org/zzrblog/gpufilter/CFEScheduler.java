@@ -45,6 +45,8 @@ public class CFEScheduler implements Camera.PreviewCallback, SurfaceHolder.Callb
             supportFilters.addFilter("BoxBlur(均值滤波)", FilterType.FILTER_TYPE_BOXBLUR);
             supportFilters.addFilter("GaussianBlur(高斯滤波)", FilterType.FILTER_TYPE_GAUSSIANBLUR);
             supportFilters.addFilter("BilateralBlur(双边滤波)", FilterType.FILTER_TYPE_BilateralBLUR);
+            supportFilters.addFilter("4镜像(仿抖音)", FilterType.FILTER_TYPE_DOUYIN_4IMAGE);
+            supportFilters.addFilter("电击(仿抖音)", FilterType.FILTER_TYPE_DOUYIN_SHOCK);
         }
         return supportFilters.names.toArray(new String[supportFilters.names.size()]);
     }

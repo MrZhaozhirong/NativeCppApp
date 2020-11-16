@@ -18,8 +18,11 @@
 #include "../filter/GpuGaussianBlurFilter.hpp"
 #include "../filter/GpuGaussianBlurFilter2.hpp"
 #include "../filter/GpuBilateralBlurFilter.hpp"
+#include "../filter/DouYin4ImageFilter.hpp"
+#include "../filter/DouYinElectricShockFilter.hpp"
 
-int GpuFilterRender::mStaticInputFps = 0;
+int GpuFilterRender::mInputFps = 0;
+
 
 GpuFilterRender::GpuFilterRender() {
     pthread_mutex_init(&mutex, NULL);
@@ -82,8 +85,8 @@ void GpuFilterRender::surfaceCreated(ANativeWindow *window)
     mEncoder.setMetaConfig(MIME_TYPE_H265, windowWidth, windowHeight, iFrameInterval, mDesiredFps, bitRate);
     mEncoder.encoderCreated();
 
-    //mFpsTimer.setTimer(1,0,this);
-    //mFpsTimer.startTimer();
+    mFpsTimer.setTimer(1, 0, this);
+    mFpsTimer.startTimer();
 }
 
 void GpuFilterRender::surfaceChanged(int width, int height)
@@ -111,7 +114,7 @@ void GpuFilterRender::surfaceDestroyed()
     }
     mEncoder.encoderDestroyed();
     mEncoder.stopEncode();
-    //mFpsTimer.stopTimer();
+    mFpsTimer.stopTimer();
 }
 
 void GpuFilterRender::feedVideoData(int8_t *data, int data_len, int previewWidth, int previewHeight)
@@ -353,6 +356,12 @@ void GpuFilterRender::checkFilterChange() {
             case FILTER_TYPE_BilateralBLUR:{
                 mFilter = new GpuBilateralBlurFilter();
             }break;
+            case FILTER_TYPE_DOUYIN_4IMAGE:{
+                mFilter = new DouYin4ImageFilter();
+            }break;
+            case FILTER_TYPE_DOUYIN_SHOCK:{
+                mFilter = new DouYinElectricShockFilter();
+            }break;
             default:
                 mFilter = new GpuBaseFilter();
                 break;
@@ -367,9 +376,16 @@ void GpuFilterRender::checkFilterChange() {
 void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 {
     if (mEglCore == NULL || mWindowSurface == NULL) {
-        LOGW("Skipping drawFrame after shutdown");
+        LOGW("Skipping drawFrame after shutdown.");
         return;
     }
+    // float elpased_sec = static_cast<float>(elpasedInMilliSec / 1000);
+    // if (floor(elpased_sec) > mCurrentElpasedTime) {// 测试代码
+    //     // 每秒消磨一秒，打印一次。
+    //     mCurrentElpasedTime = static_cast<int>(floor(elpased_sec));
+    //     LOGI("GpuFilterRender ElpasedInSec : %f", elpased_sec);
+    // }
+
     glViewport(0,0, mViewWidth, mViewHeight);
     pthread_mutex_lock(&mutex);
     ByteBuffer* item = mNV21Pool.get();
@@ -403,14 +419,18 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         if( mFilter!=NULL) {
             mFilter->setAdjustEffect(mFilterEffectPercent);
             mFilter->onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
+            if (mCurrentTypeId==FILTER_TYPE_DOUYIN_SHOCK)
+            {
+                ((DouYinElectricShockFilter*)mFilter)->setShockFps(mInputFps, mCurrentInputFps);
+            }
         }
         // 1s=1,000ms=1,000,000us=1,000,000,000ns
         static int64_t count = 0;
-        if(mStaticInputFps!=0) {
+        if(mInputFps!=0) {
             count++;
-            long frame_interval = 1000000000L / mStaticInputFps;
-            //long long pts = system_time_base_ns + frame_interval * count;
-            //LOGI("setPresentationTime %lld", pts);
+            long frame_interval = 1000000000L / mInputFps;
+            // long long pts = system_time_base_ns + frame_interval * count;
+            // LOGI("setPresentationTime %lld", pts);
             mWindowSurface->setPresentationTime(frame_interval);
         }
         mWindowSurface->swapBuffers();

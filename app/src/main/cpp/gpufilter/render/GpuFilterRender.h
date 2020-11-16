@@ -37,6 +37,12 @@ public:
     void feedVideoData(int8_t* data, int data_len, int previewWidth, int previewHeight);
     void setFilter(int filter_type_id);
     void adjustFilterValue(int value, int max);
+
+public:
+    int static      mInputFps;
+    int             mCurrentInputFps;
+    int             mCurrentElpasedTime = 0;
+
 private:
     EglCore*        mEglCore;
     WindowSurface*  mWindowSurface;
@@ -72,12 +78,10 @@ private:
     CodecEncoder    mEncoder;
 
     CELL::CELLTimer mFpsTimer;
-    int             mCurrentInputFps;
-    int static      mStaticInputFps;
     // CELLTimer定时器Callback，动态计算输入的NV21帧率
     virtual void handlerCallback()
     {
-        mStaticInputFps = mCurrentInputFps;
+        mInputFps = mCurrentInputFps;
         LOGI("mCurrentInputFps : %d",mCurrentInputFps);
         mCurrentInputFps = 0;
     }

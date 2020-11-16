@@ -6,15 +6,15 @@
 #define DOUYIN_4IMAGE_FILTER_HPP
 
 #include "GpuBaseFilter.hpp"
+#include "../render/GpuFilterRender.h"
 
 class DouYin4ImageFilter : public GpuBaseFilter {
 public:
-    int getTypeId() { return FILTER_TYPE_NORMAL; }
+    int getTypeId() { return FILTER_TYPE_DOUYIN_4IMAGE; }
 
     DouYin4ImageFilter()
     {
         LOGI("---DouYin4ImageFilter构造, %p", this);
-        GpuBaseFilter::GpuBaseFilter();
     }
 
     void init() {
@@ -54,19 +54,42 @@ public:
         GpuBaseFilter::onDraw(SamplerY_texId, SamplerU_texId, SamplerV_texId, positionCords, textureCords );
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
+        GpuBaseFilter::onDrawRGB(mFboTextureId, positionCords_left_top, texCoordinates_left_top);
+        GpuBaseFilter::onDrawRGB(mFboTextureId, positionCords_right_top, texCoordinates_right_top);
+        GpuBaseFilter::onDrawRGB(mFboTextureId, positionCords_left_bottom, texCoordinates_left_bottom);
+        GpuBaseFilter::onDrawRGB(mFboTextureId, positionCords_right_bottom, texCoordinates_right_bottom);
     }
 
 private:
     GLuint mFboId = 9999;
     GLuint mFboTextureId = 9999;
 
-    float texCoordinates[8] = {
+    // fbo纹理，遵循opengl的正立原则
+    float texCoordinates_left_top[8] = {
+            0.0f, 0.0f,     //左下
+            1.0f, 0.0f,     //右下
+            0.0f, 1.0f,     //左上
+            1.0f, 1.0f,     //右上
+    };
+    float texCoordinates_right_top[8] = {
+            1.0f, 0.0f,     //左下
+            0.0f, 0.0f,     //右下
+            1.0f, 1.0f,     //左上
+            0.0f, 1.0f,     //右上
+    };
+    float texCoordinates_left_bottom[8] = {
             0.0f, 1.0f,     //左下
             1.0f, 1.0f,     //右下
             0.0f, 0.0f,     //左上
             1.0f, 0.0f,     //右上
     };
+    float texCoordinates_right_bottom[8] = {
+            1.0f, 1.0f,     //左下
+            0.0f, 1.0f,     //右下
+            1.0f, 0.0f,     //左上
+            0.0f, 0.0f,     //右上
+    };
+
 
     float positionCords_left_top[8] = {
             //x, y          //position
@@ -75,7 +98,6 @@ private:
             -1.0f, 1.0f,    //左上
             0.0f, 1.0f,     //右上
     };
-
     float positionCords_right_top[8] = {
             //x, y          //position
             -0.0f, -0.0f,   //左下
@@ -83,7 +105,6 @@ private:
             -0.0f, 1.0f,    //左上
             1.0f, 1.0f,     //右上
     };
-
     float positionCords_left_bottom[8] = {
             //x, y          //position
             -1.0f, -1.0f,   //左下
@@ -91,7 +112,6 @@ private:
             -1.0f, 0.0f,    //左上
             0.0f, 0.0f,     //右上
     };
-
     float positionCords_right_bottom[8] = {
             //x, y          //position
             -0.0f, -1.0f,   //左下
