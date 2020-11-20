@@ -20,6 +20,7 @@
 #include "../filter/GpuGaussianBlurFilter2.hpp"
 #include "../filter/GpuBilateralBlurFilter.hpp"
 #include "../filter/DouYin4ImageFilter.hpp"
+#include "../filter/DouYinSouloutFilter.hpp"
 
 //#include "media/stagefright/MediaCodec.h"
 //#include "gui/Surface.h"
@@ -264,6 +265,9 @@ void CodecEncoder::encoderOnDraw(GLuint mYSamplerId, GLuint mUSamplerId, GLuint 
             }break;
             case FILTER_TYPE_DOUYIN_4IMAGE:{
                 mFilter = new DouYin4ImageFilter();
+            }break;
+            case FILTER_TYPE_DOUYIN_SOULOUT:{
+                mFilter = new DouYinSouloutFilter();
             }break;
             default:
                 mFilter = new GpuBaseFilter();

@@ -20,6 +20,7 @@
 #include "../filter/GpuBilateralBlurFilter.hpp"
 #include "../filter/DouYin4ImageFilter.hpp"
 #include "../filter/DouYinElectricShockFilter.hpp"
+#include "../filter/DouYinSouloutFilter.hpp"
 
 int GpuFilterRender::mInputFps = 0;
 
@@ -280,29 +281,6 @@ void GpuFilterRender::generateFrameTextureCords(int rotation, bool flipHorizonta
 void GpuFilterRender::setFilter(int filter_type_id) {
     mRequestTypeId = filter_type_id;
     // 在 checkFilterChange 方法更新mFilterTypeId
-    // if(mCurrentTypeId!=mRequestTypeId) {
-    //     /*mFilter->destroy(); 非GL线程，不执行GL语句，所以此部分代码移至checkFilterChange*/
-    //     delete mFilter;
-    //     mFilter = NULL;
-    //     switch (mRequestTypeId)
-    //     {
-    //         case FILTER_TYPE_NORMAL: {
-    //             mFilter = new GpuBaseFilter();
-    //         }break;
-    //         case FILTER_TYPE_CONTRAST:{
-    //             mFilter = new GpuContrastFilter();
-    //         }break;
-    //         case FILTER_TYPE_COLOR_INVERT:{
-    //             mFilter = new GpuColorInvertFilter();
-    //         }break;
-    //         case FILTER_TYPE_PIXELATION:{
-    //             mFilter = new GpuPixelationFilter();
-    //         }break;
-    //         default:
-    //             mFilter = new GpuBaseFilter();
-    //             break;
-    //     }
-    // }
     mEncoder.setFilter(filter_type_id);
 }
 void GpuFilterRender::adjustFilterValue(int value, int max) {
@@ -362,6 +340,9 @@ void GpuFilterRender::checkFilterChange() {
             case FILTER_TYPE_DOUYIN_SHOCK:{
                 mFilter = new DouYinElectricShockFilter();
             }break;
+            case FILTER_TYPE_DOUYIN_SOULOUT:{
+                mFilter = new DouYinSouloutFilter();
+            }break;
             default:
                 mFilter = new GpuBaseFilter();
                 break;
@@ -371,6 +352,16 @@ void GpuFilterRender::checkFilterChange() {
             mFilter->onOutputSizeChanged(mViewWidth, mViewHeight);
             mCurrentTypeId = mRequestTypeId;
         }
+    }
+}
+void GpuFilterRender::thirdFilterEffect()
+{
+    if (mCurrentTypeId==FILTER_TYPE_DOUYIN_SHOCK) {
+        ((DouYinElectricShockFilter*)mFilter)->setShockFps(mInputFps, mCurrentInputFps);
+    }
+    if (mCurrentTypeId==FILTER_TYPE_DOUYIN_SOULOUT) {
+        ((DouYinSouloutFilter*)mFilter)->setInputFps(mInputFps);
+        ((DouYinSouloutFilter*)mFilter)->setCurrentFps(mCurrentInputFps);
     }
 }
 void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
@@ -412,17 +403,16 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
         pthread_mutex_unlock(&mutex);//#赶紧解锁
         // 画面渲染
         mWindowSurface->makeCurrent();
+        checkFilterChange();
+
         yTextureId = updateTexture(dst_y, yTextureId, mFrameWidth, mFrameHeight);
         uTextureId = updateTexture(dst_u, uTextureId, mFrameWidth/2, mFrameHeight/2);
         vTextureId = updateTexture(dst_v, vTextureId, mFrameWidth/2, mFrameHeight/2);
-        checkFilterChange();
+
         if( mFilter!=NULL) {
             mFilter->setAdjustEffect(mFilterEffectPercent);
             mFilter->onDraw(yTextureId, uTextureId, vTextureId, positionCords, textureCords);
-            if (mCurrentTypeId==FILTER_TYPE_DOUYIN_SHOCK)
-            {
-                ((DouYinElectricShockFilter*)mFilter)->setShockFps(mInputFps, mCurrentInputFps);
-            }
+            thirdFilterEffect();
         }
         // 1s=1,000ms=1,000,000us=1,000,000,000ns
         static int64_t count = 0;

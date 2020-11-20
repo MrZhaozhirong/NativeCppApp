@@ -94,6 +94,7 @@ private:
 
     GLuint  updateTexture(int8_t* src, int texId, int width, int height);
     void    checkFilterChange();
+    void    thirdFilterEffect();
 
     __inline float flip(float value)
     {

@@ -55,6 +55,16 @@ public:
     void init() {
         GpuBaseFilter::init(NO_FILTER_VERTEX_SHADER.c_str(), SHOCK_FRAGMENT_SHADER.c_str());
         mShockLocation = glGetUniformLocation(mGLProgId, "is_shock");
+
+        //LOGI("mGLProgId=%d", mGLProgId);
+        //LOGI("mGLAttribPosition=%d", mGLAttribPosition);
+        //LOGI("mGLAttribTextureCoordinate=%d", mGLAttribTextureCoordinate);
+        //LOGI("mDrawModeLocation=%d", mDrawModeLocation);
+        //LOGI("mGLUniformSampleRGB=%d", mGLUniformSampleRGB);
+        //LOGI("mGLUniformSampleY=%d", mGLUniformSampleY);
+        //LOGI("mGLUniformSampleU=%d", mGLUniformSampleU);
+        //LOGI("mGLUniformSampleV=%d", mGLUniformSampleV);
+        //LOGI("mShockLocation=%d", mShockLocation);
     }
 
 
@@ -80,11 +90,7 @@ public:
             mShock = 0;
         } else {
             int halfInputFps = mInputFps/2;
-            if (mCurrentFps==halfInputFps
-                ||mCurrentFps==halfInputFps+1
-                ||mCurrentFps==halfInputFps+2
-                ||mCurrentFps==halfInputFps+3
-                ||mCurrentFps==halfInputFps+4)
+            if (mCurrentFps > halfInputFps)
             {
                 mShock = 1;
             }
@@ -106,9 +112,9 @@ public:
             glBindTexture(GL_TEXTURE_2D, SamplerV_texId);
             glUniform1i(mGLUniformSampleV, 2);
         } else {
-            glActiveTexture(GL_TEXTURE0);
-            glActiveTexture(GL_TEXTURE1);
-            glActiveTexture(GL_TEXTURE2);
+            //glActiveTexture(GL_TEXTURE0);
+            //glActiveTexture(GL_TEXTURE1);
+            //glActiveTexture(GL_TEXTURE2);
         }
         // onDrawArraysPre();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

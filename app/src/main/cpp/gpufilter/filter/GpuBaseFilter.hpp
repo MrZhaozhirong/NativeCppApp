@@ -24,6 +24,7 @@
 
 #define FILTER_TYPE_DOUYIN_4IMAGE   0x2000
 #define FILTER_TYPE_DOUYIN_SHOCK    0x2001
+#define FILTER_TYPE_DOUYIN_SOULOUT  0x2002
 
 /**
  * Filter基础类，支持YUV / RGB渲染模式。
