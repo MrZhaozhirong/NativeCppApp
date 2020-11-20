@@ -56,7 +56,7 @@ public:
                                       {\n\
                                           vec4 normalColor = vec4(yuv2rgb(textureCoordinate), 1.0);\n\
                                           vec4 soulColor = texture2D(textureSoul, soulCoordinate);\n\
-                                          gl_FragColor = mix(normalColor, soulColor, 0.3);\n\
+                                          gl_FragColor = mix(normalColor, soulColor, 0.35);\n\
                                       }\n\
                                    }";
     }
