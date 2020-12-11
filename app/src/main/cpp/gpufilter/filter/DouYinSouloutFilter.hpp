@@ -115,10 +115,12 @@ public:
             mMixFlag = 0;
         } else {
             int halfInputFps = mInputFps/2;
-            if (mCurrentFps==halfInputFps
-                || mCurrentFps==halfInputFps+1
-                || mCurrentFps==halfInputFps+2
-                || mCurrentFps==halfInputFps+3)
+            if (mCurrentFps>halfInputFps+0)
+            //    || mCurrentFps==halfInputFps+1
+            //    || mCurrentFps==halfInputFps+2
+            //    || mCurrentFps==halfInputFps+3
+            //    || mCurrentFps==halfInputFps+4
+            //    || mCurrentFps==halfInputFps+5)
             {
                 mMixFlag = 1;
             }
@@ -136,7 +138,6 @@ public:
         }
 
         glUseProgram(mGLProgId);
-        glUniform1i(mDrawModeLocation, 1);
         // runPendingOnDrawTasks();
         glVertexAttribPointer(mGLAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, positionCords); // positionCords
         glEnableVertexAttribArray(mGLAttribPosition);
@@ -194,10 +195,10 @@ private:
     };
 
     float soul_texCoordinates[8] = {
-            0.0f, 0.0f,     //左下
-            1.0f, 0.0f,     //右下
-            0.0f, 1.0f,     //左上
-            1.0f, 1.0f,     //右上
+            0.1f, 0.1f,     //左下
+            0.9f, 0.1f,     //右下
+            0.1f, 0.9f,     //左上
+            0.9f, 0.9f,     //右上
     };
 };
 #endif // DOUYIN_SOULOUT_FILTER_HPP
