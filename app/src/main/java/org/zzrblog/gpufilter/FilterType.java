@@ -24,6 +24,8 @@ public class FilterType {
 
     static final int FILTER_TYPE_DOUYIN_4IMAGE = 0x2000;
     static final int FILTER_TYPE_DOUYIN_SHOCK = 0x2001;
+    static final int FILTER_TYPE_DOUYIN_SOULOUT = 0x2002;
+
 
     public List<String> names = new LinkedList<String>();
     public List<Integer> filters = new LinkedList<Integer>();
