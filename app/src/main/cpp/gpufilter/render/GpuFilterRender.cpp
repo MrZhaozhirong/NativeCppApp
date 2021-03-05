@@ -430,16 +430,18 @@ void GpuFilterRender::renderOnDraw(double elpasedInMilliSec)
 }
 GLuint GpuFilterRender::updateTexture(int8_t *src, int texId, int width, int height)
 {
+    // https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/#_3
     GLuint mTextureID;
     if( texId == -1) {
         glGenTextures(1, &mTextureID);
         glBindTexture(GL_TEXTURE_2D, mTextureID);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height,
                      0, GL_LUMINANCE, GL_UNSIGNED_BYTE, src);
+        glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         glBindTexture(GL_TEXTURE_2D, texId);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,

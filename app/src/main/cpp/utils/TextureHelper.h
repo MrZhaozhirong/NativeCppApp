@@ -11,7 +11,7 @@ class TextureHelper {
 
 public:
     static GLuint createTextureFromImage(const char* fileName);
-
+    static GLuint createTextureFromPBO(const char* fileName);
 
 };
 
